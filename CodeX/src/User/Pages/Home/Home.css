@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+  }
+
+.letter {
+    font-size: 20.7rem; /* Adjusted size */
+    font-weight: bold;
+    color: rgb(0, 0, 0);
+    overflow: hidden;
+    margin-left: 55px;
+    
+    text-shadow: 
+        -5px -5px 0 rgb(255, 255, 255),  
+         5px -5px 0  rgb(0, 26, 255),  
+        -5px  5px 0  rgb(255, 255, 255),  
+         5px  5px 0  rgb(0, 26, 255);
+    transition: text-shadow 0.2s ease-in-out, transform 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+.letter:hover {
+    font-size: 20.7rem; /* Adjusted size */
+    font-weight: bold;
+    color: rgb(0, 0, 0);
+    text-shadow: 
+        -5px -5px 0 rgb(13, 0, 255),  
+         5px -5px 0  rgb(255, 255, 255),  
+        -5px  5px 0  rgb(0, 21, 255),  
+         5px  5px 0  rgb(255, 255, 255);
+    transition: text-shadow 0.2s ease-in-out, transform 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+/* <div className="flex justify-center items-center h-screen">
+        <div className="text-center">
+          <h1 className="text-white font-mono font-extrabold text-9xl text-blue-500">
+            {['C', 'O', 'D', 'E', 'X'].map((char, index) => (
+              <span key={index} className="letter">
+                {char}
+              </span>
+            ))}
+          </h1>
+         
+        </div>
+      </div> */
