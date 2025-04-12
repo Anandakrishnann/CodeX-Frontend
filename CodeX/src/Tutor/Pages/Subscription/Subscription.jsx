@@ -1,8 +1,35 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import BackgroundAnimation from '../../../Component/BackgroundAnimation'
 import Navbar from '../Navbar/Navbar'
+import { adminAxios } from '../../../../axiosConfig'
+import { toast } from 'react-toastify'
 
 const Subscription = () => {
+  const [plan, setPlan] = useState([])
+  console.log(plan);
+  
+  const handleSubscribe = async (id) => {
+    try{
+      const response = await adminAxios.post(`create-checkout-session/${id}/`)
+      toast.success("Subscription Request Sended")
+      window.location.href = response.data.checkout_url;
+    }catch(e){
+      toast.error("Error While Subscription")
+    }
+  }
+
+  useEffect(() => {
+        const fetchPlans = async () => {
+          try {
+              const response = await adminAxios.get("list_plan/");
+              setPlan(response.data); 
+          } catch (e) {
+            toast.error("Error When Fetching Data");
+          }
+        };
+        fetchPlans();
+      }, []);
+
   return (
     <>
         <Navbar/>
@@ -13,45 +40,42 @@ const Subscription = () => {
   <div className="flex-grow flex items-center justify-center p-8">
     <div className="max-w-4xl w-full">
       {/* Step 3: Select Plan */}
-      <div className="text-center mt-20">
+      <div className="text-center mt-10">
         <h2 className="text-5xl font-bold text-green-400 mb-8">Choose Your Plan</h2>
         <div className="grid grid-cols-3 gap-6">
-          <div className="p-6 rounded-lg cursor-pointer transition transform hover:scale-105 border-2 border-gray-700 bg-gray-800 hover:border-green-400 bg-opacity-20" style={{height: "400px"}}>
-            <h3 className="text-xl font-bold">Basic</h3>
-            <p className="text-gray-400 my-2">Basic features for personal use</p>
-            <div className="text-3xl font-bold">
-              $10/<span className="text-sm text-gray-400">month</span>
+          {plan && plan.map((data, index) => (
+            <div
+            className="relative p-6 rounded-2xl cursor-pointer transition transform hover:scale-105 border border-green-700 bg-gray-800/60 backdrop-blur-md shadow-xl flex flex-col"
+            style={{ height: "500px" }}
+            key={index}
+          >
+            {/* Plan Name */}
+            <h3 className="text-2xl font-extrabold text-green-400 mb-1 mt-2">{data.name}</h3>
+          
+            {/* Plan Category Badge */}
+            <span className="inline-block mb-2 mt-2 px-3 py-1 bg-green-600/20 text-green-300 text-lg font-semibold rounded-full uppercase tracking-wide">
+              {data.plan_category}
+            </span>
+          
+            {/* Description */}
+            <p className="text-gray-300 text-sm mb-4 mt-5 flex-grow">{data.description}</p>
+          
+            {/* Price */}
+            <div className="text-3xl font-bold text-white mb-4">
+              ₹{data.price}
+              <span className="text-sm text-gray-400 ml-1">/{data.plan_type.toLowerCase()}</span>
             </div>
-            <div className="mt-6 flex justify-center">
-            <button className="bg-green-500 w-full hover:bg-green-600 px-3 py-1 rounded text-white font-medium transition text-sm" style={{marginTop:"170px"}}>
+          
+            {/* Subscribe Button */}
+            <div className="w-full">
+              <button className="w-full bg-gradient-to-r bg-green-500 hover:bg-white hover:text-black px-4 py-2 rounded-lg text-white font-semibold transition-all" onClick={() => handleSubscribe(data.id)}>
                 Subscribe
-            </button>
+              </button>
             </div>
           </div>
-          <div className="p-6 rounded-lg cursor-pointer transition transform hover:scale-105 border-2 border-gray-700 hover:border-green-400 bg-opacity-20">
-            <h3 className="text-xl font-bold">Medium</h3>
-            <p className="text-gray-400 my-2">All features for professionals</p>
-            <div className="text-3xl font-bold">
-              $30/<span className="text-sm text-gray-400">month</span>
-            </div>
-            <div className="mt-6 flex justify-center">
-            <button className="bg-green-500 w-full hover:bg-green-600 px-3 py-1 rounded text-white font-medium transition text-sm" style={{marginTop:"170px"}}>
-                Subscribe
-            </button>
-            </div>
-          </div>
-          <div className="p-6 rounded-lg cursor-pointer transition transform hover:scale-105 border-2 border-gray-700 bg-green-500 hover:border-green-400 bg-opacity-20">
-            <h3 className="text-xl font-bold">Pro</h3>
-            <p className="text-gray-400 my-2">Custom solutions for teams</p>
-            <div className="text-3xl font-bold">
-              $99/<span className="text-sm text-gray-400">month</span>
-            </div>
-            <div className="mt-6 flex justify-center">
-            <button className="bg-green-500 w-full hover:bg-green-600 px-3 py-1 rounded text-white font-medium transition text-sm" style={{marginTop:"170px"}}>
-                Subscribe
-            </button>
-            </div>
-          </div>
+          
+          ))}
+          
         </div>
         
       </div>

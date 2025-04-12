@@ -1,19 +1,24 @@
 import React,{useState, useEffect, useDebugValue} from 'react'
-import Sidebar from '../Sidebar/Sidebar'
-import Navbar from '../Navbar/Navbar'
 import { useSelector } from 'react-redux';
 import { userAxios } from '../../../../../axiosConfig';
 import BackgroundAnimation from '../../../../Component/BackgroundAnimation';
 import EditNoteIcon from '@mui/icons-material/EditNote';
 import { toast } from 'sonner';
+import Layout from '../Layout/Layout';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import { MdEdit } from 'react-icons/md';
+import { LuActivity } from "react-icons/lu";
+import ProfilePictureModal from '../../../../Component/ProfilePictureModal/ProfilePictureModal';
 
 const UserProfile = () => {
-  const [activeItem, setActiveItem] = useState("Profile");
   const [userData, setUserData] = useState(null)
   const [isModalOpen, setIsModalOpen] = useState(false);
   const user = useSelector((state) => state.user.user);
   const [selectedUser, setSelectedUser] = useState(null)
-  const [errors, setErrors] = useState({})
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [picture, setPicture] = useState(null);
+  const [newImage, setNewImage] = useState(null)
+  const [selectedFile, setSelectedFile] = useState(null);
   const [edited, setEdit] = useState({
     first_name: "",
     last_name: "",
@@ -22,6 +27,8 @@ const UserProfile = () => {
     leetcode_id:""
   })
   console.log(selectedUser);
+  console.log("new Image", newImage);
+  console.log("new picture", picture);
   
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -40,6 +47,78 @@ const UserProfile = () => {
     setSelectedUser(null)
     setIsModalOpen(false)
   }
+
+  const handleProfileClick = () => {
+    setIsProfileModalOpen(true);
+  };
+
+
+  const uploadToCloudinary = async (file, folder, resourceType = "auto") => {
+      if (!file) {
+        toast.error(`No ${folder} file selected!`);
+        return null;
+      }
+    
+      const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+      const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+    
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", uploadPreset);
+      formData.append("resource_type", resourceType);
+    
+      try {
+        const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/upload`, {
+          method: "POST",
+          body: formData,
+        });
+    
+        const data = await response.json();
+    
+        if (data.secure_url) {
+          toast.success(`${folder} uploaded successfully!`);
+          return data.secure_url; // ✅ Use public URL
+        } else {
+          throw new Error("Upload failed");
+        }
+      } catch (error) {
+        console.error(`Cloudinary ${folder} Upload Error:`, error);
+        toast.error(`Failed to upload ${folder}`);
+        return null;
+      }
+  };
+
+
+  const handleProfilePicture = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setNewImage(URL.createObjectURL(file)); // this one is used for preview
+      setSelectedFile(file); // create a second state just for actual file upload
+    }
+  };
+  
+  
+
+  const handleProfilePictureSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (selectedFile) {
+        const profilePictureUrl = await uploadToCloudinary(selectedFile, "profile_picture", "image");
+        const response = await userAxios.post(`profile_picture/${userData.email}/`, {
+          profilePictureUrl: profilePictureUrl,
+        });
+        setPicture(response.data);
+        setNewImage(null);
+        setSelectedFile(null);
+        setIsProfileModalOpen(false)
+        toast.success("Profile Picture added Successfully");
+      }
+    } catch (error) {
+      toast.error("Failed to upload image");
+    }
+  };
+  
+
 
   const validate = (data) => {
       let tempErrors = {}
@@ -76,7 +155,6 @@ const UserProfile = () => {
         toast.error('Phone number is invalid')
       }
   
-      setErrors(tempErrors)
       return Object.keys(tempErrors).length === 0
     }
 
@@ -125,23 +203,40 @@ const UserProfile = () => {
     if (user) {
       fetchUserUser();
     }
-  }, []);
+  }, [picture]);
   
 
+  const activityData = [
+    [0, 1, 0, 1, 1, 1, 1],
+    [1, 1, 0, 1, 1, 1, 1],
+    [0, 1, 0, 1, 1, 1, 1],
+    [1, 1, 0, 0, 0, 0, 0],
+  ]; // 0 = inactive, 1 = active
+  
+  const getDate = (row, col) => {
+    const base = new Date(2025, 3, 6); // April 6, 2025 (Sunday of 1st row)
+    const dayOffset = row * 7 + col;
+    const date = new Date(base);
+    date.setDate(base.getDate() + dayOffset);
+    return date.toLocaleDateString("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
+
+
   return (
-    <div className="flex h-screen">
-      <Sidebar activeItem={activeItem} setActiveItem={setActiveItem} />
-      <div className="flex-1 flex flex-col">
-        <Navbar />
-        <BackgroundAnimation />
+    <Layout page={"Profile"}>
+      <BackgroundAnimation />
         <div className="flex flex-col font-serif md:flex-row items-start justify-center min-h-screen bg-black text-black p-6 relative z-10">
           <div className="bg-white shadow-lg rounded-lg p-8 w-full md:w-2/3">
             <div className="flex justify-between items-center">
               <h1 className="text-3xl font-bold font-serif">Profile</h1>
               
-              <button className="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2" onClick={handleOpenModal}>
+              <button className="bg-black text-white px-4 py-2 rounded-lg flex items-center space-x-2" onClick={handleOpenModal}>
                 <EditNoteIcon />
-                <span className="font-semibold">Edit Profile</span>
+                <span className="font-semibold ">Edit Profile</span>
               </button>
             </div>
 
@@ -167,20 +262,88 @@ const UserProfile = () => {
           <div className="bg-white shadow-lg rounded-lg p-8 w-full md:w-1/3 mt-6 md:mt-0 md:ml-6 text-center">
             {userData ? (
               <>
-                <img src={userData.profile_picture || "https://i.pinimg.com/736x/de/0a/47/de0a470a4617bb6272ad32dea7c497ce.jpg"} alt="Profile" className="w-32 h-32 mx-auto rounded-full object-cover border-4 border-white shadow-lg -mt-16" />
+                <div className="relative w-32 h-32 mx-auto">
+                  <img
+                    src={userData.profile_picture || "https://i.pinimg.com/736x/de/0a/47/de0a470a4617bb6272ad32dea7c497ce.jpg"}
+                    alt="Profile"
+                    className="w-32 h-32 mx-auto rounded-full object-cover border-4 border-white shadow-lg -mt-16"
+                  />
+                  <button
+                    className="absolute bottom-0 right-0 bg-black text-white p-1.5 rounded-full border-2 border-white shadow-md hover:bg-gray-800"
+                    title="Edit Profile Picture"
+                    onClick={() => handleProfileClick(userData.profile_picture)}
+                  >
+                    <MdEdit />
+                  </button>
+                </div>
                 <h2 className="mt-4 text-2xl font-bold">{userData.first_name} {userData.last_name}</h2>
                 <p className="text-gray-600 font-semibold">{userData.email}</p>
-                <button className="mt-4 bg-green-600 text-white px-4 py-2 rounded-lg flex items-center mx-auto space-x-2" >
-                  <EditNoteIcon />
-                  <span className="font-semibold">Edit Profile</span>
-                </button>
+                <p className="text-gray-600 font-semibold">{userData.phone}</p>
+                
+                <div className="flex justify-between mb-6 mt-3">
+                                <div className="text-center">
+                                <p className="text-xl text-white rounded-md p-2 bg-black">Courses</p>
+
+                                    <p className="text-2xl font-bold text-gray-800">2</p>
+                                </div>
+                                <div className="text-center">
+                                <p className="text-xl text-white rounded-md p-2 bg-black">In Progress</p>
+
+                                    <p className="text-2xl font-bold text-gray-800">1</p>
+                                </div>
+                                <div className="text-center">
+                                <p className="text-xl text-white rounded-md p-2 bg-black">Completed</p>
+
+                                    <p className="text-2xl font-bold text-gray-800">1</p>
+                                </div>
+                                </div> 
+                                <div className="bg-black text-white p-4 rounded-xl shadow-lg w-fit">
+            <h2 className="text-lg font-semibold flex items-center gap-2 mb-4">
+              <LuActivity className="text-green-500" />
+              Monthly Activity
+            </h2>
+
+              <div className="grid grid-cols-7 gap-2">
+                {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+                  <div key={day} className="text-xs text-center text-gray-400">
+                    {day}
+                  </div>
+                ))}
+
+                {activityData.flatMap((week, rowIndex) =>
+                  week.map((value, colIndex) => (
+                    <div
+                      key={`${rowIndex}-${colIndex}`}
+                      className={`w-6 h-6 rounded-full ${
+                        value
+                          ? "bg-green-500 hover:scale-110"
+                          : "bg-red-500 hover:scale-110"
+                      } transition-transform duration-200 relative group cursor-pointer`}
+                    >
+                      <div className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 hidden group-hover:block bg-white text-black text-xs rounded px-2 py-1 whitespace-nowrap z-10 shadow-lg">
+                        {getDate(rowIndex, colIndex)} <br />
+                        {Math.floor(Math.random() * 6) + 1} contributions
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+        <div className="flex justify-center gap-4 mt-4 text-sm">
+          <div className="flex items-center gap-2">
+            <span className="w-3 h-3 bg-red-500 rounded-full"></span> Inactive
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-3 h-3 bg-green-500 rounded-full"></span> Active
+          </div>
+        </div>
+      </div>
               </>
             ) : (
               <p>Loading...</p>
             )}
           </div>
         </div>
-      </div>
       {isModalOpen && (
           <div className="fixed inset-0 font-serif bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md relative" style={{height:"420px"}}>
@@ -214,8 +377,14 @@ const UserProfile = () => {
             </div>
           </div>
         )}
-
-    </div>
+        <ProfilePictureModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+        picture={newImage || userData.profile_picture}
+        onImageChange={handleProfilePicture}
+        onSave={handleProfilePictureSubmit}
+      />
+    </Layout>
   )
 }
 

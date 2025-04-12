@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import EditIcon from "@mui/icons-material/Edit";
 import TaskAltIcon from "@mui/icons-material/TaskAlt";
 import CancelIcon from "@mui/icons-material/Cancel";
 import RestoreFromTrashIcon from "@mui/icons-material/RestoreFromTrash";
@@ -28,10 +27,10 @@ const Table = ({ datas, fucntions, columns, name }) => {
   };
 
   return (
-    <div className="col-span-3 grid grid-rows-3 gap-2 ">
-      <div className="row-span-1 bg-black p-4 rounded-lg">
-        <h2 className="text-4xl font-extrabold mb-6">{name}</h2>
-        <div className="overflow-x-auto bg-white rounded-lg shadow-lg">
+    <div className="grid">
+      <div className="row-span-1 bg-black p-2 rounded-lg">
+        <h2 className="text-4xl font-extrabold mb-6 bg-black w-full mt-0" >{name}</h2>
+        <div className="overflow-x-auto bg-white rounded-lg shadow-lg ">
           <table className="min-w-full border-collapse border border-gray-300">
             {/* Dynamic Table Header */}
             <thead className="bg-gray-100">

@@ -4,22 +4,15 @@ import Navbar from "./Navbar/Navbar";
 import { useSelector } from "react-redux";
 import WhatshotIcon from '@mui/icons-material/Whatshot';
 import BackgroundAnimation from "../../../Component/BackgroundAnimation";
+import Layout from "./Layout/Layout";
 
 
 const UserDashboard = () => {
-  const [activeItem, setActiveItem] = useState("Home");
   const user = useSelector((state) => state.user.user)
 
   return (
-    <div className="flex h-screen">
-      {/* Sidebar */}
-      <Sidebar activeItem={activeItem} setActiveItem={setActiveItem} />
-
-      {/* Main Dashboard Area */}
-      <div className="flex-1 flex flex-col">
-        {/* Navbar */}
-        <Navbar />
-        <BackgroundAnimation/>
+    <Layout page={"Home"}>
+       <BackgroundAnimation/>
         <div className="flex items-center justify-end mr-9 mt-9 mb-7 relative z-10">
                   <h1 style={{color: "red", borderColor: "red"}} className="text-3xl font-extrabold border-4 border-double rounded-full text-orange-500 animate-pulse drop-shadow-[0_0_10px_#ff4500] p-3">
                     Streak {user.streak}
@@ -52,8 +45,7 @@ const UserDashboard = () => {
             </ul>
           </div>
         </div>
-      </div>
-    </div>
+    </Layout>
   );
 };
 

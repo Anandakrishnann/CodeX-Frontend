@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 import BackgroundAnimation from "../../../../Component/BackgroundAnimation";
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import SchoolIcon from '@mui/icons-material/School';
-import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
 
 const Sidebar = ({ activeItem, setActiveItem }) => {
@@ -19,7 +18,7 @@ const Sidebar = ({ activeItem, setActiveItem }) => {
       <BackgroundAnimation />
 
       <div className="flex items-center justify-between relative z-10">
-        <h2 className={`text-4xl font-extrabold transition-all text-green-500 ${open ? "block" : "hidden"}`}>Dashboard</h2>
+        <h2 className={`text-4xl font-extrabold transition-all text-white ${open ? "block" : "hidden"}`}>Dashboard</h2>
         <button className="p-4 rounded-lg hover:bg-gray-800" onClick={() => setOpen(!open)}>☰</button>
       </div>
       <nav className="mt-6 relative z-10">
@@ -56,6 +55,7 @@ const Sidebar = ({ activeItem, setActiveItem }) => {
       open={open} 
       activeItem={activeItem} 
       setActiveItem={setActiveItem} 
+      onClick={() => navigate("/tutor-course")}
       className="text-white hover:text-black hover:bg-white transition duration-200 px-4 py-2 rounded-md"
     />
     <SidebarItem 

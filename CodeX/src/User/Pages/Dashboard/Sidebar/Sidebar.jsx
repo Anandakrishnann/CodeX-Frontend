@@ -73,7 +73,7 @@ const Sidebar = ({ activeItem, setActiveItem }) => {
       open={open} 
       activeItem={activeItem} 
       setActiveItem={setActiveItem} 
-      onClick={() => navigate("/tutor")}
+      onClick={() => navigate("/")}
       className="text-white hover:text-black hover:bg-white transition duration-200 px-4 py-2 rounded-md"
     />
     <SidebarItem 

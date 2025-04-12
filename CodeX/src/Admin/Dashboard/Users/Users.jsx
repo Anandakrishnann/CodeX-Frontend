@@ -5,6 +5,7 @@ import { adminAxios } from "../../../../axiosConfig.js";
 import { toast } from "react-toastify";
 import Table from "../../Components/Table/Table.jsx";
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import Layout from "../Layout/Layout";
 
 const Users = () => {
   const [users, setUsers] = useState([]);
@@ -44,14 +45,9 @@ const Users = () => {
   const columns = ["ID", "First Name", "Last Name", "Email", "Leetcode ID", "Phone", "Status", "Actions"];
 
   return (
-    <div className="min-h-screen bg-black text-white p-6 font-sans">
-      <Navbar />
-      <div className="grid grid-cols-4 gap-6 w-full">
-        <Sidebar />
-        <Table datas={users} fucntions={toggle_status} columns={columns} name={"Users"}/>
-        
-      </div>
-    </div>
+    <Layout>
+      <Table datas={users} fucntions={toggle_status} columns={columns} name={"Users"}/>
+    </Layout>
   );
 };
 

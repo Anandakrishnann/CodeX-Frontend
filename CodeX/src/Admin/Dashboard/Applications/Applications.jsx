@@ -1,12 +1,11 @@
 import React, { useEffect, useState, version } from "react";
-import Navbar from "../Navbar/Navbar";
-import Sidebar from "../Sidebar/Sidebar.jsx";
 import { adminAxios } from "../../../../axiosConfig.js";
 import TaskAltIcon from "@mui/icons-material/TaskAlt";
 import CancelIcon from "@mui/icons-material/Cancel";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { Link, useNavigate } from "react-router-dom"; 
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import Layout from "../Layout/Layout";
 
 const Applications = () => {
   const [applications, setApplications] = useState([]);
@@ -30,11 +29,8 @@ const Applications = () => {
   const columns = ["ID", "Name", "Email", "Phone", "Status", "Actions"];
 
   return (
-    <div className="min-h-screen bg-black text-white p-6 font-sans">
-      <Navbar />
-      <div className="grid grid-cols-4 gap-6 w-full">
-        <Sidebar />
-        <div className="col-span-3 grid grid-rows-3 gap-2">
+    <Layout>
+      <div className="gridgap-2">
           <div className="row-span-1 bg-black p-4 rounded-lg">
             <h2 className="text-4xl font-extrabold mb-6">Applications</h2>
             <div className="overflow-x-auto bg-white rounded-lg shadow-lg">
@@ -78,7 +74,7 @@ const Applications = () => {
                             <span className="px-3 py-1 pb-2 text-white bg-yellow-500 rounded-full">
                               <AccessTimeIcon />
                             </span>
-                          ) : application.status === "accepted" ? (
+                          ) : application.status === "verified" ? (
                             <span className="px-3 py-1 pb-2 text-white bg-green-500 rounded-full">
                               <TaskAltIcon />
                             </span>
@@ -137,8 +133,7 @@ const Applications = () => {
             </div>
           </div>
         </div>
-      </div>
-    </div>
+    </Layout>
   );
 };
 

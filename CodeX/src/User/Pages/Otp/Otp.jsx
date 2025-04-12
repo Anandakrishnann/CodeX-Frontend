@@ -1,38 +1,45 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { otpTime } from "../../../redux/slices/userSlice";
+import { otpTime, setOtpTime } from "../../../redux/slices/userSlice";
 import { userAxios } from "../../../../axiosConfig";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import BackgroundAnimation from "../../../Component/BackgroundAnimation";
 
 const OTPVerification = () => {
-  const [otp, setOtp] = useState('');
+  const [otp, setOtp] = useState(null);
   const [email, setEmail] = useState('');
   const [expired, setExpired] = useState(false);
   const seconds = useSelector((state) => state.user.second);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // ⏳ Set initial timer value from localStorage or default
-  useEffect(() => {
-    setEmail(localStorage.getItem("userEmail"));
 
-    const expireAt = localStorage.getItem("otpExpireTime");
-    if (expireAt) {
-      const remaining = Math.floor((+expireAt - Date.now()) / 1000);
-      if (remaining > 0) {
-        dispatch(otpTime(remaining));
-      } else {
-        dispatch(otpTime(0));
-        setExpired(true);
-      }
+  useEffect(() => {
+    const emailFromStorage = localStorage.getItem("userEmail");
+    setEmail(emailFromStorage);
+  
+    let expireAt = localStorage.getItem("otpExpireTime");
+  
+  
+    if (!expireAt) {
+      const newExpireAt = Date.now() + 120 * 1000;
+      localStorage.setItem("otpExpireTime", newExpireAt.toString());
+      expireAt = newExpireAt;
+    }
+  
+    const remaining = Math.floor((+expireAt - Date.now()) / 1000);
+    if (remaining > 0) {
+      dispatch(otpTime(remaining));
+      setExpired(false);
     } else {
-      dispatch(otpTime(0)); // If no time stored, default to 0
+      dispatch(otpTime(0));
+      setExpired(true);
     }
   }, [dispatch]);
+  
 
-  // ⏲ Countdown Logic
+  // ✅ Countdown timer
   useEffect(() => {
     if (seconds <= 0) {
       setExpired(true);
@@ -46,16 +53,16 @@ const OTPVerification = () => {
     return () => clearInterval(timer);
   }, [seconds, dispatch]);
 
-  // 🔁 Resend OTP
+  // ✅ Resend OTP
   const handleResend = async (e) => {
     e.preventDefault();
     try {
       const response = await userAxios.post("resend_otp/", { email });
       toast.success(response.data.message || "OTP has been resent!");
 
-      const expireAt = Date.now() + 120 * 1000; // 2 min from now
+      const expireAt = Date.now() + 120 * 1000;
       localStorage.setItem("otpExpireTime", expireAt.toString());
-      dispatch(otpTime(120));
+      dispatch(setOtpTime()); // reset to 120
       setExpired(false);
     } catch (error) {
       console.error("Error:", error);
@@ -63,7 +70,7 @@ const OTPVerification = () => {
     }
   };
 
-  // ✅ Verify OTP
+  // ✅ Submit OTP
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -73,6 +80,7 @@ const OTPVerification = () => {
       localStorage.removeItem("otpExpireTime");
       setOtp('');
       setExpired(false);
+      dispatch(setOtpTime());
       navigate("/login");
     } catch (error) {
       console.error("Error:", error);
@@ -83,7 +91,7 @@ const OTPVerification = () => {
   return (
     <div className="min-h-screen w-full flex items-center justify-center p-4 relative overflow-hidden">
       <BackgroundAnimation />
-      <div className="p-8 rounded-xl shadow-2xl w-full max-w-md relative z-10 border-2 border-green-500 ">
+      <div className="p-8 rounded-xl shadow-2xl w-full max-w-md relative z-10 border-2 border-green-500">
         <h2 className="text-white text-4xl font-extrabold text-center mb-4">
           Enter Your <span className="text-green-500">OTP</span>
         </h2>
@@ -103,9 +111,8 @@ const OTPVerification = () => {
               style={{ width: "600px" }}
             />
           </div>
-
           <div className="flex gap-4 justify-center">
-            {expired ? (
+            {expired === true ? (
               <button
                 type="button"
                 onClick={handleResend}

@@ -32,6 +32,11 @@ import { ToastContainer } from "react-toastify";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
 import Subscription from "./Tutor/Pages/Subscription/Subscription";
 import Plans from "./Admin/Dashboard/Plans/Plans";
+import Success from "./Tutor/Pages/Subscription/Success";
+import Cancel from "./Tutor/Pages/Subscription/Cancel";
+import SubscriptionProtectedRoutes from "./Tutor/Components/SubscriptionProtectedRoutes";
+import Category from "./Admin/Dashboard/Category/Category";
+import Course from "./Tutor/Pages/Dashboard/Course/Course";
 
 const queryClient = new QueryClient();  // ✅ Fix QueryClient initialization
 
@@ -72,13 +77,20 @@ function App() {
               <Route path="/tutor/form" element={<Form />} />
               <Route path="/tutor/order-complete" element={<OrderCompletion />} />
               <Route path="/tutor/notifications" element={<Notifications />} />
+            </Route>
+
+            {/* Tutor Subscription Protected Routes */}
+            <Route element={<SubscriptionProtectedRoutes/>}>
               <Route path="/tutor/subscription" element={<Subscription />} />
+              <Route path="/success" element={<Success />} />
+              <Route path="/cancel" element={<Cancel />} />
             </Route>
 
             {/* Tutor Protected Routes */}
             <Route element={<TutorProtectedRoutes />}>
               <Route path="/tutor-dashboard" element={<TutorDashboard />} />
               <Route path="/tutor-profile" element={<TutorProfile />} />
+              <Route path="/tutor-course" element={<Course />} />
             </Route>
 
             {/* Admin Protected Routes */}
@@ -88,6 +100,7 @@ function App() {
               <Route path="/admin/tutors" element={<Tutors />} />
               <Route path="/admin/applications" element={<Applications />} />
               <Route path="/admin/plans" element={<Plans />} />
+              <Route path="/admin/category" element={<Category />} />
               <Route path="/admin/application-view/:userId" element={<Overview />} />
               <Route path="/admin/tutor-view/:userId" element={<TutorView />} />
             </Route>

@@ -1,103 +1,79 @@
-import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import "./Sidebar.css";
-import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
-import GroupIcon from '@mui/icons-material/Group';
-import SchoolIcon from '@mui/icons-material/School';
-import { useDispatch } from 'react-redux';
-import { logoutUser } from '../../../redux/slices/userSlice';
-import { toast } from 'react-toastify';
-import { userAxios } from '../../../../axiosConfig';
+"use client"
+import { useNavigate, useLocation } from "react-router-dom"
+import { useDispatch } from "react-redux"
+import { logoutUser } from "../../../redux/slices/userSlice"
+import { toast } from "react-toastify"
+import { userAxios } from "../../../../axiosConfig"
 import FileCopyIcon from '@mui/icons-material/FileCopy';
-import { BsFillStarFill } from "react-icons/bs";
-import { IoMdHome } from "react-icons/io";
-import { SiFormspree } from "react-icons/si";
+import SchoolIcon from '@mui/icons-material/School';
+import GroupIcon from '@mui/icons-material/Group';
+import HomeIcon from '@mui/icons-material/Home';
+import ViewListIcon from '@mui/icons-material/ViewList';
+import StarIcon from '@mui/icons-material/Star';
+import LogoutIcon from '@mui/icons-material/Logout';
 
-const Sidebar = () => {
-  const navigate = useNavigate();
-  const location = useLocation(); // Get current URL path
+export default function Sidebar() {
+  const navigate = useNavigate()
+  const location = useLocation()
   const dispatch = useDispatch()
 
   const handleNavigation = (path) => {
-    navigate(path);
-  };
+    navigate(path)
+  }
 
   const logout = async () => {
-    try{
-        const response = await userAxios.post('logout/')
-        dispatch(logoutUser())
-        toast.success("Successfully Logged out")
-        navigate('/')
-    }catch (error){
-        toast.error("Something went wrong")
+    try {
+      const response = await userAxios.post("logout/")
+      dispatch(logoutUser())
+      toast.success("Successfully Logged out")
+      navigate("/")
+    } catch (error) {
+      toast.error("Something went wrong")
     }
-}
+  }
+
+  const navItems = [
+    { path: "/admin/dashboard", icon: <HomeIcon className="h-6 w-6" />, label: "Dashboard" },
+    { path: "/admin/users", icon: <GroupIcon className="h-6 w-6" />, label: "Users" },
+    { path: "/admin/tutors", icon: <SchoolIcon className="h-6 w-6" />, label: "Tutors" },
+    { path: "/admin/applications", icon: <FileCopyIcon className="h-6 w-6" />, label: "Applications" },
+    { path: "/admin/category", icon: <ViewListIcon className="h-6 w-6" />, label: "Category" },
+    { path: "/admin/plans", icon: <StarIcon className="h-6 w-6" />, label: "Subscription Plans" },
+  ]
 
   return (
-    <div
-      className="col-span-1 bg-black p-4 rounded-lg text-2xl flex flex-col justify-between"
-      style={{ maxHeight: "600px", maxWidth: "400px", height: "800px" }}
-    >
-      {/* Top Section (Navigation) */}
-      <div className="space-y-4">
-        <button
-          className={`w-full flex items-center text-left p-2 rounded transition font-extrabold ${
-            location.pathname === "/admin/dashboard" ? "bg-white text-black" : "hover:bg-white hover:text-black text-white"
-          }`}
-          onClick={() => handleNavigation("/admin/dashboard")}
-        >
-          <IoMdHome/>
-          
-          <p className="pl-4">Dashboard</p>
-        </button>
-
-        <button
-          className={`w-full flex items-center text-left p-2 rounded transition font-extrabold ${
-            location.pathname === "/admin/users" ? "bg-white text-black" : "hover:bg-white hover:text-black text-white"
-          }`}
-          onClick={() => handleNavigation("/admin/users")}
-        >
-          <GroupIcon />
-          <p className="pl-4">Users</p>
-        </button>
-
-        <button
-          className={`w-full flex items-center text-left p-2 rounded transition font-extrabold ${
-            location.pathname === "/admin/tutors" ? "bg-white text-black" : "hover:bg-white hover:text-black text-white"
-          }`}
-          onClick={() => handleNavigation("/admin/tutors")}
-        >
-          <SchoolIcon />
-          <p className="pl-4">Tutors</p>
-        </button>
-        <button
-          className={`w-full flex items-center text-left p-2 rounded transition font-extrabold ${
-            location.pathname === "/admin/applications" ? "bg-white text-black" : "hover:bg-white hover:text-black text-white"
-          }`}
-          onClick={() => handleNavigation("/admin/applications")}
-        >
-          <FileCopyIcon />
-          <p className="pl-4">Applications</p>
-        </button>
-        <button
-          className={`w-full flex items-center text-left p-2 rounded transition font-extrabold ${
-            location.pathname === "/admin/plans" ? "bg-white text-black" : "hover:bg-white hover:text-black text-white"
-          }`}
-          onClick={() => handleNavigation("/admin/plans")}
-        >
-          <BsFillStarFill />
-          <p className="pl-4">Subscription Plans</p>
-        </button>
+    <aside className="h-screen w-64 fixed left-0 top-0 bg-black p-4 flex flex-col overflow-y-auto">
+      {/* Logo or Brand */}
+      <div className="mb-8 pt-4">
+        <h1 className="text-3xl font-extrabold text-white">CodeX</h1>
       </div>
 
-      {/* Bottom Section (Logout Button) */}
-      <div className="mt-auto">
-        <button className="w-full p-3 bg-white hover:bg-red-600 hover:text-white text-black rounded-lg font-bold" onClick={logout}>
-          Logout
+      {/* Navigation Links */}
+      <nav className="space-y-2 flex-1">
+        {navItems.map((item) => (
+          <button
+            key={item.path}
+            className={`w-full flex items-center text-left p-3 rounded-lg transition font-bold text-lg ${
+              location.pathname === item.path ? "bg-white text-black" : "text-white hover:bg-white hover:text-black"
+            }`}
+            onClick={() => handleNavigation(item.path)}
+          >
+            {item.icon}
+            <span className="ml-3">{item.label}</span>
+          </button>
+        ))}
+      </nav>
+
+      {/* Logout Button */}
+      <div className="pt-6 pb-4">
+        <button
+          className="w-full p-3 bg-white hover:bg-red-600 hover:text-white text-black rounded-lg font-bold flex items-center justify-center"
+          onClick={logout}
+        >
+          <LogoutIcon className="h-5 w-5 mr-2" />
+          <span>Logout</span>
         </button>
       </div>
-    </div>
-  );
-};
-
-export default Sidebar;
+    </aside>
+  )
+}

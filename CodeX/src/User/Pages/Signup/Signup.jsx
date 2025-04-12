@@ -97,6 +97,9 @@ const Signup = () => {
     e.preventDefault()
     if (validate()) {
       localStorage.setItem('userEmail', formData.email)
+      const expireAt = Date.now() + 120 * 1000;
+      localStorage.setItem("otpExpireTime", expireAt.toString());
+
       try {
         const response = await userAxios.post('signup/', {
           first_name: formData.firstName,
@@ -128,10 +131,10 @@ const Signup = () => {
   }
 
   return (
-    <div className="h-full overflow-hidden flex justify-center items-center px-2">
+    <div className="overflow-hidden flex justify-center px-2 mt-5">
       <BackgroundAnimation />
       <motion.div className="text-center" initial="hidden" animate="visible" variants={fadeIn}>
-      <div className="w-full h-screen max-w-md relative z-10 mt-5 sm:mt-0">
+      <div className="w-full h-full max-w-md relative z-10">
         <div className="w-full p-8 rounded-lg shadow-lg  border border-green-500">
           <h2 className="text-5xl font-bold mb-3 text-green-500 text-start">Register.</h2>
           <span className="text-base sm:text-lg text-white mb-3 text-start block">
@@ -143,7 +146,7 @@ const Signup = () => {
           <form onSubmit={handleSubmit}>
             <div className="space-y-4">
               <input
-                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-white text-lg font-mono"
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-white text-lg font-mono"
                 type="text"
                 name="firstName"
                 value={formData.firstName}
@@ -151,7 +154,7 @@ const Signup = () => {
                 placeholder="First Name"
               />
               <input
-                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-white text-lg font-mono"
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-white text-lg font-mono"
                 type="text"
                 name="lastName"
                 value={formData.lastName}
@@ -159,7 +162,7 @@ const Signup = () => {
                 placeholder="Last Name"
               />
               <input
-                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-white text-lg font-mono"
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-white text-lg font-mono"
                 type="email"
                 name="email"
                 value={formData.email}
@@ -167,7 +170,7 @@ const Signup = () => {
                 placeholder="Email"
               />
               <input
-                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-white text-lg font-mono"
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-white text-lg font-mono"
                 type="text"
                 name="leetcodeId"
                 value={formData.leetcodeId}
@@ -175,7 +178,7 @@ const Signup = () => {
                 placeholder="Leetcode ID"
               />
               <input
-                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-white text-lg font-mono"
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-white text-lg font-mono"
                 type="text"
                 name="phoneNumber"
                 value={formData.phoneNumber}
@@ -183,7 +186,7 @@ const Signup = () => {
                 placeholder="Phone Number"
               />
               <input
-                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-white text-lg font-mono"
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-white text-lg font-mono"
                 type="password"
                 name="password"
                 value={formData.password}
@@ -191,7 +194,7 @@ const Signup = () => {
                 placeholder="Password"
               />
               <input
-                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-white text-lg font-mono"
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-white text-lg font-mono"
                 type="password"
                 name="confirmPassword"
                 value={formData.confirmPassword}
@@ -200,7 +203,7 @@ const Signup = () => {
               />
               <button
                 type="submit"
-                className="w-full p-3 bg-white text-2xl font-extrabold text-black rounded-md hover:bg-black hover:text-white focus:outline-none focus:ring-2 focus:ring-black"
+                className="w-full p-2 bg-white text-2xl font-extrabold text-black rounded-md hover:bg-black hover:text-white focus:outline-none focus:ring-2 focus:ring-black"
               >
                 Sign Up
               </button>

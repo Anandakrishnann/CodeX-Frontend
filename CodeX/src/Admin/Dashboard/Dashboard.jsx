@@ -1,20 +1,13 @@
 import React from "react";
 import './Dashboard.css'
-import Sidebar from "./Sidebar/Sidebar";
-import Navbar from "./Navbar/Navbar";
 import { LineChart } from "@mui/x-charts";
+import Layout from "./Layout/Layout";
 
 const Dashboard = () => {
   return (
-    <div className="min-h-screen bg-black text-white p-6 font-sans">
-        <Navbar />
-      <div className="grid grid-cols-4 gap-6">
-        {/* Sidebar */}
-        
-        <Sidebar />
-
-        {/* Main Content Area */}
-        <div className="col-span-3 grid grid-rows-3 gap-6">
+    <Layout>
+       {/* Main Content Area */}
+       <div className="col-span-3 grid grid-rows-3 gap-6">
           {/* Overview Section */}
           <div className="row-span-1 bg-gray-800 p-4 rounded-lg">
             <h2 className="text-lg font-semibold mb-4">Over View</h2>
@@ -180,8 +173,7 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
-      </div>
-    </div>
+    </Layout>
   );
 };
 

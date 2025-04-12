@@ -47,14 +47,14 @@ const Login = () => {
           <span className='text-1xl text-white mb-3 text-start block'>Dont have an Account ? <span onClick={signup} className='text-blue-500 cursor-pointer'>Sign Up</span></span>
           <div className="space-y-4">
             <input 
-              className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-white text-lg font-mono font-bold"
+              className="w-full p-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-white text-lg font-mono font-bold"
               type="email" 
               value={email}
               placeholder="Email" 
               onChange={(e) => setEmail(e.target.value)}
             />
             <input 
-              className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-white"
+              className="w-full p-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-white"
               type="password" 
               value={password}
               placeholder="Password" 
@@ -62,7 +62,7 @@ const Login = () => {
             />
             <h1 className='text-white ml-60 cursor-pointer'>forgot password?</h1>
             <button onClick={login}
-              className="w-full p-3 bg-white text-2xl font-extrabold text-black rounded-md hover:bg-black hover:text-white focus:outline-none focus:ring-2 focus:ring-black"
+              className="w-full p-1 bg-white text-2xl font-extrabold text-black rounded-md hover:bg-black hover:text-white focus:outline-none focus:ring-2 focus:ring-black"
             >
               Log In
             </button>

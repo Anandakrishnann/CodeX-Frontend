@@ -61,14 +61,14 @@ const Login = () => {
 
             <div className="space-y-4">
               <input
-                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-white text-lg font-mono font-bold"
+                className="w-full p-2 border border-black-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
                 type="email"
                 value={email}
                 placeholder="Email"
                 onChange={(e) => setEmail(e.target.value)}
               />
               <input
-                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-white"
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
                 type="password"
                 value={password}
                 placeholder="Password"
@@ -79,12 +79,12 @@ const Login = () => {
               </div>
               <button
                 onClick={login}
-                className="w-full p-3 bg-white text-2xl font-extrabold text-black rounded-md hover:bg-black hover:text-white focus:outline-none focus:ring-2 focus:ring-black"
+                className="w-full p-2 bg-white text-2xl font-extrabold text-black rounded-md hover:bg-black hover:text-white focus:outline-none focus:ring-2 focus:ring-black"
               >
                 Log In
               </button>
               <button
-                className="w-full p-3 bg-white text-sm sm:text-base rounded-full font-bold text-black flex items-center justify-center gap-2 hover:bg-black hover:text-white focus:outline-none focus:ring-2 focus:ring-black"
+                className="w-full p-2 bg-white text-sm sm:text-base rounded-full font-bold text-black flex items-center justify-center gap-2 hover:bg-black hover:text-white focus:outline-none focus:ring-2 focus:ring-black"
                 onClick={logout}
               >
                 <img src={google} className='w-6 h-6 rounded-full' alt="Google logo" />

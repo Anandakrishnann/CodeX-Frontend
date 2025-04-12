@@ -1,43 +1,29 @@
-import React, { useState } from 'react'
-import './Navbar.css'
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { Search, Plus, User } from "lucide-react"
 
-const Navbar = () => {
+export default function Navbar() {
   return (
-    <div className="flex justify-between items-center mb-6">
-        <div className="flex items-center space-x-2">
-          <span className="text-6xl font-extrabold text-white">CodeX</span>
-        </div>
-        <div className="flex items-center space-x-4">
+    <header className="h-16 fixed top-0 right-0 left-64 bg-black z-10 px-6 flex items-center justify-between">
+      <div className="flex-1 max-w-md">
+        <div className="relative">
           <input
             type="text"
             placeholder="Search"
-            className="bg-white p-2 rounded-md text-black focus:outline-none"
+            className="w-full bg-white p-2 pl-10 rounded-md text-black focus:outline-none"
           />
-          <div className="flex space-x-2">
-            <button className="bg-white p-2 rounded-full">
-              <svg
-                className="w-5 h-5 text-black"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
-            </button>
-            
-          </div>
-          <div className="flex items-center space-x-2 bg-white p-2 rounded-md">
-            <span className="text-black"><AccountCircleIcon/></span>
-          </div>
+          <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
         </div>
       </div>
+
+      <div className="flex items-center space-x-4">
+        <button className="bg-white p-2 rounded-full hover:bg-gray-200 transition-colors">
+          <Plus className="h-5 w-5 text-black" />
+        </button>
+
+        <div className="flex items-center space-x-2 bg-white p-2 rounded-md hover:bg-gray-200 transition-colors cursor-pointer">
+          <User className="h-5 w-5 text-black" />
+          <span className="text-black font-medium">Admin</span>
+        </div>
+      </div>
+    </header>
   )
 }
-
-export default Navbar

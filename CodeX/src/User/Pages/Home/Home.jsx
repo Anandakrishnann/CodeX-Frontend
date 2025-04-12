@@ -108,13 +108,13 @@ const Home = () => {
         variants={staggerContainer}
       >
         <motion.h2 
-          className="text-7xl font-bold text-white text-center" style={{marginBottom: "70px"}}
+          className="text-7xl font-bold text-white text-center relative z-10" style={{marginBottom: "70px"}}
           variants={fadeIn}
         >
           Popular Courses
         </motion.h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 ">
           {popularCourses.map((course) => (
             <motion.div 
               key={course.id}

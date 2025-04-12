@@ -11,6 +11,7 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import { toast } from 'react-toastify';
 import Loading from '../../Components/Loading/Loading';
+import Layout from '../Layout/Layout';
 
 
 const TutorView = () => {
@@ -42,11 +43,8 @@ const TutorView = () => {
   }
   
   return (
-    <div className="min-h-screen bg-black text-white p-6 font-sans">
-      <Navbar />
-      <div className="grid grid-cols-4 gap-6 w-full">
-        <Sidebar />
-                <div className="mx-auto px-4 py-8 font-serif" style={{width: "1100px"}}>
+    <Layout>
+          <div className="mx-auto px-4 py-8 font-serif" style={{width: "1100px"}}>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             {/* Left Section - User Information */}
                             <div className="md:col-span-2 bg-white rounded-lg shadow-lg overflow-hidden">
@@ -255,8 +253,7 @@ const TutorView = () => {
                             </div>
                         </div>
             </div>
-      </div>
-    </div>
+    </Layout>
   )
 }
 

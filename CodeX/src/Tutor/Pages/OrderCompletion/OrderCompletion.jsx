@@ -1,3 +1,4 @@
+import BackgroundAnimation from "../../../Component/BackgroundAnimation"
 import { useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 
@@ -45,8 +46,10 @@ const OrderCompletion = () => {
   }
 
   return (
+    <>
+    <BackgroundAnimation/>
     <div className="min-h-screen  from-gray-50 to-gray-100 flex flex-col items-center justify-center p-6">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden transform transition-all hover:scale-105 duration-300">
+      <div className="max-w-md w-full  rounded-2xl shadow-xl overflow-hidden transform transition-all hover:scale-105 duration-300">
         <div className="p-8">
           {/* Success Icon with Animation */}
           <div className="flex justify-center">
@@ -76,8 +79,8 @@ const OrderCompletion = () => {
 
           {/* Content */}
           <div className="text-center mt-8">
-            <h1 className="text-4xl font-extrabold text-gray-900 mb-4 animate-fadeIn">Done!</h1>
-            <p className="text-lg text-gray-600 mb-8 animate-fadeIn delay-200">
+            <h1 className="text-4xl font-extrabold text-white mb-4 animate-fadeIn">Done!</h1>
+            <p className="text-lg text-white mb-8 animate-fadeIn delay-200">
               Your Application is sent, It usually takes 2-3 days. We'll notify you.
             </p>
 
@@ -111,7 +114,7 @@ const OrderCompletion = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
                 
-                className="px-8 py-3 bg-black text-white cursor-pointer font-medium rounded-lg shadow-md hover:bg-gray-800 transition-colors duration-300 flex items-center justify-center"
+                className="px-8 py-3 bg-white text-black cursor-pointer font-medium rounded-lg shadow-md hover:bg-black hover:text-white transition-colors duration-300 flex items-center justify-center"
                onClick={home}>
                 <svg
                   className="w-5 h-5 mr-2"
@@ -156,6 +159,7 @@ const OrderCompletion = () => {
 
       
     </div>
+    </>
   )
 }
 
