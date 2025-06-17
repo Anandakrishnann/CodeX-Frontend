@@ -24,7 +24,8 @@ const EditUserModal = ({ user, closeModal, refreshUsers }) => {
       newErrors.phone = "Phone must be 10-15 digits long";
     }
     if (!/^[a-zA-Z0-9_]+$/.test(formData.leetcode_id)) {
-      newErrors.leetcode_id = "LeetCode ID can only contain letters, numbers, and underscores";
+      newErrors.leetcode_id =
+        "LeetCode ID can only contain letters, numbers, and underscores";
     }
 
     setErrors(newErrors);
@@ -59,54 +60,85 @@ const EditUserModal = ({ user, closeModal, refreshUsers }) => {
         <h2 className="text-xl font-bold mb-4">Edit User</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-2">
-            <label className="block text-sm font-medium text-gray-700">First Name</label>
+            <label className="block text-sm font-medium text-gray-700">
+              First Name
+            </label>
             <input
               type="text"
               name="first_name"
               value={formData.first_name}
               onChange={handleChange}
-              className={`w-full p-2 border rounded-lg ${errors.first_name ? "border-red-500" : ""}`}
+              className={`w-full p-2 border rounded-lg ${
+                errors.first_name ? "border-red-500" : ""
+              }`}
             />
-            {errors.first_name && <p className="text-red-500 text-sm">{errors.first_name}</p>}
+            {errors.first_name && (
+              <p className="text-red-500 text-sm">{errors.first_name}</p>
+            )}
           </div>
           <div className="mb-2">
-            <label className="block text-sm font-medium text-gray-700">Last Name</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Last Name
+            </label>
             <input
               type="text"
               name="last_name"
               value={formData.last_name}
               onChange={handleChange}
-              className={`w-full p-2 border rounded-lg ${errors.last_name ? "border-red-500" : ""}`}
+              className={`w-full p-2 border rounded-lg ${
+                errors.last_name ? "border-red-500" : ""
+              }`}
             />
-            {errors.last_name && <p className="text-red-500 text-sm">{errors.last_name}</p>}
+            {errors.last_name && (
+              <p className="text-red-500 text-sm">{errors.last_name}</p>
+            )}
           </div>
           <div className="mb-2">
-            <label className="block text-sm font-medium text-gray-700">Phone</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Phone
+            </label>
             <input
               type="text"
               name="phone"
               value={formData.phone}
               onChange={handleChange}
-              className={`w-full p-2 border rounded-lg ${errors.phone ? "border-red-500" : ""}`}
+              className={`w-full p-2 border rounded-lg ${
+                errors.phone ? "border-red-500" : ""
+              }`}
             />
-            {errors.phone && <p className="text-red-500 text-sm">{errors.phone}</p>}
+            {errors.phone && (
+              <p className="text-red-500 text-sm">{errors.phone}</p>
+            )}
           </div>
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">LeetCode ID</label>
+            <label className="block text-sm font-medium text-gray-700">
+              LeetCode ID
+            </label>
             <input
               type="text"
               name="leetcode_id"
               value={formData.leetcode_id}
               onChange={handleChange}
-              className={`w-full p-2 border rounded-lg ${errors.leetcode_id ? "border-red-500" : ""}`}
+              className={`w-full p-2 border rounded-lg ${
+                errors.leetcode_id ? "border-red-500" : ""
+              }`}
             />
-            {errors.leetcode_id && <p className="text-red-500 text-sm">{errors.leetcode_id}</p>}
+            {errors.leetcode_id && (
+              <p className="text-red-500 text-sm">{errors.leetcode_id}</p>
+            )}
           </div>
           <div className="flex justify-end space-x-2">
-            <button type="button" onClick={closeModal} className="px-4 py-2 bg-gray-500 text-white rounded-lg">
+            <button
+              type="button"
+              onClick={closeModal}
+              className="px-4 py-2 bg-gray-500 text-white rounded-lg"
+            >
               Cancel
             </button>
-            <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded-lg">
+            <button
+              type="submit"
+              className="px-4 py-2 bg-blue-500 text-white rounded-lg"
+            >
               Save
             </button>
           </div>

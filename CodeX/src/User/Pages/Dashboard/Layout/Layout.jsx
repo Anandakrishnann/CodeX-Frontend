@@ -1,9 +1,9 @@
-import React,{useState} from 'react';
-import  Sidebar  from '../Sidebar/Sidebar';
-import  Navbar  from '../Navbar/Navbar';
+import React, { useState } from "react";
+import Sidebar from "../Sidebar/Sidebar";
+import Navbar from "../Navbar/Navbar";
 
 export default function Layout({ children, page }) {
-    const [activeItem, setActiveItem] = useState(page || "Home");
+  const [activeItem, setActiveItem] = useState(page || "Home");
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar - Fixed */}
@@ -19,9 +19,7 @@ export default function Layout({ children, page }) {
         </div>
 
         {/* Main Scrollable Content */}
-        <div className="flex-1 overflow-y-auto bg-gray-50 p-4">
-          {children}
-        </div>
+        <div className="flex-1 overflow-y-auto bg-gray-50 p-4">{children}</div>
       </div>
     </div>
   );

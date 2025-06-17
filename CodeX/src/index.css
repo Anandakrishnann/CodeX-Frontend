@@ -4,7 +4,7 @@
 @tailwind components;
 @tailwind utilities;
 
-body{
+body {
   background-color: black;
 }
 
@@ -19,7 +19,7 @@ body{
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 151 55% 42%;
+    --primary: 0 0% 100%; /* Replaced green with white */
     --primary-foreground: 210 40% 98%;
 
     --secondary: 210 40% 96.1%;
@@ -28,7 +28,7 @@ body{
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 151 55% 42%;
+    --accent: 0 0% 50%; /* Replaced green with neutral gray */
     --accent-foreground: 222.2 47.4% 11.2%;
 
     --destructive: 0 84.2% 60.2%;
@@ -36,7 +36,7 @@ body{
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 151 55% 42%;
+    --ring: 0 0% 100%; /* Removed green ring */
     --radius: 0.5rem;
   }
 
@@ -45,7 +45,7 @@ body{
     --foreground: 210 40% 98%;
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 151 55% 42%;
+    --ring: 0 0% 100%; /* Removed green ring in dark mode */
   }
 }
 

@@ -4,7 +4,6 @@ import { toast } from "react-toastify";
 import Table from "../../Components/Table/Table.jsx";
 import Layout from "../Layout/Layout.jsx";
 
-
 const Tutors = () => {
   const [tutors, setTutors] = useState([]);
 
@@ -21,7 +20,6 @@ const Tutors = () => {
     fetchUsers();
   }, []);
   console.log(tutors);
-  
 
   const toggle_status = async (e, userId) => {
     e.preventDefault();
@@ -41,12 +39,25 @@ const Tutors = () => {
     }
   };
 
-
-  const columns = ["ID", "First Name", "Last Name", "Email", "Leetcode ID", "Phone", "Status", "Actions"];
+  const columns = [
+    "ID",
+    "First Name",
+    "Last Name",
+    "Email",
+    "Leetcode ID",
+    "Phone",
+    "Status",
+    "Actions",
+  ];
 
   return (
     <Layout>
-      <Table datas={tutors} fucntions={toggle_status} columns={columns} name={"Tutors"} />
+      <Table
+        datas={tutors}
+        fucntions={toggle_status}
+        columns={columns}
+        name={"Tutors"}
+      />
     </Layout>
   );
 };

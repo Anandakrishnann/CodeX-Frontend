@@ -27,8 +27,10 @@ const BackgroundAnimation = () => {
         this.x += this.speedX;
         this.y += this.speedY;
 
-        if (this.x < 0 || this.x > particles.width) this.x = Math.random() * particles.width;
-        if (this.y < 0 || this.y > particles.height) this.y = Math.random() * particles.height;
+        if (this.x < 0 || this.x > particles.width)
+          this.x = Math.random() * particles.width;
+        if (this.y < 0 || this.y > particles.height)
+          this.y = Math.random() * particles.height;
       }
 
       draw() {

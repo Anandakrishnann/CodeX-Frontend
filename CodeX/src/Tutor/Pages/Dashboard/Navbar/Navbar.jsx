@@ -1,11 +1,14 @@
 import React from "react";
 import { Bell, Menu, Search } from "lucide-react";
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import NotificationsIcon from '@mui/icons-material/Notifications';
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import NotificationsIcon from "@mui/icons-material/Notifications";
 
 const Navbar = ({ setSidebarOpen }) => {
   return (
-    <header className="flex items-center justify-between h-16 px-6 border-gray-200 relative z-10" style={{maxHeight: "90px", marginTop: "20px", marginBottom: "5px"}}>
+    <header
+      className="flex items-center justify-between h-16 px-6 border-gray-200 relative z-10"
+      style={{ maxHeight: "90px", marginTop: "20px", marginBottom: "5px" }}
+    >
       <div className="flex items-center">
         <button className="lg:hidden mr-4" onClick={() => setSidebarOpen(true)}>
           <Menu className="h-6 w-6" />
@@ -13,7 +16,10 @@ const Navbar = ({ setSidebarOpen }) => {
         <h1 className="text-xl font-semibold"></h1>
       </div>
 
-      <div className="flex items-center space-x-4" style={{marginBottom: "20px"}}>
+      <div
+        className="flex items-center space-x-4"
+        style={{ marginBottom: "20px" }}
+      >
         <div className="relative">
           <input
             type="text"
@@ -27,7 +33,7 @@ const Navbar = ({ setSidebarOpen }) => {
           <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
         </button>
         <button className="relative p-1">
-        <AccountCircleIcon fontSize="large" className="w-5 h-5 text-white" />
+          <AccountCircleIcon fontSize="large" className="w-5 h-5 text-white" />
           <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
         </button>
       </div>

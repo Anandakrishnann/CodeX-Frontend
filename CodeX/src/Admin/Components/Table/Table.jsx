@@ -3,7 +3,7 @@ import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import TaskAltIcon from "@mui/icons-material/TaskAlt";
 import CancelIcon from "@mui/icons-material/Cancel";
 import RestoreFromTrashIcon from "@mui/icons-material/RestoreFromTrash";
-import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import { Link } from "react-router-dom";
 import EditUserModal from "../../../Component/EditModal/EditUserModal";
 
@@ -29,7 +29,9 @@ const Table = ({ datas, fucntions, columns, name }) => {
   return (
     <div className="grid">
       <div className="row-span-1 bg-black p-2 rounded-lg">
-        <h2 className="text-4xl font-extrabold mb-6 bg-black w-full mt-0" >{name}</h2>
+        <h2 className="text-4xl font-extrabold mb-6 bg-black w-full mt-0">
+          {name}
+        </h2>
         <div className="overflow-x-auto bg-white rounded-lg shadow-lg ">
           <table className="min-w-full border-collapse border border-gray-300">
             {/* Dynamic Table Header */}
@@ -53,12 +55,24 @@ const Table = ({ datas, fucntions, columns, name }) => {
                       index % 2 === 0 ? "bg-gray-50" : "bg-white"
                     } hover:bg-gray-200 transition`}
                   >
-                    <td className="p-4 text-md font-extrabold text-gray-800">{user.id}</td>
-                    <td className="p-4 text-md font-extrabold text-gray-800">{user.first_name}</td>
-                    <td className="p-4 text-md font-extrabold text-gray-800">{user.last_name}</td>
-                    <td className="p-4 text-md font-extrabold text-gray-800">{user.email}</td>
-                    <td className="p-4 text-md font-extrabold text-gray-800">{user.leetcode_id}</td>
-                    <td className="p-4 text-md font-extrabold text-gray-800">{user.phone}</td>
+                    <td className="p-4 text-md font-extrabold text-gray-800">
+                      {user.id}
+                    </td>
+                    <td className="p-4 text-md font-extrabold text-gray-800">
+                      {user.first_name}
+                    </td>
+                    <td className="p-4 text-md font-extrabold text-gray-800">
+                      {user.last_name}
+                    </td>
+                    <td className="p-4 text-md font-extrabold text-gray-800">
+                      {user.email}
+                    </td>
+                    <td className="p-4 text-md font-extrabold text-gray-800">
+                      {user.leetcode_id}
+                    </td>
+                    <td className="p-4 text-md font-extrabold text-gray-800">
+                      {user.phone}
+                    </td>
                     <td className="p-4">
                       {user.status === false ? (
                         <span className="px-3 py-1 pb-2 text-white bg-green-500 rounded-full">
@@ -71,7 +85,6 @@ const Table = ({ datas, fucntions, columns, name }) => {
                       )}
                     </td>
                     <td className="p-4 flex space-x-3">
-                      
                       {user.status === false ? (
                         <button
                           className="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
@@ -101,7 +114,10 @@ const Table = ({ datas, fucntions, columns, name }) => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={columns.length} className="p-4 text-center text-gray-600">
+                  <td
+                    colSpan={columns.length}
+                    className="p-4 text-center text-gray-600"
+                  >
                     No users found
                   </td>
                 </tr>

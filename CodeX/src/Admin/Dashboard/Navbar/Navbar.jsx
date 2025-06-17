@@ -1,4 +1,4 @@
-import { Search, Plus, User } from "lucide-react"
+import { Search, Plus, User } from "lucide-react";
 
 export default function Navbar() {
   return (
@@ -25,5 +25,5 @@ export default function Navbar() {
         </div>
       </div>
     </header>
-  )
+  );
 }

@@ -1,6 +1,12 @@
-import React from 'react';
+import React from "react";
 
-const ProfilePictureModal = ({ isOpen, onClose, picture, onImageChange, onSave }) => {
+const ProfilePictureModal = ({
+  isOpen,
+  onClose,
+  picture,
+  onImageChange,
+  onSave,
+}) => {
   if (!isOpen) return null;
 
   return (
@@ -17,7 +23,7 @@ const ProfilePictureModal = ({ isOpen, onClose, picture, onImageChange, onSave }
           src={picture || ""}
           alt="Profile Preview"
           className="w-64 h-74 rounded-lg rounded-full"
-          style={{ marginLeft: '60px' }}
+          style={{ marginLeft: "60px" }}
         />
         <div className="flex">
           <input
@@ -28,7 +34,7 @@ const ProfilePictureModal = ({ isOpen, onClose, picture, onImageChange, onSave }
           />
           <button
             className="bg-green-600 text-white rounded-md mt-5"
-            style={{ width: '100px', height: '40px' }}
+            style={{ width: "100px", height: "40px" }}
             onClick={onSave}
           >
             Save

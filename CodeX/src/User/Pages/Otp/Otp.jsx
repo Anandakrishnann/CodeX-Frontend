@@ -8,26 +8,24 @@ import BackgroundAnimation from "../../../Component/BackgroundAnimation";
 
 const OTPVerification = () => {
   const [otp, setOtp] = useState(null);
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const [expired, setExpired] = useState(false);
   const seconds = useSelector((state) => state.user.second);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-
   useEffect(() => {
     const emailFromStorage = localStorage.getItem("userEmail");
     setEmail(emailFromStorage);
-  
+
     let expireAt = localStorage.getItem("otpExpireTime");
-  
-  
+
     if (!expireAt) {
       const newExpireAt = Date.now() + 120 * 1000;
       localStorage.setItem("otpExpireTime", newExpireAt.toString());
       expireAt = newExpireAt;
     }
-  
+
     const remaining = Math.floor((+expireAt - Date.now()) / 1000);
     if (remaining > 0) {
       dispatch(otpTime(remaining));
@@ -37,7 +35,6 @@ const OTPVerification = () => {
       setExpired(true);
     }
   }, [dispatch]);
-  
 
   // ✅ Countdown timer
   useEffect(() => {
@@ -78,7 +75,7 @@ const OTPVerification = () => {
       toast.success("Your Account Activated Successfully. Please Login!");
       dispatch(otpTime(0));
       localStorage.removeItem("otpExpireTime");
-      setOtp('');
+      setOtp("");
       setExpired(false);
       dispatch(setOtpTime());
       navigate("/login");

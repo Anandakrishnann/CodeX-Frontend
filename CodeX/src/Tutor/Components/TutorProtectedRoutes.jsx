@@ -6,7 +6,11 @@ const TutorProtectedRoutes = () => {
   const role = useSelector((state) => state.user.role);
   const subscribed = useSelector((state) => state.user.subscribed);
 
-  return role === "tutor" && subscribed ?  <Outlet /> : <Navigate to="/" replace /> ;
+  return role === "tutor" && subscribed ? (
+    <Outlet />
+  ) : (
+    <Navigate to="/" replace />
+  );
 };
 
 export default TutorProtectedRoutes;
