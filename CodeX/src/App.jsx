@@ -64,7 +64,7 @@ import TutorChat from "./Tutor/Pages/Dashboard/TutorChat/TutorChat";
 import TutorMeeting from "./Tutor/Pages/Dashboard/TutorMeeting/TutorMeeting";
 import UserMeetings from "./User/Pages/Dashboard/UserMeetings/UserMeetings";
 import MeetingRoom from "./Component/MeetingRoom/MeetingRoom";
-import Review from "./User/review";
+import Review from "./User/Review";
 
 
 const queryClient = new QueryClient();  // ✅ Fix QueryClient initialization
