@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { cn } from "../../../lib/utils.js";
+import { cn } from "@/lib/utils.js";
 import { useDispatch, useSelector } from "react-redux";
 import { userAxios } from "../../../../axiosConfig";
 import { logoutUser } from "../../../redux/slices/userSlice";
