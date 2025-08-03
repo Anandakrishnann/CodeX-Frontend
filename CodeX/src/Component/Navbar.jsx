@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { cn } from "@/lib/utils";
+import { cn } from "../../lib/utils.js";
 const Navbar = () => {
   // Remove Redux dependencies temporarily
   const isAuthenticated = false; // Default to not authenticated for now
