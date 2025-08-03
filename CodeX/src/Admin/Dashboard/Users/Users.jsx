@@ -6,8 +6,10 @@ import { toast } from "react-toastify";
 import Table from "../../Components/Table/Table.jsx";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import Layout from "../Layout/Layout";
+import { useSelector } from "react-redux";
 
 const Users = () => {
+  const tutor = useSelector((state) => state.user.role)
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
@@ -21,7 +23,7 @@ const Users = () => {
     };
 
     fetchUsers();
-  }, []);
+  }, [tutor]);
 
   const toggle_status = async (e, userId) => {
     e.preventDefault();

@@ -64,6 +64,9 @@ const Login = () => {
             setTimeout(() => {
               navigate("/admin/dashboard");
             }, 10);
+          } else if (user.role?.trim().toLowerCase() === "tutor") {
+            console.log("tutor logined")
+            navigate("/tutor");
           } else {
             navigate("/");
           }

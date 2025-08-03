@@ -7,9 +7,10 @@ const Success = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  useEffect(() => {
+  const goToDashboard = () => {
     dispatch(setSubscribedTrue());
-  }, [dispatch]);
+    navigate("/tutor")
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black text-white px-4">
@@ -25,7 +26,7 @@ const Success = () => {
         </p>
         <h1
           className="inline-block bg-green-500 hover:bg-green-600 cursor-pointer text-white font-semibold py-2 px-6 rounded-lg transition duration-300"
-          onClick={() => navigate("/tutor")}
+          onClick={() => goToDashboard()}
         >
           Go to Dashboard
         </h1>

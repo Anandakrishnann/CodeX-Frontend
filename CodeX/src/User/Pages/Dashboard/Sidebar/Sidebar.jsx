@@ -8,6 +8,7 @@ import SchoolIcon from "@mui/icons-material/School";
 import QuestionAnswerIcon from "@mui/icons-material/QuestionAnswer";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
+import CastIcon from '@mui/icons-material/Cast';
 
 const Sidebar = ({ activeItem, setActiveItem }) => {
   const [open, setOpen] = useState(false);
@@ -35,7 +36,7 @@ const Sidebar = ({ activeItem, setActiveItem }) => {
 
         {/* Header */}
         <div className="flex items-center justify-between relative z-10 mb-6">
-          <h2 className="text-3xl font-extrabold text-green-500">Dashboard</h2>
+          <h2 className="text-3xl font-extrabold ">Dashboard</h2>
           <div className="lg:hidden">
             <button onClick={() => setOpen(false)} className="p-2">
               <CloseIcon />
@@ -83,6 +84,16 @@ const Sidebar = ({ activeItem, setActiveItem }) => {
               setActiveItem={setActiveItem}
               onClick={() => {
                 navigate("/user/chat");
+                setOpen(false);
+              }}
+            />
+            <SidebarItem
+              icon={<CastIcon />}
+              label="Meeting's"
+              activeItem={activeItem}
+              setActiveItem={setActiveItem}
+              onClick={() => {
+                navigate("/user/meet");
                 setOpen(false);
               }}
             />

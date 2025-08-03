@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AnimatedBackground from "../../../Component/BackgroundAnimation";
 import Footer from "../Footer/Footer";
@@ -7,16 +7,22 @@ import Navbar from "../Navbar/Navbar";
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
-import { loginUser } from "../../../redux/slices/userSlice";
-import { userAxios } from "../../../../axiosConfig";
+import { loginUser, setSubscribedTrue } from "../../../redux/slices/userSlice";
+import { tutorAxios, userAxios } from "../../../../axiosConfig";
 
 const TutorHome = () => {
+  const [isSubscribed, setIdSubscribed] = useState(false);
+
   const navigate = useNavigate();
   const tutor = useSelector((state) => state.user.user);
   const subscribed = useSelector((state) => state.user.subscribed);
+  console.log("subscribed", subscribed);
+
   console.log(tutor);
   console.log(subscribed);
   const dispatch = useDispatch();
+  console.log("is subscribed", isSubscribed);
+  
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -24,7 +30,7 @@ const TutorHome = () => {
 
   useEffect(() => {
     if (!tutor?.id) return;
-
+    tutorSubscribed();
     const fetchTutor = async () => {
       try {
         const response = await userAxios.get("tutor_home/");
@@ -42,6 +48,21 @@ const TutorHome = () => {
 
     fetchTutor();
   }, []); // ✅ only watch tutor.id, not entire tutor object
+
+  const tutorSubscribed = async () => {
+    try {
+      const response = await tutorAxios.get("tutor_subscribed/");
+      if (response.data.subscribed) {
+        setIdSubscribed(true);
+        dispatch(setSubscribedTrue());
+      } else {
+        setIdSubscribed(false);
+      }
+    } catch (error) {
+      console.log("Error while checking subscription:", error);
+      setIdSubscribed(false); // fallback
+    }
+  };
 
   const form = () => {
     navigate("/tutor/form");
@@ -118,7 +139,7 @@ const TutorHome = () => {
                       </Button>
                     </div>
                   </div>
-                ) : tutor.role === "tutor" && subscribed === true ? (
+                ) : tutor.role === "tutor" && isSubscribed === true ? (
                   // Case 3: Is a tutor and subscribed
                   <div className="grid">
                     <div className="bg-black bg-opacity-50 border border-green-800 p-8 rounded-lg transform hover:scale-105 transition-all">

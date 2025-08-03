@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import {
   setCourseId,
   setModuleId,
+  setTutorId
 } from "../../../../../redux/slices/userSlice";
 import { LuActivity } from "react-icons/lu";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
@@ -16,6 +17,7 @@ import BackgroundAnimation from "../../../../../Component/BackgroundAnimation";
 const CourseModules = () => {
   const [modules, setModules] = useState([]);
   const [course, setCourse] = useState(null);
+  const [tutor, setTutor] = useState(null);
   const [selectedData, setSelectedData] = useState(null);
   const [filteredModules, setFilteredModules] = useState([]);
   const [filter, setFilter] = useState("pending");
@@ -40,6 +42,19 @@ const CourseModules = () => {
     }
   };
 
+  const fetchTutor = async () => {
+    try{
+      const response = await userAxios.get(`course_tutor/${course_id}/`);
+      console.log("requestes data of tutor", response.data);
+
+      setTutor(response.data);
+      dispatch(setTutorId(response.data))
+    }catch(error){
+      console.log(error || "Error while fetching tutor");
+      
+    }
+  }
+
   const fetchModules = async () => {
     try {
       const response = await userAxios.get("course_modules/", {
@@ -55,6 +70,7 @@ const CourseModules = () => {
   useEffect(() => {
     fetchCourse();
     fetchModules();
+    fetchTutor()
   }, []);
 
   useEffect(() => {
@@ -127,9 +143,15 @@ const CourseModules = () => {
             </div>
           ) : null}
           {/* Filter Buttons */}
+          <button
+              className={`text-xl font-bold px-5 py-2 ml-6 mt-2 bg-white text-black rounded-lg border-2 border-white hover:bg-black hover:text-white transition-all duration-300`} 
+              onClick={() => navigate("/user/chat")} 
+            >
+              Chat With Tutor
+            </button>
           <div className="mb-10">
             <button
-              className="text-2xl ml-6 mr-24 text-black bg-white  rounded-md font-extrabold m-3  hover:text-white hover:bg-black hover:border-white "
+              className="text-2xl ml-6 mr-24 text-black bg-white  rounded-md font-extrabold m-3  hover:text-white hover:bg-black hover:border-white"
               style={{ width: "180px" }}
             ></button>
 
@@ -163,6 +185,7 @@ const CourseModules = () => {
             >
               Completed
             </button>
+            
           </div>
           <h3 className="text-4xl font-bold mb-10 text-left text-white mt-6">
             Your Learning Journey

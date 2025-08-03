@@ -7,6 +7,8 @@ import BackgroundAnimation from "../../../../Component/BackgroundAnimation";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import SchoolIcon from "@mui/icons-material/School";
 import QuestionAnswerIcon from "@mui/icons-material/QuestionAnswer";
+import CastIcon from '@mui/icons-material/Cast';
+
 
 const Sidebar = ({ activeItem, setActiveItem }) => {
   const [open, setOpen] = useState(true);
@@ -78,7 +80,16 @@ const Sidebar = ({ activeItem, setActiveItem }) => {
             open={open}
             activeItem={activeItem}
             setActiveItem={setActiveItem}
-            onClick={() => navigate("/tutor/chat ")}
+            onClick={() => navigate("/tutor/chat")}
+            className="text-white hover:text-black hover:bg-white transition duration-200 px-4 py-2 rounded-md"
+          />
+          <SidebarItem
+            icon={<CastIcon className="text-white" />}
+            label="Meeting's"
+            open={open}
+            activeItem={activeItem}
+            setActiveItem={setActiveItem}
+            onClick={() => navigate("/tutor/meet")}
             className="text-white hover:text-black hover:bg-white transition duration-200 px-4 py-2 rounded-md"
           />
           {/* <SidebarItem 

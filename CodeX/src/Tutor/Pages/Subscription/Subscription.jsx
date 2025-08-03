@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import BackgroundAnimation from "../../../Component/BackgroundAnimation";
 import Navbar from "../Navbar/Navbar";
-import { adminAxios } from "../../../../axiosConfig";
+import { adminAxios, userAxios } from "../../../../axiosConfig";
 import { toast } from "react-toastify";
 
 const Subscription = () => {
@@ -10,7 +10,7 @@ const Subscription = () => {
 
   const handleSubscribe = async (id) => {
     try {
-      const response = await adminAxios.post(`create-checkout-session/${id}/`);
+      const response = await userAxios.post(`create-checkout-session/${id}/`);
       toast.success("Subscription Request Sended");
       window.location.href = response.data.checkout_url;
     } catch (e) {

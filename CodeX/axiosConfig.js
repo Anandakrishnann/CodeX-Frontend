@@ -1,10 +1,10 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://127.0.0.1:8000/";
+const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}`;
 
 const userAxios = axios.create({
   baseURL: `${API_BASE_URL}api/`,
-  withCredentials: true, // Ensure cookies are sent
+  withCredentials: true,
 });
 
 const adminAxios = axios.create({
@@ -17,8 +17,13 @@ const tutorAxios = axios.create({
   withCredentials: true,
 });
 
+const chatAxios = axios.create({
+  baseURL: `${API_BASE_URL}chat/`,
+  withCredentials: true,
+});
+
 // Apply interceptors for token refresh
-[userAxios, adminAxios, tutorAxios].forEach((axiosInstance) => {
+[userAxios, adminAxios, tutorAxios, chatAxios].forEach((axiosInstance) => {
   axiosInstance.interceptors.response.use(
     (response) => response,
     async (error) => {
@@ -55,4 +60,4 @@ const tutorAxios = axios.create({
   );
 });
 
-export { userAxios, adminAxios, tutorAxios };
+export { userAxios, adminAxios, tutorAxios, chatAxios };

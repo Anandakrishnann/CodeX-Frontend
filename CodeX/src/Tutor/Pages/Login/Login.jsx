@@ -19,8 +19,10 @@ const Login = () => {
       console.log("Login successful:", response.data);
       if (response.status === 200) {
         dispatch(loginUser(response.data.user));
-
         toast.success("Login Successful!");
+        if(response.data.user.role === "tutor"){
+          navigate("/tutor")
+        }
         navigate("/");
       }
     } catch (error) {

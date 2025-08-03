@@ -61,6 +61,11 @@ import OrderSuccess from "./User/Pages/OrderSuccess/OrderSuccess";
 import Certificate from "./User/Pages/Dashboard/UserCourses/Certificate/Certificate";
 import Chat from "./User/Pages/Dashboard/UserChat/UserChat";
 import TutorChat from "./Tutor/Pages/Dashboard/TutorChat/TutorChat";
+import TutorMeeting from "./Tutor/Pages/Dashboard/TutorMeeting/TutorMeeting";
+import UserMeetings from "./User/Pages/Dashboard/UserMeetings/UserMeetings";
+import MeetingRoom from "./Component/MeetingRoom/MeetingRoom";
+import Review from "./User/review";
+
 
 const queryClient = new QueryClient();  // ✅ Fix QueryClient initialization
 
@@ -86,6 +91,7 @@ function App() {
             />
             <BrowserRouter>
               <Routes>
+                <Route path="/review" element={<Review />} />
                 <Route path="/" element={<Home />} />
                 <Route path="/loading" element={<Loading />} />
                 <Route path="/tasks" element={<TaskSection />} />
@@ -108,6 +114,8 @@ function App() {
                   <Route path="/user-profile" element={<UserProfile />} />
                   <Route path="/user/courses" element={<UserCourses />} />
                   <Route path="/user/chat" element={<Chat />} />
+                  <Route path="/user/meet" element={<UserMeetings />} />
+                  <Route path="/room/:roomID/:userID/:userName" element={<MeetingRoom />} />
                   <Route path="/user/courses-modules" element={<CourseModules />} />
                   <Route path="/user/courses-lessons" element={<CourseLessons />} />
                   <Route path="/user/lesson-overview" element={<CourseLessonOverview />} />
@@ -132,6 +140,7 @@ function App() {
                   <Route path="/tutor/profile" element={<TutorProfile />} />
                   <Route path="/tutor/course" element={<Course />} />
                   <Route path="/tutor/chat" element={<TutorChat />} />
+                  <Route path="/tutor/meet" element={<TutorMeeting />} />
                   <Route path="/tutor/course/modules" element={<Modules />} />
                   <Route path="/tutor/course/lessons" element={<Lessons />} />
                   <Route path="/tutor/lesson/overview" element={<LessonOverview />} />
