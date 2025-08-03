@@ -181,7 +181,7 @@ const CourseLessonOverview = () => {
             {/* Complete Button */}
             <div className="flex justify-center">
               <button
-                className="text-2xl p-2  text-white bg-black border border-white  rounded-md font-extrabold m-3 border border-transparent transition duration-200 hover:bg-white hover:text-black hover:border-black"
+                className="text-2xl p-2  text-white bg-black border-white  rounded-md font-extrabold m-3 border transition duration-200 hover:bg-white hover:text-black hover:border-black"
                 onClick={() => {
                   handleCompleteLesson(lesson_id);
                 }}

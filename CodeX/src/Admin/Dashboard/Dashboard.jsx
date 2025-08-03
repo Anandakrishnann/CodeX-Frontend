@@ -1,5 +1,4 @@
 import React from "react";
-import "./Dashboard.css";
 import { LineChart } from "@mui/x-charts";
 import Layout from "./Layout/Layout";
 

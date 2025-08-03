@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import "./Signup.css";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { userAxios } from "../../../../axiosConfig";
