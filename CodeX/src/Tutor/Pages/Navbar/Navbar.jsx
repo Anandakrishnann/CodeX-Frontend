@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { cn } from "../../../lib/utils";
+import { cn } from "@/lib/utils";
 import { useDispatch, useSelector } from "react-redux"; // ✅ include useDispatch
 import { logoutUser } from "../../../redux/slices/userSlice"; // ✅ make sure this path is correct
 import { userAxios } from "../../../../axiosConfig";
