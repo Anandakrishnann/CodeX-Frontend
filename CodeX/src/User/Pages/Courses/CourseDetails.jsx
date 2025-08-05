@@ -12,14 +12,11 @@ const CourseDetails = () => {
   const [openSection, setOpenSection] = useState(null);
   const [course, setCourse] = useState(null);
   const [showFullDesc, setShowFullDesc] = useState(false);
-  const course_id = useSelector((state) => state.user.courseId);
-  const user = useSelector((state) => state.user.user);
   const [showModal, setShowModal] = useState(false);
   const [isEnrolled, setIsEnrolled] = useState(false);
-  const [loading, setLoading] = useState(true);
 
-  console.log("course_id", course_id);
-  console.log("user", user.email);
+  const course_id = useSelector((state) => state.user.courseId);
+  const user = useSelector((state) => state.user.user);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -28,12 +25,18 @@ const CourseDetails = () => {
     window.scrollTo(0, 0);
   }, []);
 
+  useEffect(() => {
+    if (!user) {
+      navigate("/login");
+    }
+  }, [user]);
+
   const fetchCourse = async () => {
     try {
       const response = await userAxios.get(`course_details/${course_id}/`);
       setCourse(response.data);
     } catch (error) {
-      console.log(error || "Error While Fetching Course Details");
+      console.error("Error fetching course details:", error);
     }
   };
 
@@ -41,7 +44,7 @@ const CourseDetails = () => {
     try {
       const res = await userAxios.get("/check_enrollment/", {
         params: {
-          user_email: user.email,
+          user_email: user?.email,
           course_id: course_id,
         },
       });
@@ -54,54 +57,13 @@ const CourseDetails = () => {
     }
   };
 
-  const handlePaymentApprove = async (
-    data,
-    actions,
-    course,
-    user,
-    navigate,
-    handleClose
-  ) => {
-    try {
-      const details = await actions.order.capture();
-      console.log("Payment Successful:", details);
-
-      // Verify payment
-      const verifyRes = await userAxios.post("payment_verification/", {
-        user_email: user.email,
-        course_id: course.id,
-      });
-
-      if (verifyRes.status !== 200) {
-        toast.error(verifyRes.data?.error || "Payment Verification Failed");
-        return;
-      }
-
-      // Mark payment success and enroll
-      const successRes = await userAxios.post("paypal_success/", {
-        user_email: user.email,
-        course_id: course.id,
-        payment_details: details,
-      });
-
-      console.log("Backend Response:", successRes.data);
-      toast.success(
-        "Payment Successful 🎉 Go To Dashboard To See Course Details"
-      );
-      navigate("/user/order-success");
-      handleClose();
-    } catch (error) {
-      const errMsg =
-        error?.response?.data?.error || "Payment processing failed";
-      console.error("Error sending to backend:", error);
-      toast.error(errMsg);
-    }
-  };
-
   useEffect(() => {
     fetchCourse();
-    checkUserEnrollment();
-  }, [course_id]);
+
+    if (user && user.email) {
+      checkUserEnrollment();
+    }
+  }, [course_id, user]);
 
   const toggleSection = useCallback((index) => {
     setOpenSection((prev) => (prev === index ? null : index));
@@ -113,7 +75,6 @@ const CourseDetails = () => {
   };
 
   const handleClose = () => setShowModal(false);
-  const handleOpen = () => setShowModal(true);
 
   return (
     <div className="min-h-screen bg-black text-white font-poppins">
@@ -127,8 +88,9 @@ const CourseDetails = () => {
               <div className="md:w-1/3 flex flex-col items-center">
                 <img
                   src={
-                    course.profile_picture ||
-                    "https://i.pinimg.com/736x/6d/ac/d4/6dacd4cf41a3637d021f0aba48de54fc.jpg"
+                    course.profile_picture?.startsWith("http")
+                      ? course.profile_picture
+                      : "https://i.pinimg.com/736x/6d/ac/d4/6dacd4cf41a3637d021f0aba48de54fc.jpg"
                   }
                   alt="Course"
                   className="w-72 h-72 object-cover rounded-xl border-2 border-white"
@@ -137,7 +99,7 @@ const CourseDetails = () => {
                   {course.first_name} {course.last_name}
                 </h2>
                 <button
-                  className=" bg-white hover:bg-black hover:text-green-500 text-black font-semibold p-2 rounded-lg mt-3"
+                  className="bg-white hover:bg-black hover:text-green-500 text-black font-semibold p-2 rounded-lg mt-3"
                   onClick={() => TutorDetails(course.tutor_id)}
                 >
                   View Tutor Details
@@ -154,14 +116,15 @@ const CourseDetails = () => {
                   <span className="text-green-500 font-medium">
                     (335,678 ratings)
                   </span>
-                  <span>{course.created_at}</span>
+                  <span>
+                    {new Date(course.created_at).toLocaleDateString()}
+                  </span>
                 </div>
               </div>
             </div>
 
             {/* Learn & Purchase */}
             <div className="mt-12 grid md:grid-cols-3 gap-6">
-              {/* What you'll learn */}
               <div className="md:col-span-2 bg-white text-black p-6 rounded-2xl shadow">
                 <h2 className="text-2xl font-bold mb-4">What You'll Learn</h2>
                 <ul className="list-disc list-inside space-y-2 text-lg">
@@ -171,7 +134,6 @@ const CourseDetails = () => {
                 </ul>
               </div>
 
-              {/* Purchase Box */}
               <div className="bg-gray-900 text-white p-6 rounded-2xl shadow flex flex-col justify-between">
                 <div>
                   <h3 className="text-xl font-semibold">{course.title}</h3>
@@ -181,22 +143,32 @@ const CourseDetails = () => {
                   <p className="text-2xl font-bold text-green-500 mt-2 mb-4">
                     ₹{course.price}
                   </p>
-                  {isEnrolled ? (
-                    <button
-                      onClick={() => navigate("/user-dashboard")}
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg mb-4"
-                    >
-                      Go to Dashboard
-                    </button>
+                  {user ? (
+                    isEnrolled ? (
+                      <button
+                        onClick={() => navigate("/user-dashboard")}
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg mb-4"
+                      >
+                        Go to Dashboard
+                      </button>
+                    ) : (
+                      <button
+                        className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 rounded-lg mb-4 disabled:opacity-50"
+                        onClick={() => setShowModal(true)}
+                        disabled={!course?.price}
+                      >
+                        BUY COURSE
+                      </button>
+                    )
                   ) : (
                     <button
-                      className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 rounded-lg mb-4 disabled:opacity-50"
-                      onClick={() => setShowModal(true)}
-                      disabled={!course?.price}
+                      onClick={() => navigate("/login")}
+                      className="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 rounded-lg mb-4"
                     >
-                      BUY COURSE
+                      Login to Buy Course
                     </button>
                   )}
+
                   <ul className="list-disc list-inside text-sm text-gray-300">
                     {course?.benefits?.split(",").map((b, idx) => (
                       <li key={idx}>{b.trim()}</li>
@@ -206,7 +178,7 @@ const CourseDetails = () => {
               </div>
             </div>
 
-            {/* Modules Accordion */}
+            {/* Course Content Accordion */}
             <div className="mt-12 bg-white text-black p-6 rounded-2xl shadow">
               <h2 className="text-2xl font-bold mb-6">Course Content</h2>
               {course?.module_data?.map((module, index) => (
@@ -222,13 +194,13 @@ const CourseDetails = () => {
                       {openSection === index ? "▼" : "►"} {module.title}
                     </span>
                     <span className="text-gray-600 text-sm">
-                      {module.lessons.length} Lessons
+                      {module?.lessons?.length || 0} Lessons
                     </span>
                   </button>
 
                   {openSection === index && (
                     <ul className="bg-white p-4 space-y-2 text-sm">
-                      {module.lessons.map((lesson, idx) => (
+                      {module?.lessons?.map((lesson, idx) => (
                         <li
                           key={idx}
                           className="flex justify-between items-center"
@@ -236,11 +208,12 @@ const CourseDetails = () => {
                           <div className="flex items-center gap-2">
                             <span className="text-black text-xl">•</span>
                             <span className="text-black font-medium">
-                              {lesson.title}
+                              {lesson?.title}
                             </span>
                           </div>
                           <span className="text-gray-600 text-sm">
-                            {lesson.created_at}
+                            {lesson?.created_at &&
+                              new Date(lesson.created_at).toLocaleDateString()}
                           </span>
                         </li>
                       ))}
@@ -293,7 +266,6 @@ const CourseDetails = () => {
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-black bg-opacity-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-lg relative">
-            {/* Close Button */}
             <button
               onClick={handleClose}
               className="absolute top-2 right-2 text-gray-600 hover:text-black text-xl font-bold"
@@ -301,10 +273,8 @@ const CourseDetails = () => {
               ×
             </button>
 
-            {/* Title */}
             <h2 className="text-xl font-semibold mb-4">Complete Payment</h2>
 
-            {/* PayPal Buttons */}
             <PayPalButtons
               createOrder={(data, actions) => {
                 return actions.order.create({
@@ -319,13 +289,13 @@ const CourseDetails = () => {
               }}
               onApprove={async (data, actions) => {
                 const details = await actions.order.capture();
-                const orderID = data.orderID; // ✅ Correct order ID
+                const orderID = data.orderID;
 
                 try {
                   const successRes = await userAxios.post("paypal_success/", {
-                    user_email: user.email,
+                    user_email: user?.email,
                     course_id: course.id,
-                    orderID: orderID, // ✅ Correctly pass orderID
+                    orderID,
                   });
                   toast.success("Payment Successful 🎉 Go to Dashboard");
                   navigate("/user/order-success");

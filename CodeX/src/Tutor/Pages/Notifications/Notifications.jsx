@@ -12,11 +12,11 @@ const Notifications = () => {
         <div className="flex-1 flex flex-col md:flex-row px-6 py-4">
           {/* Left Side Illustration */}
           <div className="w-full md:w-1/3 flex items-center justify-center">
-            <img
-              src="https://i.pinimg.com/736x/71/0f/f9/710ff9a6e585e27dc9658e5a68d8eb6b.jpg"
+            {/* <img
+              src=""
               alt="Person relaxing with coffee"
               className="relative z-10"
-            />
+            /> */}
           </div>
 
           {/* Middle Content */}
@@ -39,11 +39,11 @@ const Notifications = () => {
 
           {/* Right Side Illustration */}
           <div className="w-full md:w-1/3 flex items-center justify-center mt-8 md:mt-0">
-            <img
-              src="https://i.pinimg.com/736x/94/d0/11/94d011a17d2150637acee92f946a1c3f.jpg"
+            {/* <img
+              src=""
               alt="Computer monitor with person"
               className="transform rotate-6"
-            />
+            /> */}
           </div>
         </div>
 

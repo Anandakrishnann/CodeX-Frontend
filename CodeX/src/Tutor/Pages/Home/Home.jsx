@@ -30,8 +30,13 @@ const TutorHome = () => {
 
   useEffect(() => {
     if (!tutor?.id) return;
-    tutorSubscribed();
-    const fetchTutor = async () => {
+    if (tutor?.role === "tutor"){
+      tutorSubscribed();
+      fetchTutor();
+    }
+  }, [tutor]);
+
+  const fetchTutor = async () => {
       try {
         const response = await userAxios.get("tutor_home/");
         if (response.status === 200) {
@@ -45,9 +50,6 @@ const TutorHome = () => {
         toast.error("Something Went Wrong.");
       }
     };
-
-    fetchTutor();
-  }, []); // ✅ only watch tutor.id, not entire tutor object
 
   const tutorSubscribed = async () => {
     try {

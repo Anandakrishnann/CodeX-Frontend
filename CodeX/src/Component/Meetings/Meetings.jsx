@@ -19,7 +19,7 @@ export default function TutorMeeting() {
   const [availableMeetings, setAvailableMeetings] = useState([]);
   const [userBookedMeetings, setUserBookedMeetings] = useState([]);
   const [recentMeetings, setRecentMeetings] = useState([]);
-
+  const [isSubscribed, setIsSubscribed] = useState(false)
   const role = useSelector((state) => state.user.role);
   const user = useSelector((state) => state.user.user);
   const today = new Date().toISOString().split("T")[0];
@@ -31,12 +31,27 @@ export default function TutorMeeting() {
     if (role === "tutor") {
       tutorSheduledMeetings();
       tutorRecentMeetings();
+      tutorSubscribed()
     } else if (role === "user") {
       userAvailableMeetings();
       userBookedMeetingFetch();
       userRecentMeetings();
     }
   }, [role]);
+
+  const tutorSubscribed = async () => {
+    try {
+      const response = await tutorAxios.get("tutor_subscribed/");
+      if (response.data.subscribed) {
+        setIsSubscribed(true);
+      } else {
+        setIsSubscribed(false);
+      }
+    } catch (error) {
+      console.log("Error while checking subscription:", error);
+      setIsSubscribed(false); // fallback
+    }
+  };
 
   const userAvailableMeetings = async () => {
     try {
@@ -244,7 +259,7 @@ export default function TutorMeeting() {
                       </div>
 
                       <div className="p-6 pt-0">
-                        {role === "tutor" ? (
+                        {role === "tutor" && isSubscribed === true ? (
                           <div className="flex gap-2">
                             <button className="flex-1 border-2 border-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:border-blue-600 hover:text-blue-600 flex justify-center">
                               <Edit className="w-4 h-4" />
@@ -294,7 +309,7 @@ export default function TutorMeeting() {
         )}
 
         {/* Create Meeting Form */}
-        {activeTab === "schedule" && role === "tutor" && (
+        {activeTab === "schedule" && role === "tutor" && isSubscribed === true && (
           <div className="max-w-2xl mx-auto">
             <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8">
               <h2 className="text-2xl font-bold text-center text-gray-900 mb-6">

@@ -174,7 +174,7 @@ const Home = () => {
                           {/* View Button */}
                           <div className="p-6 pt-0 mt-auto bg-gradient-to-t from-black via-transparent to-transparent z-10">
                             <button
-                              onClick={() => handleClick(course.id)}
+                              onClick={() => handleCourseView(course.id)}
                               className="w-full bg-green-500/10 hover:bg-green-600 text-green-300 hover:text-white border border-green-400 rounded-xl font-semibold py-3 transition-all duration-300 hover:shadow-xl backdrop-blur-lg"
                             >
                               🚀 View Course

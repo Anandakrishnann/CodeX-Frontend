@@ -1,0 +1,24 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://codex-y6fz.onrender.com/api/:path*"
+    },
+    {
+      "source": "/adminpanel/:path*",
+      "destination": "https://codex-y6fz.onrender.com/adminpanel/:path*"
+    },
+    {
+      "source": "/tutorpanel/:path*",
+      "destination": "https://codex-y6fz.onrender.com/tutorpanel/:path*"
+    },
+    {
+      "source": "/chat/:path*",
+      "destination": "https://codex-y6fz.onrender.com/chat/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/"
+    }
+  ]
+}
