@@ -1,204 +1,270 @@
-import React from "react";
-import { LineChart } from "@mui/x-charts";
+import React, { useEffect, useState } from "react";
+import { LineChart, BarChart } from "@mui/x-charts";
 import Layout from "./Layout/Layout";
+import { adminAxios } from "../../../axiosConfig";
 
 const Dashboard = () => {
+  const [analytics, setAnalytics] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      try {
+        const response = await adminAxios.get("admin_dashboard/");
+        setAnalytics(response.data);
+        console.log(response.data);
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAnalytics();
+  }, []);
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center min-h-screen bg-gradient-to-br">
+          <div className="text-center">
+            <div className="inline-block animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500 mb-4"></div>
+            <div className="text-white text-xl font-semibold">Loading dashboard...</div>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
-      {/* Main Content Area */}
-      <div className="col-span-3 grid grid-rows-3 gap-6">
-        {/* Overview Section */}
-        <div className="row-span-1 bg-gray-800 p-4 rounded-lg">
-          <h2 className="text-lg font-semibold mb-4">Over View</h2>
-          <div className="grid grid-cols-3 gap-4">
-            <div className="bg-gray-700 p-2 rounded text-center">
-              <p className="text-sm text-green-400">+4.4%</p>
-              <p className="text-2xl font-bold">$56,242.00</p>
-              <p>Income</p>
-            </div>
-            <div className="bg-gray-700 p-2 rounded text-center">
-              <p className="text-sm text-green-400">+4.4%</p>
-              <p className="text-2xl font-bold">$56,242.00</p>
-              <p>Spending</p>
-            </div>
-            <div className="bg-gray-700 p-2 rounded text-center">
-              <p className="text-sm text-green-400">+4.4%</p>
-              <p className="text-2xl font-bold">$56,242.00</p>
-              <p>Net Profit</p>
-            </div>
+      <div className="min-h-screen bg-gradient-to-br p-4 sm:p-6 lg:p-8">
+        <div className="max-w-7xl mx-auto space-y-6">
+          {/* Header */}
+          <div className="mb-8">
+            <h1 className="text-4xl font-bold text-white mb-2 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+              Dashboard Overview
+            </h1>
+            <p className="text-gray-400">Welcome back! Here's what's happening today.</p>
           </div>
-        </div>
 
-        <div className="bg-gray-800 p-4 rounded-lg">
-          <h2 className="text-lg font-semibold mb-4">
-            Total Amount <span className="text-sm text-gray-400">All Time</span>
-          </h2>
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <span>Profit</span>
-              <span className="text-purple-400">$400.00</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Loss</span>
-              <span className="text-purple-400">$900.00</span>
-            </div>
+          {/* Stats Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+            <StatCard 
+              title="Total Users" 
+              value={analytics.total_users} 
+              gradient="from-blue-500 via-blue-600 to-cyan-500"
+              icon="👥"
+            />
+            <StatCard 
+              title="Total Tutors" 
+              value={analytics.total_tutors} 
+              gradient="from-emerald-500 via-green-600 to-teal-500"
+              icon="🎓"
+            />
+            <StatCard 
+              title="Total Courses" 
+              value={analytics.total_courses} 
+              gradient="from-purple-500 via-purple-600 to-pink-500"
+              icon="📚"
+            />
+            <StatCard 
+              title="Total Revenue" 
+              value={`$${analytics.total_revenue}`} 
+              gradient="from-orange-500 via-amber-600 to-yellow-500"
+              icon="💰"
+            />
           </div>
-          <div className="mt-4">
-            <svg className="w-full h-32">
-              <rect x="0" y="0" width="50" height="100" fill="#6B46C1" />
-              <rect x="60" y="20" width="50" height="80" fill="#A0AEC0" />
-              <rect x="120" y="40" width="50" height="60" fill="#6B46C1" />
-              <rect x="180" y="30" width="50" height="70" fill="#A0AEC0" />
-            </svg>
-          </div>
-        </div>
-        <LineChart
-          xAxis={[
-            {
-              data: [1, 2, 3, 5, 8, 10],
-              tickLabelStyle: { fill: "#FFFFFF" }, // X-axis label color
-              axisLine: { stroke: "#FFFFFF" }, // X-axis line color
-            },
-          ]}
-          yAxis={[
-            {
-              tickLabelStyle: { fill: "#FFFFFF" }, // Y-axis label color
-              axisLine: { stroke: "#FFFFFF" }, // Y-axis line color
-            },
-          ]}
-          series={[
-            {
-              data: [2, 5.5, 2, 8.5, 1.5, 5],
-              color: "#FFFFFF",
-            },
-          ]}
-          width={800}
-          height={400}
-        />
 
-        {/* Scheduled Payments */}
-        <div className="row-span-1 bg-gray-800 p-4 rounded-lg">
-          <h2 className="text-lg font-semibold mb-4">Scheduled Payments</h2>
-          <div className="flex items-center space-x-4">
-            <div className="w-1/2">
-              <div className="w-48 h-48 mx-auto">
-                <svg viewBox="0 0 36 36" className="w-full h-full">
-                  <path
-                    d="M18 2.0845
-                       a 15.9155 15.9155 0 0 1 0 31.831
-                       a 15.9155 15.9155 0 0 1 0 -31.831"
-                    fill="none"
-                    stroke="#6B46C1"
-                    strokeWidth="3"
-                  />
-                  <path
-                    d="M18 2.0845
-                       a 15.9155 15.9155 0 0 1 0 31.831
-                       a 15.9155 15.9155 0 0 1 0 -31.831"
-                    fill="none"
-                    stroke="#A0AEC0"
-                    strokeWidth="3"
-                    strokeDasharray="50 100"
-                  />
-                  <text
-                    x="18"
-                    y="20.35"
-                    textAnchor="middle"
-                    fontSize="6"
-                    fill="#fff"
+          {/* Revenue Trends */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+            <ChartCard title="Monthly Revenue Trend" icon="📈">
+              <div className="mt-4">
+                <LineChart
+                  xAxis={[{ 
+                    data: analytics.monthly_revenue_trend.map(item => item.month), 
+                    scaleType: "point",
+                  }]}
+                  series={[{ 
+                    data: analytics.monthly_revenue_trend.map(item => Number(item.revenue)), 
+                    color: "#10B981",
+                    curve: "natural"
+                  }]}
+                  width={500}
+                  height={300}
+                  sx={{
+                    '& .MuiChartsAxis-line': { stroke: '#6B7280' },
+                    '& .MuiChartsAxis-tick': { stroke: '#6B7280' },
+                    '& .MuiChartsAxis-tickLabel': { fill: '#9CA3AF' }
+                  }}
+                />
+              </div>
+            </ChartCard>
+
+            <ChartCard title="Yearly Revenue Trend" icon="📊">
+              <div className="mt-4">
+                <BarChart
+                  xAxis={[{ 
+                    data: analytics.yearly_revenue_trend.map(item => String(item.year)), 
+                    scaleType: "band"
+                  }]}
+                  series={[{ 
+                    data: analytics.yearly_revenue_trend.map(item => Number(item.revenue)), 
+                    color: "#8B5CF6"
+                  }]}
+                  width={500}
+                  height={300}
+                  sx={{
+                    '& .MuiChartsAxis-line': { stroke: '#6B7280' },
+                    '& .MuiChartsAxis-tick': { stroke: '#6B7280' },
+                    '& .MuiChartsAxis-tickLabel': { fill: '#9CA3AF' }
+                  }}
+                />
+              </div>
+            </ChartCard>
+          </div>
+
+          {/* Top Performers */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+            <ListCard 
+              title="Top Tutors" 
+              items={analytics.top_tutors} 
+              label="earnings" 
+              icon="🏆"
+              accentColor="text-amber-400"
+            />
+            <ListCard 
+              title="Top Courses" 
+              items={analytics.top_courses} 
+              label="enrollments" 
+              icon="⭐"
+              accentColor="text-purple-400"
+            />
+          </div>
+
+          {/* User Growth & Transactions */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+            <ChartCard title="User Growth Trend" icon="📱">
+              <div className="mt-4">
+                <LineChart
+                  xAxis={[{ 
+                    data: analytics.user_growth.map(item => item.month), 
+                    scaleType: "point" 
+                  }]}
+                  series={[{ 
+                    data: analytics.user_growth.map(item => Number(item.count)), 
+                    color: "#06B6D4",
+                    curve: "natural"
+                  }]}
+                  width={500}
+                  height={300}
+                  sx={{
+                    '& .MuiChartsAxis-line': { stroke: '#6B7280' },
+                    '& .MuiChartsAxis-tick': { stroke: '#6B7280' },
+                    '& .MuiChartsAxis-tickLabel': { fill: '#9CA3AF' }
+                  }}
+                />
+              </div>
+            </ChartCard>
+
+            <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 shadow-2xl border border-white/10 hover:border-purple-500/30 transition-all duration-300">
+              <div className="flex items-center gap-3 mb-6">
+                <span className="text-2xl">💳</span>
+                <h2 className="text-xl font-bold text-white">Recent Transactions</h2>
+              </div>
+              <div className="space-y-3 max-h-80 overflow-y-auto custom-scrollbar">
+                {analytics.recent_transactions.map((txn, idx) => (
+                  <div 
+                    key={idx} 
+                    className="flex flex-col sm:flex-row sm:justify-between gap-2 p-4 rounded-xl bg-slate-700/30 hover:bg-slate-700/50 transition-all duration-200 border border-white/5"
                   >
-                    70%
-                  </text>
-                </svg>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-white font-medium truncate">{txn.user}</p>
+                      <p className="text-purple-400 text-sm truncate">{txn.course}</p>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <span className="text-emerald-400 font-semibold">${txn.amount}</span>
+                      <span className="text-gray-400 text-sm whitespace-nowrap">{txn.date}</span>
+                    </div>
+                  </div>
+                ))}
               </div>
-            </div>
-            <div className="w-1/2">
-              <p>
-                Corporate Card{" "}
-                <span className="text-purple-400">$2,600.00</span>
-              </p>
-              <p>
-                Debit Card <span className="text-purple-400">$5,832.00</span>
-              </p>
-              <p>
-                Cash <span className="text-purple-400">$900.00</span>
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Total Amount and Active Customers */}
-        <div className="row-span-1 grid grid-cols-2 gap-6">
-          {/* Total Amount */}
-
-          {/* Active Customers */}
-          <div className="bg-gray-800 p-4 rounded-lg">
-            <h2 className="text-lg font-semibold mb-4">
-              Active Customers{" "}
-              <span className="text-sm text-gray-400">Inactive</span>
-            </h2>
-            <div className="space-y-4">
-              <div className="flex items-center space-x-2">
-                <img
-                  src="https://via.placeholder.com/30"
-                  alt="Olivia Rhys"
-                  className="w-8 h-8 rounded-full"
-                />
-                <div>
-                  <p>Olivia Rhys</p>
-                  <p className="text-sm text-gray-400">olivia@gmail.com</p>
-                </div>
-                <span className="ml-auto">Monthly</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <img
-                  src="https://via.placeholder.com/30"
-                  alt="Phoenix Baker"
-                  className="w-8 h-8 rounded-full"
-                />
-                <div>
-                  <p>Phoenix Baker</p>
-                  <p className="text-sm text-gray-400">phoenix@gmail.com</p>
-                </div>
-                <span className="ml-auto">Yearly</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <img
-                  src="https://via.placeholder.com/30"
-                  alt="Candice Wu"
-                  className="w-8 h-8 rounded-full"
-                />
-                <div>
-                  <p>Candice Wu</p>
-                  <p className="text-sm text-gray-400">candice@gmail.com</p>
-                </div>
-                <span className="ml-auto">Monthly</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Transactions Overview */}
-        <div className="row-span-1 bg-gray-800 p-4 rounded-lg">
-          <h2 className="text-lg font-semibold mb-4">Transactions Overview</h2>
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <span>Invoice #3066</span>
-              <span>Jan 6, 2022</span>
-              <span className="text-green-400">Paid</span>
-              <span>$59.99</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Invoice #3065</span>
-              <span>Jan 6, 2022</span>
-              <span className="text-green-400">Paid</span>
-              <span>$368.84</span>
             </div>
           </div>
         </div>
       </div>
+
+      <style jsx>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: rgba(71, 85, 105, 0.3);
+          border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(139, 92, 246, 0.5);
+          border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(139, 92, 246, 0.8);
+        }
+      `}</style>
     </Layout>
   );
 };
+
+const StatCard = ({ title, value, gradient, icon }) => (
+  <div className={`relative overflow-hidden bg-gradient-to-br ${gradient} p-6 rounded-2xl shadow-2xl transform hover:scale-105 transition-all duration-300 group`}>
+    <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
+    <div className="relative z-10">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-sm font-medium text-white/90 uppercase tracking-wider">{title}</h3>
+        <span className="text-3xl opacity-80">{icon}</span>
+      </div>
+      <p className="text-4xl font-bold text-white drop-shadow-lg">{value}</p>
+      <div className="mt-4 h-1 w-16 bg-white/40 rounded-full"></div>
+    </div>
+  </div>
+);
+
+const ChartCard = ({ title, children, icon }) => (
+  <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 shadow-2xl border border-white/10 hover:border-purple-500/30 transition-all duration-300">
+    <div className="flex items-center gap-3 mb-2">
+      <span className="text-2xl">{icon}</span>
+      <h2 className="text-xl font-bold text-white">{title}</h2>
+    </div>
+    <div className="overflow-x-auto">
+      {children}
+    </div>
+  </div>
+);
+
+const ListCard = ({ title, items, label, icon, accentColor }) => (
+  <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 shadow-2xl border border-white/10 hover:border-purple-500/30 transition-all duration-300">
+    <div className="flex items-center gap-3 mb-6">
+      <span className="text-2xl">{icon}</span>
+      <h2 className="text-xl font-bold text-white">{title}</h2>
+    </div>
+    <div className="space-y-3">
+      {items.map((item, idx) => (
+        <div 
+          key={idx} 
+          className="flex items-center justify-between p-4 rounded-xl bg-slate-700/30 hover:bg-slate-700/50 transition-all duration-200 group border border-white/5"
+        >
+          <div className="flex items-center gap-3">
+            <div className={`w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-sm`}>
+              {idx + 1}
+            </div>
+            <span className="text-white font-medium">{item.name}</span>
+          </div>
+          <span className={`${accentColor} font-semibold text-lg group-hover:scale-110 transition-transform`}>
+            {label === "earnings" ? `$${item[label]}` : item[label]}
+          </span>
+        </div>
+      ))}
+    </div>
+  </div>
+);
 
 export default Dashboard;

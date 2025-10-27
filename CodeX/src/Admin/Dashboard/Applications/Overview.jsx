@@ -7,16 +7,20 @@ import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import TaskAltIcon from "@mui/icons-material/TaskAlt";
 import CancelIcon from "@mui/icons-material/Cancel";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import EmailIcon from "@mui/icons-material/Email";
+import PhoneIcon from "@mui/icons-material/Phone";
+import CakeIcon from "@mui/icons-material/Cake";
+import SchoolIcon from "@mui/icons-material/School";
+import WorkIcon from "@mui/icons-material/Work";
+import EmojiObjectsIcon from "@mui/icons-material/EmojiObjects";
+import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import { toast } from "react-toastify";
 import Loading from "../../Components/Loading/Loading";
 import Layout from "../Layout/Layout";
 
 const Overview = () => {
   const { userId } = useParams();
-  console.log(userId);
-
   const [userData, setUserData] = useState(null);
-  console.log(userData);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -32,10 +36,6 @@ const Overview = () => {
       fetchUserData();
     }
   }, [userId]);
-
-  if (!userData) {
-    return <Loading />;
-  }
 
   const acceptApplication = async (applicationId) => {
     if (!applicationId) {
@@ -75,283 +75,264 @@ const Overview = () => {
     }
   };
 
+  if (!userData) {
+    return <Loading />;
+  }
+
+  const getStatusConfig = (status) => {
+    const configs = {
+      pending: {
+        gradient: "from-amber-400 to-orange-500",
+        icon: <AccessTimeIcon className="w-5 h-5" />,
+        text: "Pending Review"
+      },
+      verified: {
+        gradient: "from-emerald-400 to-green-600",
+        icon: <TaskAltIcon className="w-5 h-5" />,
+        text: "Verified"
+      },
+      rejected: {
+        gradient: "from-red-400 to-rose-600",
+        icon: <CancelIcon className="w-5 h-5" />,
+        text: "Rejected"
+      }
+    };
+    return configs[status] || configs.pending;
+  };
+
+  const statusConfig = getStatusConfig(userData.status);
+
   return (
     <Layout>
-      <div className="mx-auto px-4 py-8 font-serif" style={{ width: "1100px" }}>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Left Section - User Information */}
-          <div className="md:col-span-2 bg-white rounded-lg shadow-lg overflow-hidden">
-            <div className="p-6 flex justify-between items-center border-b border-gray-200">
-              <h2 className="text-2xl font-bold text-black font-serif">
-                Application
-              </h2>
-              <button
-                style={{
-                  backgroundColor:
-                    userData.status === "pending"
-                      ? "#ffd700"
-                      : userData.status === "accepted"
-                      ? "green"
-                      : userData.status === "rejected"
-                      ? "red"
-                      : "black",
-                }}
-                className=" text-white font-extrabold text-xl px-4 py-2 rounded-md flex items-center gap-2"
-              >
-                {userData.status === "pending" ? (
-                  <span className="h-4 w-4 mr-3 mb-4 ">
-                    <AccessTimeIcon />
-                  </span>
-                ) : userData.status === "accepted" ? (
-                  <span className="h-4 w-4 mr-3 mb-2">
-                    <TaskAltIcon />
-                  </span>
-                ) : userData.status === "rejected" ? (
-                  <span className="h-4 w-4 mr-3 mb-2">
-                    <CancelIcon />
-                  </span>
-                ) : null}
-                <span>{userData.status}</span>
-              </button>
+      <div className="min-h-screen py-8 px-4">
+        <div className="max-w-7xl mx-auto">
+          {/* Header with Status Badge */}
+          <div className="mb-8 flex items-center justify-between">
+            <div>
+              <h1 className="text-4xl font-bold text-white mb-2 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                Application Overview
+              </h1>
+              <p className="text-gray-400">Review and manage tutor application</p>
+            </div>
+            <div className={`bg-gradient-to-r ${statusConfig.gradient} px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-3 transform hover:scale-105 transition-all duration-300`}>
+              {statusConfig.icon}
+              <span className="text-white font-bold text-lg">{statusConfig.text}</span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Profile Card - Right Side (shown first on mobile) */}
+            <div className="lg:col-span-1 order-1 lg:order-2">
+              <div className="bg-slate-800/50 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden border border-white/10 sticky top-6">
+                {/* Cover & Profile Picture */}
+                <div className="relative">
+                  <div className="h-32 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600"></div>
+                  <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2">
+                    <div className="relative">
+                      <img
+                        src={userData.profile_picture}
+                        alt={userData.username}
+                        className="w-32 h-32 rounded-full border-4 border-slate-800 object-cover shadow-xl"
+                      />
+                      <div className="absolute bottom-0 right-0 w-8 h-8 bg-gradient-to-r from-emerald-400 to-green-500 rounded-full border-4 border-slate-800"></div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Profile Info */}
+                <div className="pt-20 pb-6 px-6 text-center">
+                  <h2 className="text-2xl font-bold text-white mb-1">
+                    {userData.username}
+                    <span className="ml-2 text-purple-400 text-lg">({userData.age})</span>
+                  </h2>
+                  <p className="text-gray-400 mb-4 flex items-center justify-center gap-2">
+                    <WorkIcon className="w-4 h-4" />
+                    {userData.occupation}
+                  </p>
+                  
+                  <div className="space-y-3 mb-6">
+                    <div className="bg-slate-700/50 rounded-xl p-3">
+                      <p className="text-purple-400 font-semibold flex items-center justify-center gap-2 mb-1">
+                        <EmojiObjectsIcon className="w-4 h-4" />
+                        Expertise
+                      </p>
+                      <p className="text-white">{userData.expertise}</p>
+                    </div>
+                    <div className="bg-slate-700/50 rounded-xl p-3">
+                      <p className="text-blue-400 font-semibold flex items-center justify-center gap-2 mb-1">
+                        <SchoolIcon className="w-4 h-4" />
+                        Education
+                      </p>
+                      <p className="text-white">{userData.education}</p>
+                    </div>
+                    <div className="bg-slate-700/50 rounded-xl p-3">
+                      <p className="text-emerald-400 font-semibold flex items-center justify-center gap-2 mb-1">
+                        <TrendingUpIcon className="w-4 h-4" />
+                        Experience
+                      </p>
+                      <p className="text-white">{userData.experience}</p>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="space-y-3">
+                    {userData.status === "pending" && (
+                      <>
+                        <button
+                          onClick={() => acceptApplication(userId)}
+                          className="w-full bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-bold py-3 px-6 rounded-xl flex items-center justify-center gap-2 transition-all duration-300 transform hover:scale-105 shadow-lg"
+                        >
+                          <DoneOutlineIcon className="w-5 h-5" />
+                          Accept Application
+                        </button>
+                        <button
+                          onClick={() => rejectApplication(userId)}
+                          className="w-full bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white font-bold py-3 px-6 rounded-xl flex items-center justify-center gap-2 transition-all duration-300 transform hover:scale-105 shadow-lg"
+                        >
+                          <CloseIcon className="w-5 h-5" />
+                          Reject Application
+                        </button>
+                      </>
+                    )}
+                    {userData.status === "verified" && (
+                      <div className="bg-gradient-to-r from-emerald-500 to-green-600 text-white font-bold py-3 px-6 rounded-xl flex items-center justify-center gap-2 shadow-lg">
+                        <DoneOutlineIcon className="w-5 h-5" />
+                        Verified
+                      </div>
+                    )}
+                    {userData.status === "rejected" && (
+                      <div className="bg-gradient-to-r from-red-500 to-rose-600 text-white font-bold py-3 px-6 rounded-xl flex items-center justify-center gap-2 shadow-lg">
+                        <CloseIcon className="w-5 h-5" />
+                        Rejected
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div className="p-6 ">
-              <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-6">
-                INFORMATIONS
-              </h3>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 text-extrabold">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Username
-                  </label>
-                  <input
-                    type="text"
-                    defaultValue={userData.username}
-                    readOnly="True"
-                    className="w-full p-3 border border-gray-200 rounded-md bg-gray-50 text-gray-700"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Email address
-                  </label>
-                  <input
-                    type="email"
-                    readOnly="True"
-                    defaultValue={userData.email}
-                    className="w-full p-3 border border-gray-200 rounded-md bg-gray-50 text-gray-700"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Date of Birth
-                  </label>
-                  <input
-                    type="text"
-                    readOnly="True"
-                    defaultValue={userData.date_of_birth}
-                    className="w-full p-3 border border-gray-200 rounded-md bg-gray-50 text-gray-700"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Education
-                  </label>
-                  <input
-                    type="text"
-                    readOnly="True"
-                    defaultValue={userData.education}
-                    className="w-full p-3 border border-gray-200 rounded-md bg-gray-50 text-gray-700"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Expertise
-                  </label>
-                  <input
-                    type="text"
-                    readOnly="True"
-                    defaultValue={userData.expertise}
-                    className="w-full p-3 border border-gray-200 rounded-md bg-gray-50 text-gray-700"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Occupation
-                  </label>
-                  <input
-                    type="text"
-                    readOnly="True"
-                    defaultValue={userData.occupation}
-                    className="w-full p-3 border border-gray-200 rounded-md bg-gray-50 text-gray-700"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Experience
-                  </label>
-                  <input
-                    type="text"
-                    readOnly="True"
-                    defaultValue={userData.experience}
-                    className="w-full p-3 border border-gray-200 rounded-md bg-gray-50 text-gray-700"
-                  />
-                </div>
-              </div>
-              <div className="border mb-3">
-                <label className="block text-4xl font-extrabold text-gray-700 m-3">
-                  About
-                </label>
-                <h3 className="w-full p-3 border border-gray-200 rounded-md bg-gray-50 text-gray-700">
-                  {userData.about}
+            {/* Main Content - Left Side */}
+            <div className="lg:col-span-2 order-2 lg:order-1 space-y-6">
+              {/* Personal Information */}
+              <div className="bg-slate-800/50 backdrop-blur-sm rounded-3xl p-6 shadow-2xl border border-white/10">
+                <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                  <div className="w-1 h-6 bg-gradient-to-b from-purple-400 to-pink-400 rounded-full"></div>
+                  Personal Information
                 </h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <InfoField
+                    icon={<EmailIcon className="w-5 h-5" />}
+                    label="Email Address"
+                    value={userData.email}
+                    color="text-white"
+                  />
+                  <InfoField
+                    icon={<CakeIcon className="w-5 h-5" />}
+                    label="Date of Birth"
+                    value={userData.date_of_birth}
+                    color="text-white"
+                  />
+                  <InfoField
+                    icon={<SchoolIcon className="w-5 h-5" />}
+                    label="Education"
+                    value={userData.education}
+                    color="text-white"
+                  />
+                  <InfoField
+                    icon={<EmojiObjectsIcon className="w-5 h-5" />}
+                    label="Expertise"
+                    value={userData.expertise}
+                    color="text-white"
+                  />
+                  <InfoField
+                    icon={<WorkIcon className="w-5 h-5" />}
+                    label="Occupation"
+                    value={userData.occupation}
+                    color="text-white"
+                  />
+                  <InfoField
+                    icon={<TrendingUpIcon className="w-5 h-5" />}
+                    label="Experience"
+                    value={userData.experience}
+                    color="text-white"
+                  />
+                </div>
               </div>
-              <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-6">
-                CONTACT INFORMATION
-              </h3>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Phone
-                </label>
-                <input
-                  type="text"
-                  readOnly="True"
-                  defaultValue={userData.phone}
-                  className="w-full p-3 border border-gray-200 rounded-md bg-gray-50 text-gray-700"
+
+              {/* About Section */}
+              <div className="bg-slate-800/50 backdrop-blur-sm rounded-3xl p-6 shadow-2xl border border-white/10">
+                <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                  <div className="w-1 h-6 bg-gradient-to-b from-purple-400 to-pink-400 rounded-full"></div>
+                  About
+                </h3>
+                <p className="text-gray-300 leading-relaxed bg-slate-700/30 p-4 rounded-xl border border-white/5">
+                  {userData.about}
+                </p>
+              </div>
+
+              {/* Contact Information */}
+              <div className="bg-slate-800/50 backdrop-blur-sm rounded-3xl p-6 shadow-2xl border border-white/10">
+                <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                  <div className="w-1 h-6 bg-gradient-to-b from-purple-400 to-pink-400 rounded-full"></div>
+                  Contact Information
+                </h3>
+                <InfoField
+                  icon={<PhoneIcon className="w-5 h-5" />}
+                  label="Phone Number"
+                  value={userData.phone}
+                  color="text-white"
                 />
               </div>
-              <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-6 mt-3">
-                Presentation
-              </h3>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Verification Document
-                </label>
+              {/* Documents & Media */}
+              <div className="bg-slate-800/50 backdrop-blur-sm rounded-3xl p-6 shadow-2xl border border-white/10">
+                <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                  <div className="w-1 h-6 bg-gradient-to-b from-purple-400 to-pink-400 rounded-full"></div>
+                  Verification Documents
+                </h3>
 
-                {userData.verification_file ? (
-                  <div>
+                {/* PDF Document */}
+                <div className="mb-6">
+                  <label className="block text-sm font-semibold text-gray-400 mb-3 uppercase tracking-wider">
+                    Verification Document
+                  </label>
+                  {userData.verification_file ? (
                     <a
                       href={userData.verification_file}
                       target="_blank"
-                            rel="noopener noreferrer"
-                      className="text-black text-2xl underline font-extrabold"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-4 bg-gradient-to-r from-red-500/20 to-pink-500/20 hover:from-red-500/30 hover:to-pink-500/30 border border-red-500/30 rounded-xl p-4 transition-all duration-300 group"
                     >
-                      View PDF
-                      <PictureAsPdfIcon
-                        style={{ width: "60px", height: "50px" }}
-                      />
+                      <div className="bg-red-500/20 p-3 rounded-lg group-hover:scale-110 transition-transform">
+                        <PictureAsPdfIcon className="w-8 h-8 text-red-400" />
+                      </div>
+                      <div>
+                        <p className="text-white font-semibold">View Verification PDF</p>
+                        <p className="text-gray-400 text-sm">Click to open document</p>
+                      </div>
                     </a>
-                  </div>
-                ) : (
-                  <p className="text-red-500">Invalid document format</p>
-                )}
-              </div>
+                  ) : (
+                    <div className="text-red-400 bg-red-500/10 border border-red-500/30 rounded-xl p-4">
+                      No document uploaded
+                    </div>
+                  )}
+                </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Presentation Video
-                </label>
-                <video
-                  style={{ height: "500px", width: "650px" }}
-                  src={userData.presentation_video}
-                  className="w-full p-3 border border-gray-200 rounded-md bg-gray-50 text-gray-700"
-                  controls
-                  loop
-                  muted
-                ></video>
-              </div>
-            </div>
-          </div>
-          {/* Right Section - Profile */}
-          <div
-            className="bg-white rounded-lg shadow-lg overflow-hidden"
-            style={{ maxHeight: "600px" }}
-          >
-            <div className="relative " style={{ marginBottom: "120px" }}>
-              <div className="h-32 bg-black "></div>
-              <div className="absolute top-16 inset-x-0 flex justify-center">
-                <div className="ring-4 ring-white rounded-full">
-                  <img
-                    src={userData.profile_picture}
-                    alt="Profile"
-                    style={{ height: "200px", width: "200px" }}
-                    className="rounded-full bg-gray-200   object-cover"
-                  />
+                {/* Presentation Video */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-400 mb-3 uppercase tracking-wider">
+                    Presentation Video
+                  </label>
+                  <div className="rounded-2xl overflow-hidden border border-white/10 shadow-xl">
+                    <video
+                      src={userData.presentation_video}
+                      controls
+                      className="w-full aspect-video bg-black"
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-
-            <div className="pt-16 pb-6 px-6 text-center">
-              {/* <div className="flex justify-between mb-6">
-                                <div className="text-center">
-                                    <p className="text-2xl font-bold text-gray-800">22</p>
-                                    <p className="text-sm text-gray-500">Friends</p>
-                                </div>
-                                <div className="text-center">
-                                    <p className="text-2xl font-bold text-gray-800">10</p>
-                                    <p className="text-sm text-gray-500">Photos</p>
-                                </div>
-                                <div className="text-center">
-                                    <p className="text-2xl font-bold text-gray-800">89</p>
-                                    <p className="text-sm text-gray-500">Comments</p>
-                                </div>
-                                </div> */}
-
-              <h2 className="text-2xl font-extrabold text-gray-800 ">
-                {userData.username}{" "}
-                <span className="font-normal text-black font-extrabold text-3xl">
-                  {" "}
-                  {userData.age}
-                </span>
-              </h2>
-              <p className="text-gray-500 mb-2">{userData.occupation}</p>
-              <p className="text-gray-700 font-medium mb-1">
-                Expertise In - {userData.expertise}
-              </p>
-              <p className="text-gray-500">{userData.education}</p>
-            </div>
-            <div className="flex justify-center space-x-2 mb-6">
-              {userData.status === "pending" ? (
-                <>
-                  <button
-                    style={{ backgroundColor: "red" }}
-                    className="text-white px-4 py-2 rounded-md flex items-center gap-2 cursor-pointer"
-                    onClick={() => rejectApplication(userId)}
-                  >
-                    <CloseIcon className="h-4 w-4" />
-                    <span>Reject{userData.id}</span>
-                  </button>
-                  <button
-                    style={{ backgroundColor: "green" }}
-                    className="text-white px-4 py-2 rounded-md flex items-center gap-2 cursor-pointer"
-                    onClick={() => acceptApplication(userId)}
-                  >
-                    <DoneOutlineIcon className="h-4 w-4" />
-                    <span>Accept</span>
-                  </button>
-                </>
-              ) : userData.status === "accepted" ? (
-                <button
-                  style={{ backgroundColor: "green" }}
-                  className="text-white px-4 py-2 rounded-md flex items-center gap-2"
-                >
-                  <DoneOutlineIcon className="h-4 w-4" />
-                  <span>Accepted</span>
-                </button>
-              ) : userData.status === "rejected" ? (
-                <button
-                  style={{ backgroundColor: "red" }}
-                  className="text-white px-4 py-2 rounded-md flex items-center gap-2 cursor-pointer"
-                >
-                  <CloseIcon className="h-4 w-4" />
-                  <span>Rejected</span>
-                </button>
-              ) : null}
             </div>
           </div>
         </div>
@@ -359,5 +340,17 @@ const Overview = () => {
     </Layout>
   );
 };
+
+const InfoField = ({ icon, label, value, color }) => (
+  <div className="bg-slate-700/30 rounded-xl p-4 border border-white/5 hover:border-purple-500/30 transition-all duration-300">
+    <div className="flex items-center gap-2 mb-2">
+      <span className={color}>{icon}</span>
+      <label className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'white' }}>
+        {label}
+      </label>
+    </div>
+    <p className="text-white font-medium">{value}</p>
+  </div>
+);
 
 export default Overview;

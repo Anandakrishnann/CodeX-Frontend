@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Layout from "../Layout/Layout";
-import { User, Tag, Calendar } from "lucide-react";
+import { User, Tag, Calendar, FileClock, FileText, Save, Pencil, Edit3, LineChart } from "lucide-react";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import RestoreFromTrashIcon from "@mui/icons-material/RestoreFromTrash";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { setCourseId } from "../../../redux/slices/userSlice";
 import { useNavigate } from "react-router-dom";
+import Tooltip from '@mui/material/Tooltip';
 
 const Courses = () => {
   const [Courses, setCourses] = useState([]);
@@ -61,6 +62,11 @@ const Courses = () => {
     dispatch(setCourseId(id));
     navigate("/admin/courses/Overview");
   };
+
+  const handleCourseAnalytics = (id) => {
+      dispatch(setCourseId(id))
+      navigate("/admin/courses/analytics");
+    }
 
   return (
     <Layout page="Courses">
@@ -151,26 +157,40 @@ const Courses = () => {
                       </span>
 
                       <div className="flex items-center space-x-2">
+                        <Tooltip title="View Analytics" arrow>
+                            <button
+                            onClick={() => handleCourseAnalytics(course.id)}
+                            className="p-2 text-white bg-blue-500 rounded-lg hover:bg-white hover:text-blue-500 hover:border hover:border-blue-500 transition"
+                          >
+                            <LineChart fontSize="small" />
+                          </button>
+                        </Tooltip>
+                        <Tooltip title="View Details" arrow>
                         <button
                           className="p-2 text-white bg-blue-500 rounded-lg hover:bg-white hover:text-blue-500 hover:border hover:border-blue-500 transition"
                           onClick={() => handleCourseClick(course.id)}
                         >
                           <VisibilityIcon fontSize="small" />
                         </button>
+                        </Tooltip>
                         {course.is_active ? (
+                          <Tooltip title="Delete" arrow>
                           <button
                             className="p-2 text-white bg-red-500 rounded-lg hover:bg-white hover:text-red-500 hover:border hover:border-red-500 transition"
                             onClick={(e) => toggle_status(e, course.id)}
                           >
                             <DeleteForeverIcon fontSize="small" />
                           </button>
+                          </Tooltip>
                         ) : (
+                          <Tooltip title="Restore" arrow>
                           <button
                             className="p-2 text-white bg-green-500 rounded-lg hover:bg-white hover:text-green-500 hover:border hover:border-green-500 transition"
                             onClick={(e) => toggle_status(e, course.id)}
                           >
                             <RestoreFromTrashIcon fontSize="small" />
                           </button>
+                          </Tooltip>
                         )}
                       </div>
                     </div>
