@@ -29,14 +29,14 @@ const Table = ({ datas, fucntions, columns, name }) => {
   return (
     <div className="grid">
       <div className="row-span-1 bg-black p-2 rounded-lg">
-        <h2 className="text-4xl font-extrabold mb-6 bg-black w-full mt-0">
+        <h2 className="text-4xl font-extrabold mb-6 bg-black w-full mt-0 text-white">
           {name}
         </h2>
         <div className="overflow-x-auto bg-white rounded-lg shadow-lg ">
           <table className="min-w-full border-collapse border border-gray-300">
             {/* Dynamic Table Header */}
             <thead className="bg-gray-100">
-              <tr className="text-gray-700 text-left border-b border-gray-300">
+              <tr className="text-black text-left border-b border-gray-300">
                 {columns.map((col, index) => (
                   <th key={index} className="p-3 text-md font-extrabold">
                     {col}

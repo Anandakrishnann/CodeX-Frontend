@@ -3,17 +3,31 @@ import { Home, LogOut } from "lucide-react";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
 import { useNavigate } from "react-router-dom";
-import BackgroundAnimation from "../../../../Component/BackgroundAnimation";
 import SchoolIcon from "@mui/icons-material/School";
 import QuestionAnswerIcon from "@mui/icons-material/QuestionAnswer";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 import CastIcon from '@mui/icons-material/Cast';
+import { useDispatch } from "react-redux";
+import { userAxios } from "../../../../../axiosConfig";
+import { logoutUser } from "@/redux/slices/userSlice";
+import { toast } from "react-toastify";
 
 const Sidebar = ({ activeItem, setActiveItem }) => {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch()
 
+   const logout = async () => {
+    try {
+      const response = await userAxios.post("logout/");
+      dispatch(logoutUser()); // ✅ Update redux state
+      toast.success("Logout Successfully");
+      navigate("/login");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "An error occurred");
+    }
+  };
   return (
     <>
       {/* Mobile Toggle Button */}
@@ -28,14 +42,12 @@ const Sidebar = ({ activeItem, setActiveItem }) => {
 
       {/* Sidebar */}
       <div
-        className={`fixed top-0 left-0 z-40 h-full bg-gray-900 text-white p-5 transform ${
+        className={`fixed top-0 left-0 z-40 h-full bg-transparent text-white p-5 transform ${
           open ? "translate-x-0" : "-translate-x-full"
         } transition-transform duration-300 lg:relative lg:translate-x-0 lg:w-64 lg:flex lg:flex-col`}
       >
-        <BackgroundAnimation />
-
         {/* Header */}
-        <div className="flex items-center justify-between relative z-10 mb-6">
+        <div className="flex items-center justify-between mb-6">
           <h2 className="text-3xl font-extrabold ">Dashboard</h2>
           <div className="lg:hidden">
             <button onClick={() => setOpen(false)} className="p-2">
@@ -45,7 +57,7 @@ const Sidebar = ({ activeItem, setActiveItem }) => {
         </div>
 
         {/* Navigation */}
-        <nav className="relative z-10">
+        <nav>
           <ul className="space-y-4">
             <SidebarItem
               icon={<Home />}
@@ -112,10 +124,7 @@ const Sidebar = ({ activeItem, setActiveItem }) => {
               label="Logout"
               activeItem={activeItem}
               setActiveItem={setActiveItem}
-              onClick={() => {
-                // your logout logic
-                setOpen(false);
-              }}
+              onClick={logout}
             />
           </ul>
         </nav>

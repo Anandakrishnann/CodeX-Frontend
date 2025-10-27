@@ -243,6 +243,19 @@ const Chat = ({ roomId: initialRoomId, currentUserId }) => {
     ? `${user.first_name} ${user.last_name}`.trim()
     : "You";
 
+  console.log(rooms);
+
+  const sortedRooms = [...rooms].sort((a, b) => {
+    const getTime = (room) => {
+      if (room.last_message?.timestamp) {
+        return new Date(room.last_message.timestamp).getTime();
+      }
+      return new Date(room.created_at).getTime();
+    };
+
+    return getTime(a) - getTime(b); // ascending: oldest first
+  });
+
   return (
     <div className="flex h-full text-white rounded-none md:rounded-2xl overflow-hidden shadow-2xl border-0 md:border border-gray-800 relative z-10">
       <aside
@@ -269,8 +282,8 @@ const Chat = ({ roomId: initialRoomId, currentUserId }) => {
           </div>
         </div>
         <div className="flex-1 overflow-y-auto px-2 md:px-4 py-2 bg-black">
-          {rooms.length > 0 ? (
-            rooms.map((room) => (
+          {sortedRooms.length > 0 ? (
+            sortedRooms.map((room) => (
               <div
                 key={room.id}
                 onClick={() => handleRoomSelect(room)}

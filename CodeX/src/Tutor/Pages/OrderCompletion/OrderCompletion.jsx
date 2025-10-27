@@ -12,7 +12,7 @@ const OrderCompletion = () => {
 
     function randomInRange(min, max) {
       return Math.random() * (max - min) + min;
-    }
+    } 
 
     const interval = setInterval(() => {
       const timeLeft = animationEnd - Date.now();

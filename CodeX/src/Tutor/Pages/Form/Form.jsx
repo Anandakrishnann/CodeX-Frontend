@@ -24,7 +24,6 @@ const Form = () => {
     verificationVideo: null,
   });
 
-  const handleNext = () => setStep(step + 1);
   const handlePrev = () => setStep(step - 1);
   const totalSteps = 6;
   const progressPercentage = (step / totalSteps) * 100;
@@ -39,59 +38,69 @@ const Form = () => {
   const validate = () => {
     let isValid = true;
 
-    if (!formData.fullName.trim() || !/^[a-zA-Z\s]+$/.test(formData.fullName)) {
-      toast.error("Enter a valid full name (letters & spaces only)");
-      isValid = false;
+    if (step === 1) {
+      if (
+        !formData.fullName.trim() ||
+        !/^[a-zA-Z\s]+$/.test(formData.fullName)
+      ) {
+        toast.error("Enter a valid full name (letters & spaces only)");
+        isValid = false;
+      }
+      if (!/^\d{10}$/.test(formData.phone)) {
+        toast.error("Phone number must be 10 digits");
+        isValid = false;
+      }
+      if (!formData.dob) {
+        toast.error("Date of Birth is required");
+        isValid = false;
+      }
     }
 
-    if (!/^\d{10}$/.test(formData.phone)) {
-      toast.error("Phone number must be 10 digits");
-      isValid = false;
+    if (step === 2) {
+      if (!formData.education.trim()) {
+        toast.error("Education level is required");
+        isValid = false;
+      }
+      if (!formData.expertise.trim()) {
+        toast.error("Expertise field is required");
+        isValid = false;
+      }
+      if (!formData.occupation.trim()) {
+        toast.error("Occupation is required");
+        isValid = false;
+      }
+      if (!/^\d+$/.test(formData.experience)) {
+        toast.error("Experience should be a valid number");
+        isValid = false;
+      }
     }
 
-    if (!formData.dob) {
-      toast.error("Date of Birth is required");
-      isValid = false;
+    if (step === 3) {
+      if (formData.about.length < 50) {
+        toast.error("About section must be at least 50 characters");
+        isValid = false;
+      }
     }
 
-    if (!formData.education.trim()) {
-      toast.error("Education level is required");
-      isValid = false;
+    if (step === 4) {
+      if (!formData.profilePicture) {
+        toast.error("Upload a profile picture");
+        isValid = false;
+      }
     }
 
-    if (!formData.expertise.trim()) {
-      toast.error("Expertise field is required");
-      isValid = false;
+    if (step === 5) {
+      if (!formData.verificationFile) {
+        toast.error("Upload a verification document");
+        isValid = false;
+      }
     }
 
-    if (!formData.occupation.trim()) {
-      toast.error("Occupation is required");
-      isValid = false;
-    }
-
-    if (!/^\d+$/.test(formData.experience)) {
-      toast.error("Experience should be a valid number");
-      isValid = false;
-    }
-
-    if (formData.about.length < 50) {
-      toast.error("About section must be at least 50 characters");
-      isValid = false;
-    }
-
-    if (!formData.verificationFile) {
-      toast.error("Upload a verification document");
-      isValid = false;
-    }
-
-    if (!formData.profilePicture) {
-      toast.error("Upload a profile Picture document");
-      isValid = false;
-    }
-
-    if (!formData.verificationVideo) {
-      toast.error("Upload a verification video");
-      isValid = false;
+    if (step === 6) {
+      if (!formData.verificationVideo) {
+        toast.error("Upload a verification video");
+        isValid = false;
+      }
     }
 
     return isValid;
@@ -159,6 +168,12 @@ const Form = () => {
     }
   };
 
+  const handleNext = () => {
+    if (validate()) {
+      setStep(step + 1);
+    }
+  };
+
   return (
     <>
       <Navbar />
@@ -192,7 +207,7 @@ const Form = () => {
                   value={formData.fullName}
                   onChange={handleChange}
                   placeholder="Full name"
-                  className="w-full p-2 text-black  mb-3 rounded "
+                  className="w-full p-2 text-black  mb-3 rounded bg-white"
                   required
                 />
                 <input
@@ -201,7 +216,7 @@ const Form = () => {
                   value={formData.phone}
                   onChange={handleChange}
                   placeholder="Phone"
-                  className="w-full p-2 text-black mb-3 rounded"
+                  className="w-full p-2 text-black mb-3 rounded bg-white"
                   required
                 />
                 <input
@@ -211,7 +226,7 @@ const Form = () => {
                   onChange={handleChange}
                   max={new Date().toISOString().split("T")[0]}
                   placeholder="DOB"
-                  className="w-full p-2 text-black mb-3 rounded"
+                  className="w-full p-2 text-black mb-3 rounded bg-white"
                 />
               </>
             )}
@@ -226,7 +241,7 @@ const Form = () => {
                   value={formData.education}
                   onChange={handleChange}
                   placeholder="Highest Education level"
-                  className="w-full p-2 mb-3 text-black rounded"
+                  className="w-full p-2 mb-3 text-black rounded bg-white"
                 />
                 <input
                   type="text"
@@ -234,7 +249,7 @@ const Form = () => {
                   value={formData.expertise}
                   onChange={handleChange}
                   placeholder="Area of expertise"
-                  className="w-full p-2 mb-3 text-black rounded"
+                  className="w-full p-2 mb-3 text-black rounded bg-white"
                 />
                 <input
                   type="text"
@@ -242,7 +257,7 @@ const Form = () => {
                   value={formData.occupation}
                   onChange={handleChange}
                   placeholder="Current Occupation"
-                  className="w-full p-2 mb-3 text-black rounded"
+                  className="w-full p-2 mb-3 text-black rounded bg-white"
                 />
                 <input
                   type="text"
@@ -250,7 +265,7 @@ const Form = () => {
                   value={formData.experience}
                   onChange={handleChange}
                   placeholder="Experience"
-                  className="w-full p-2 mb-3 text-black rounded"
+                  className="w-full p-2 mb-3 text-black rounded bg-white"
                 />
               </>
             )}
@@ -264,7 +279,7 @@ const Form = () => {
                   value={formData.about}
                   onChange={handleChange}
                   placeholder="Describe yourself..."
-                  className="w-full p-2 h-24 mb-3 text-black rounded"
+                  className="w-full p-2 h-24 mb-3 text-black rounded bg-white"
                 ></textarea>
               </>
             )}
@@ -283,7 +298,7 @@ const Form = () => {
                   <img
                     src={profilePicturePreview}
                     alt="Profile Preview"
-                    className="w-32 h-32 mt-2 rounded"
+                    className="w-32 h-32 mt-2 rounded bg-white"
                   />
                 )}
               </>
@@ -375,7 +390,7 @@ const Form = () => {
               ) : (
                 <button
                   onClick={handleSubmit}
-                  className="px-4 py-2 bg-green-600 rounded"
+                  className="px-4 py-2 bg-green-600 rounded cursor-pointer"
                 >
                   Submit
                 </button>

@@ -3,7 +3,6 @@ import Chat from "../../../../Component/Chat/Chat";
 import Layout from "../Layout/Layout";
 import { useSelector } from "react-redux";
 import { chatAxios } from "../../../../../axiosConfig";
-import BackgroundAnimation from "../../../../Component/BackgroundAnimation";
 
 const UserChat = () => {
   const user = useSelector((state) => state.user.user);
@@ -39,7 +38,6 @@ const UserChat = () => {
 
   return (
     <Layout page="Chat's">
-      <BackgroundAnimation />
       {roomCheckComplete ? (
         <Chat roomId={roomId} currentUserId={user?.id} />
       ) : (

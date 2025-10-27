@@ -6,7 +6,6 @@ import { Navigate, useNavigate } from "react-router-dom";
 import { setLessonId } from "../../../../../redux/slices/userSlice";
 import { userAxios } from "../../../../../../axiosConfig";
 import { Flag } from "lucide-react";
-import BackgroundAnimation from "../../../../../Component/BackgroundAnimation";
 
 const CourseLessonOverview = () => {
   const [lesson, setLesson] = useState(null);
@@ -50,7 +49,6 @@ const CourseLessonOverview = () => {
 
   return (
     <Layout page="Courses">
-      <BackgroundAnimation/>
       <div className="p-8 min-h-screen relative z-10  text-white">
         <div className="max-w-7xl mx-auto">
           {/* Header */}

@@ -99,7 +99,7 @@ const CourseDetails = () => {
                   {course.first_name} {course.last_name}
                 </h2>
                 <button
-                  className="bg-white hover:bg-black hover:text-green-500 text-black font-semibold p-2 rounded-lg mt-3"
+                  className="bg-white hover:bg-black hover:text-green-500 text-black font-semibold p-2 rounded-lg mt-3 cursor-pointer"
                   onClick={() => TutorDetails(course.tutor_id)}
                 >
                   View Tutor Details
@@ -147,13 +147,13 @@ const CourseDetails = () => {
                     isEnrolled ? (
                       <button
                         onClick={() => navigate("/user-dashboard")}
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg mb-4"
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg mb-4 cursor-pointer"
                       >
                         Go to Dashboard
                       </button>
                     ) : (
                       <button
-                        className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 rounded-lg mb-4 disabled:opacity-50"
+                        className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 rounded-lg mb-4 disabled:opacity-50 cursor-pointer"
                         onClick={() => setShowModal(true)}
                         disabled={!course?.price}
                       >

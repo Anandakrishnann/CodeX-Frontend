@@ -9,7 +9,6 @@ import { LuActivity } from "react-icons/lu";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import { MdOutlinePendingActions } from "react-icons/md";
 import { userAxios } from "../../../../../axiosConfig";
-import BackgroundAnimation from "../../../../Component/BackgroundAnimation";
 
 
 const UserCourses = () => {
@@ -74,8 +73,6 @@ const UserCourses = () => {
 
   return (
     <Layout page="Courses">
-        <BackgroundAnimation />
-      
       <div className="p-8 min-h-screen relative z-10  text-white">
         <div className="max-w-7xl mx-auto">
           {/* Header */}

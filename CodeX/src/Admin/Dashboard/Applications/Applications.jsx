@@ -32,7 +32,7 @@ const Applications = () => {
     <Layout>
       <div className="gridgap-2">
         <div className="row-span-1 bg-black p-4 rounded-lg">
-          <h2 className="text-4xl font-extrabold mb-6">Applications</h2>
+          <h2 className="text-4xl font-extrabold mb-6 text-white">Applications</h2>
           <div className="overflow-x-auto bg-white rounded-lg shadow-lg">
             <table className="min-w-full border-collapse border border-gray-300">
               {/* Table Header */}

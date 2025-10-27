@@ -103,7 +103,7 @@ const OTPVerification = () => {
               type="number"
               value={otp}
               onChange={(e) => setOtp(e.target.value)}
-              className="w-full px-4 py-3 bg-gray-800/80 text-black rounded-lg focus:ring-2 focus:ring-cyan-500 focus:outline-none placeholder-gray-400 appearance-none"
+              className="w-full px-4 py-3 bg-gray-800/80 text-white rounded-lg focus:ring-2 focus:ring-cyan-500 focus:outline-none placeholder-gray-400 appearance-none"
               placeholder="Enter OTP"
               style={{ width: "600px" }}
             />

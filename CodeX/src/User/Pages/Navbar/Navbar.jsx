@@ -134,14 +134,14 @@ const Navbar = () => {
             {isAuthenticated ? (
               <button
                 onClick={logout}
-                className="bg-green-500 hover:bg-green-600 text-white font-medium px-4 py-2 rounded-md transition-all duration-300"
+                className="bg-green-500 hover:bg-green-600 text-white font-medium px-4 py-2 rounded-md transition-all duration-300 cursor-pointer"
               >
                 Log Out
               </button>
             ) : (
               <button
                 onClick={login}
-                className="bg-green-500 hover:bg-green-600 text-white font-medium px-4 py-2 rounded-md transition-all duration-300"
+                className="bg-green-500 hover:bg-green-600 text-white font-medium px-4 py-2 rounded-md transition-all duration-300 cursor-pointer"
               >
                 Log In
               </button>
@@ -231,7 +231,7 @@ const Navbar = () => {
             </button>
 
             <button
-              className="w-full text-white hover:bg-gray-800 px-3 py-2 rounded-md text-base font-medium transition-all text-left"
+              className="w-full text-white hover:bg-gray-800 px-3 py-2 rounded-md text-base font-medium transition-all text-left cursor-pointer"
               onClick={() => {
                 navigate("/user-dashboard");
                 setMobileMenuOpen(false);
@@ -246,7 +246,7 @@ const Navbar = () => {
                   logout();
                   setMobileMenuOpen(false);
                 }}
-                className="w-full bg-green-500 hover:bg-green-600 text-white font-medium px-3 py-2 rounded-md transition-all text-left"
+                className="w-full bg-green-500 hover:bg-green-600 text-white font-medium px-3 py-2 rounded-md transition-all text-left cursor-pointer"
               >
                 Log Out
               </button>
@@ -256,7 +256,7 @@ const Navbar = () => {
                   login();
                   setMobileMenuOpen(false);
                 }}
-                className="w-full bg-green-500 hover:bg-green-600 text-white font-medium px-3 py-2 rounded-md transition-all text-left"
+                className="w-full bg-green-500 hover:bg-green-600 text-white font-medium px-3 py-2 rounded-md transition-all text-left cursor-pointer"
               >
                 Log In
               </button>

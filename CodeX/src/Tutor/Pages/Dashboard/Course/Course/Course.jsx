@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import Layout from "../../Layout/Layout";
-import { User, Tag, Calendar } from "lucide-react";
+import { User, Tag, Calendar, FileClock, FileText, Save, Pencil, Edit3, LineChart } from "lucide-react";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import RestoreFromTrashIcon from "@mui/icons-material/RestoreFromTrash";
+import Tooltip from '@mui/material/Tooltip';
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import { useDispatch, useSelector } from "react-redux";
 import { adminAxios, tutorAxios } from "../../../../../../axiosConfig";
@@ -248,6 +249,11 @@ const Course = () => {
     navigate("/tutor/course/modules");
   };
 
+  const handleCourseAnalytics = (id) => {
+    dispatch(setCourseId(id))
+    navigate("/tutor/course/analytics");
+  }
+
   const setDraft = async (id) => {
     try{
       await tutorAxios.post(`set_draft/${id}/`)
@@ -394,39 +400,59 @@ const Course = () => {
                           </button>
                         ) : (
                           <>
+                          <Tooltip title="View Analytics" arrow>
+                             <button
+                              onClick={() => handleCourseAnalytics(course.id)}
+                              className="p-2 text-white bg-blue-500 rounded-lg hover:bg-white hover:text-blue-500 hover:border hover:border-blue-500 transition"
+                            >
+                              <LineChart fontSize="small" />
+                            </button>
+                          </Tooltip>
+                           <Tooltip title="Details" arrow>
                             <button
                               className="p-2 text-white bg-blue-500 rounded-lg hover:bg-white hover:text-blue-500 hover:border hover:border-blue-500 transition"
                               onClick={() => handleCourseClick(course.id)}
                             >
                               <VisibilityIcon fontSize="small" />
                             </button>
+                            </Tooltip>
+                            <Tooltip title="Edit" arrow>
                             <button
                               className="p-2 text-white bg-blue-500 rounded-lg hover:bg-white hover:text-blue-500 hover:border hover:border-blue-500 transition"
                               onClick={() => handleEditModal(course.id)}
                             >
                               <ModeEditIcon fontSize="small" />
                             </button>
-                            <button
+                            </Tooltip>
+                            <Tooltip title="Set as Draft" arrow>
+                              <button
                               className="p-2 text-white bg-blue-500 rounded-lg hover:bg-white hover:text-blue-500 hover:border hover:border-blue-500 transition"
                               onClick={() => setDraft(course.id)}
                             >
-                              <ModeEditIcon fontSize="small" /> Set Draft
+                              <FileClock fontSize="small" />
                             </button>
+                            </Tooltip>
+                            
 
                             {course.is_active ? (
+                              <Tooltip title="Delete" arrow>
                               <button
                                 className="p-2 text-white bg-red-500 rounded-lg hover:bg-white hover:text-red-500 hover:border hover:border-red-500 transition"
                                 onClick={(e) => toggle_status(e, course.id)}
                               >
                                 <DeleteForeverIcon fontSize="small" />
                               </button>
+                              </Tooltip>
                             ) : (
-                              <button
+                              <Tooltip title="Restore" arrow>
+                                <button
                                 className="p-2 text-white bg-green-500 rounded-lg hover:bg-white hover:text-green-500 hover:border hover:border-green-500 transition"
                                 onClick={(e) => toggle_status(e, course.id)}
                               >
                                 <RestoreFromTrashIcon fontSize="small" />
                               </button>
+                              </Tooltip>
+                              
                             )}
                           </>
                         )}
@@ -464,11 +490,11 @@ const Course = () => {
                 {/* Header with gradient */}
                 <div className="mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
                   <div className="bg-gradient-to-r from-black to-blue-500 text-transparent bg-clip-text">
-                    <h2 className="text-3xl font-extrabold mb-1">
+                    <h2 className="text-3xl font-extrabold mb-1 text-white">
                       Create Course
                     </h2>
                   </div>
-                  <p className="text-gray-500 dark:text-gray-400">
+                  <p className="text-gray-500 dark:text-gray-400 ">
                     Fill in the details to create a new course
                   </p>
                 </div>
@@ -480,7 +506,7 @@ const Course = () => {
                     <button
                       type="button"
                       className={`text-sm font-medium ${
-                        step === 1 ? "text-gray-500" : "text-black"
+                        step === 1 ? "text-white" : "text-gray-500"
                       }`}
                       onClick={() => setStep(1)}
                     >
@@ -489,7 +515,7 @@ const Course = () => {
                     <button
                       type="button"
                       className={`text-sm font-medium ${
-                        step === 2 ? "text-gray-500" : "text-black"
+                        step === 2 ? "text-white" : "text-gray-500"
                       }`}
                       onClick={() => setStep(2)}
                     >
@@ -502,7 +528,7 @@ const Course = () => {
                     <>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          <label className=" font-medium text-gray-700 dark:text-gray-300">
                             Course Name
                           </label>
                           <input

@@ -22,6 +22,7 @@ const TutorHome = () => {
   console.log(subscribed);
   const dispatch = useDispatch();
   console.log("is subscribed", isSubscribed);
+  console.log("tutor role", tutor?.role);
   
 
   useEffect(() => {
@@ -30,10 +31,8 @@ const TutorHome = () => {
 
   useEffect(() => {
     if (!tutor?.id) return;
-    if (tutor?.role === "tutor"){
       tutorSubscribed();
       fetchTutor();
-    }
   }, [tutor]);
 
   const fetchTutor = async () => {
@@ -41,6 +40,8 @@ const TutorHome = () => {
         const response = await userAxios.get("tutor_home/");
         if (response.status === 200) {
           dispatch(loginUser(response.data.user));
+          console.log(response.data.user);
+
         }
       } catch (error) {
         console.error(
@@ -75,7 +76,7 @@ const TutorHome = () => {
     visible: { opacity: 1, y: 0, transition: { duration: 0.8 } },
   };
 
-  return (
+  return ( 
     <>
       <Navbar />
       <div className="min-h-screen bg-codex-darkBg text-white relative">

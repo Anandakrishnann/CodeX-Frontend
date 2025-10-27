@@ -172,7 +172,7 @@ const Login = () => {
                 </div>
                 <button
                   onClick={login}
-                  className="w-full p-2 bg-green-500 text-2xl font-extrabold text-white rounded-md hover:bg-white hover:text-black focus:outline-none focus:ring-2 focus:ring-black"
+                  className="w-full p-2 bg-green-500 text-2xl font-extrabold text-white rounded-md hover:bg-white hover:text-black focus:outline-none focus:ring-2 focus:ring-black cursor-pointer"
                 >
                   Log In
                 </button>

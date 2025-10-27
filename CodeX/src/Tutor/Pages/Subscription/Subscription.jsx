@@ -77,7 +77,7 @@ const Subscription = () => {
                       {/* Subscribe Button */}
                       <div className="w-full">
                         <button
-                          className="w-full bg-gradient-to-r bg-green-500 hover:bg-white hover:text-black px-4 py-2 rounded-lg text-white font-semibold transition-all"
+                          className="w-full bg-gradient-to-r bg-green-500 hover:bg-white hover:text-black px-4 py-2 rounded-lg text-white font-semibold transition-all cursor-pointer"
                           onClick={() => handleSubscribe(data.id)}
                         >
                           Subscribe

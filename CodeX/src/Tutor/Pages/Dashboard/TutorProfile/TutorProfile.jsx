@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { tutorAxios } from "../../../../../axiosConfig";
-import BackgroundAnimation from "../../../../Component/BackgroundAnimation";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import FileOpenIcon from "@mui/icons-material/FileOpen";
 import { TiStarOutline } from "react-icons/ti";
@@ -239,7 +238,6 @@ const TutorProfile = () => {
 
   return (
     <Layout page={"Profile"}>
-      <BackgroundAnimation />
       <div className="flex flex-col font-serif md:flex-row items-start justify-center min-h-screen bg-black text-black p-4 relative z-10">
         <div className="bg-white shadow-lg rounded-lg p-8 w-full md:w-2/3">
           <div className="flex justify-between items-center">

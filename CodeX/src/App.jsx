@@ -65,6 +65,7 @@ import TutorMeeting from "./Tutor/Pages/Dashboard/TutorMeeting/TutorMeeting";
 import UserMeetings from "./User/Pages/Dashboard/UserMeetings/UserMeetings";
 import MeetingRoom from "./Component/MeetingRoom/MeetingRoom";
 import Review from "./User/Review";
+import CourseAnalytics from "./Tutor/Pages/Dashboard/Course/Course/CourseAnalytics";
 
 
 const queryClient = new QueryClient();  // ✅ Fix QueryClient initialization
@@ -141,6 +142,7 @@ function App() {
                   <Route path="/tutor/course" element={<Course />} />
                   <Route path="/tutor/chat" element={<TutorChat />} />
                   <Route path="/tutor/meet" element={<TutorMeeting />} />
+                  <Route path="tutor/course/analytics" element={<CourseAnalytics/> } />
                   <Route path="/tutor/course/modules" element={<Modules />} />
                   <Route path="/tutor/course/lessons" element={<Lessons />} />
                   <Route path="/tutor/lesson/overview" element={<LessonOverview />} />

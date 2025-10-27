@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import BackgroundAnimation from "../../../Component/BackgroundAnimation";
 import Layout from "./Layout/Layout";
 import { motion } from "framer-motion";
 import { 
@@ -27,8 +26,6 @@ const UserDashboard = () => {
 
   return (
     <Layout page={"Home"}>
-      <BackgroundAnimation />
-      
       {/* Dashboard Content */}
       <div className="p-6 relative z-10 min-h-screen">
         {/* Welcome Section - Enhanced with animation and gradient */}

@@ -320,7 +320,7 @@ const Overview = () => {
                 <>
                   <button
                     style={{ backgroundColor: "red" }}
-                    className="text-white px-4 py-2 rounded-md flex items-center gap-2"
+                    className="text-white px-4 py-2 rounded-md flex items-center gap-2 cursor-pointer"
                     onClick={() => rejectApplication(userId)}
                   >
                     <CloseIcon className="h-4 w-4" />
@@ -328,7 +328,7 @@ const Overview = () => {
                   </button>
                   <button
                     style={{ backgroundColor: "green" }}
-                    className="text-white px-4 py-2 rounded-md flex items-center gap-2"
+                    className="text-white px-4 py-2 rounded-md flex items-center gap-2 cursor-pointer"
                     onClick={() => acceptApplication(userId)}
                   >
                     <DoneOutlineIcon className="h-4 w-4" />
@@ -346,7 +346,7 @@ const Overview = () => {
               ) : userData.status === "rejected" ? (
                 <button
                   style={{ backgroundColor: "red" }}
-                  className="text-white px-4 py-2 rounded-md flex items-center gap-2"
+                  className="text-white px-4 py-2 rounded-md flex items-center gap-2 cursor-pointer"
                 >
                   <CloseIcon className="h-4 w-4" />
                   <span>Rejected</span>
