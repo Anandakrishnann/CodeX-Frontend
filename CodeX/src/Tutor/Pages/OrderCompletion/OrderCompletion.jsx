@@ -1,9 +1,11 @@
 import BackgroundAnimation from "../../../Component/BackgroundAnimation";
 import { useEffect } from "react";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 const OrderCompletion = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch()
 
   useEffect(() => {
     const duration = 3 * 1000;
@@ -42,6 +44,7 @@ const OrderCompletion = () => {
   }, []);
 
   const home = () => {
+    dispatch(setSubscribedTrue())
     navigate("/tutor");
   };
 

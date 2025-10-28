@@ -118,3 +118,14 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.8);
 }
+
+/* Ensure all clickable buttons show pointer cursor (without altering UI) */
+@layer base {
+  button:not(:disabled),
+  [role="button"],
+  input[type="button"]:not(:disabled),
+  input[type="submit"]:not(:disabled),
+  input[type="reset"]:not(:disabled) {
+    cursor: pointer;
+  }
+}

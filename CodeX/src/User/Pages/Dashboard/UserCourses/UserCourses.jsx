@@ -168,7 +168,7 @@ const UserCourses = () => {
                               ></div>
                             </div>
                             <div className="flex justify-between text-xs text-gray-500">
-                              <span>{courseObj.progress}% completed</span>
+                              <span>{Math.round(courseObj.progress)}% completed</span>
                               <span>Last accessed: 2 days ago</span>
                             </div>
                           </div>
@@ -222,7 +222,7 @@ const UserCourses = () => {
                               ></div>
                             </div>
                             <div className="flex justify-between text-xs text-gray-500">
-                              <span>{courseObj.progress}% completed</span>
+                              <span>{Math.round(courseObj.progress)}% completed</span>
                               <span>Last accessed: 2 days ago</span>
                             </div>
                           </div>

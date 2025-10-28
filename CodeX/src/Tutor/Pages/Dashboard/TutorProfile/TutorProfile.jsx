@@ -7,8 +7,17 @@ import { TiStarOutline } from "react-icons/ti";
 import Layout from "../Layout/Layout";
 import VerifiedIcon from "@mui/icons-material/Verified";
 import { MdEdit } from "react-icons/md";
-import ProfilePictureModal from "../../../../Component/ProfilePictureModal/ProfilePictureModal"; // Import the new component
-import { toast } from "react-toastify"; // Assuming toast is used for notifications
+import EmailIcon from "@mui/icons-material/Email";
+import PhoneIcon from "@mui/icons-material/Phone";
+import CakeIcon from "@mui/icons-material/Cake";
+import SchoolIcon from "@mui/icons-material/School";
+import WorkIcon from "@mui/icons-material/Work";
+import EmojiObjectsIcon from "@mui/icons-material/EmojiObjects";
+import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import ProfilePictureModal from "../../../../Component/ProfilePictureModal/ProfilePictureModal";
+import { toast } from "react-toastify";
 
 const TutorProfile = () => {
   const [userData, setUserData] = useState(null);
@@ -45,8 +54,8 @@ const TutorProfile = () => {
   const handleProfilePicture = (event) => {
     const file = event.target.files[0];
     if (file) {
-      setNewImage(URL.createObjectURL(file)); // this one is used for preview
-      setSelectedFile(file); // create a second state just for actual file upload
+      setNewImage(URL.createObjectURL(file));
+      setSelectedFile(file);
     }
   };
 
@@ -92,6 +101,7 @@ const TutorProfile = () => {
   const handleCloseModal = () => {
     setSelectedUser(null);
     setIsModalOpen(false);
+    setCurrentEditStep(1);
   };
 
   const handleProfileClick = (pic) => {
@@ -161,7 +171,7 @@ const TutorProfile = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const user = {
+    const userPayload = {
       first_name: edited.first_name || userData.first_name,
       last_name: edited.last_name || userData.last_name,
       phone: edited.phone || userData.phone,
@@ -176,36 +186,32 @@ const TutorProfile = () => {
       about: edited.about || userData.about,
     };
 
-    const data = { user, tutor };
+    const data = { user: userPayload, tutor };
 
-    if (validate({ ...user, ...tutor })) {
+    if (validate({ ...userPayload, ...tutor })) {
       try {
         const response = await tutorAxios.put("edit_tutor/", data);
         setUserData(response.data);
         toast.success("Profile updated successfully");
         setIsModalOpen(false);
+        setCurrentEditStep(1);
         fetchTutorData();
       } catch (error) {
         if (error.response && error.response.data) {
           const errorData = error.response.data;
 
-          // Handle 404 error (e.g., "User not found")
           if (errorData.error) {
             toast.error(errorData.error);
           }
 
-          // Handle 400 validation errors (e.g., serializer.errors)
           if (error.response.status === 400) {
             Object.entries(errorData).forEach(([field, messages]) => {
-              // Messages is typically an array of strings
               if (Array.isArray(messages)) {
                 messages.forEach((message) =>
                   toast.error(`${field}: ${message}`)
                 );
               } else {
-                // Fallback for unexpected formats
                 toast.error(`${field}: ${messages}`);
-                console.log(messages);
               }
             });
           }
@@ -236,395 +242,341 @@ const TutorProfile = () => {
     }
   };
 
+  if (!userData) {
+    return (
+      <Layout page={"Profile"}>
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <div className="inline-block animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500 mb-4"></div>
+            <div className="text-white text-xl font-semibold">Loading profile...</div>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout page={"Profile"}>
-      <div className="flex flex-col font-serif md:flex-row items-start justify-center min-h-screen bg-black text-black p-4 relative z-10">
-        <div className="bg-white shadow-lg rounded-lg p-8 w-full md:w-2/3">
-          <div className="flex justify-between items-center">
-            <h1 className="text-3xl font-bold font-serif">Profile</h1>
-            <div className="text-white px-4 py-2 rounded-lg space-x-2">
-              {currentStep > 1 && (
-                <button
-                  onClick={() => setCurrentStep(currentStep - 1)}
-                  className="bg-black px-4 py-2 rounded"
-                  style={{ marginLeft: "320px" }}
-                >
-                  Previous
-                </button>
-              )}
-              {currentStep < 2 && (
-                <button
-                  onClick={() => setCurrentStep(currentStep + 1)}
-                  className="bg-black text-white px-4 py-2 rounded"
-                  style={{ marginLeft: "350px" }}
-                >
-                  Next
-                </button>
-              )}
+      <div className="min-h-screen py-8 px-4">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="mb-8 flex items-center justify-between">
+            <div>
+              <h1 className="text-4xl font-bold text-white mb-2 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                My Profile
+              </h1>
+              <p className="text-gray-400">Manage your profile information</p>
             </div>
             <button
-              className="bg-black text-white px-4 py-2 rounded-lg flex items-center space-x-2"
               onClick={() => handleOpenModal(userData)}
+              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-2 transform hover:scale-105 transition-all duration-300"
             >
               <EditNoteIcon />
-              <span className="font-semibold">Edit Profile</span>
+              Edit Profile
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-            {userData ? (
-              <>
-                {currentStep === 1 && (
-                  <>
-                    <div>
-                      <label className="block text-gray-600">First Name</label>
-                      <input
-                        type="text"
-                        value={userData.first_name || ""}
-                        className="w-full p-2 mt-1 border border-gray-300 rounded-lg bg-gray-100"
-                        readOnly
-                      />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Profile Card - Right Side */}
+            <div className="lg:col-span-1 order-1 lg:order-2">
+              <div className="bg-slate-800/50 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden border border-white/10 sticky top-6">
+                {/* Cover & Profile Picture */}
+                <div className="relative">
+                  <div className="h-32 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600"></div>
+                  <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2">
+                    <div className="relative">
+                      {userData?.profile_picture ? (
+                        <img
+                          src={userData.profile_picture}
+                          alt={userData.first_name}
+                          className="w-32 h-32 rounded-full border-4 border-slate-800 object-cover shadow-xl"
+                        />
+                      ) : (
+                        <div className="w-32 h-32 rounded-full border-4 border-slate-800 bg-slate-700 flex items-center justify-center shadow-xl">
+                          <span className="text-gray-400">No Image</span>
+                        </div>
+                      )}
+                      <button
+                        onClick={() => handleProfileClick(userData.profile_picture)}
+                        className="absolute bottom-0 right-0 w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center border-4 border-slate-800 shadow-lg hover:scale-110 transition-transform"
+                      >
+                        <MdEdit className="text-white" />
+                      </button>
                     </div>
-                    <div>
-                      <label className="block text-gray-600">Last Name</label>
-                      <input
-                        type="text"
-                        value={userData.last_name || ""}
-                        className="w-full p-2 mt-1 border border-gray-300 rounded-lg bg-gray-100"
-                        readOnly
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-gray-600">
-                        Email address
-                      </label>
-                      <input
-                        type="email"
-                        value={userData.email || ""}
-                        className="w-full p-2 mt-1 border border-gray-300 rounded-lg bg-gray-100"
-                        readOnly
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-gray-600">
-                        Date of Birth
-                      </label>
-                      <input
-                        type="text"
-                        value={userData.dob || ""}
-                        className="w-full p-2 mt-1 border border-gray-300 rounded-lg bg-gray-100"
-                        readOnly
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-gray-600">Phone</label>
-                      <input
-                        type="text"
-                        value={userData.phone || ""}
-                        className="w-full p-2 mt-1 border border-gray-300 rounded-lg bg-gray-100"
-                        readOnly
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-gray-600">Education</label>
-                      <input
-                        type="text"
-                        value={userData.education || ""}
-                        className="w-full p-2 mt-1 border border-gray-300 rounded-lg bg-gray-100"
-                        readOnly
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-gray-600">Expertise</label>
-                      <input
-                        type="text"
-                        value={userData.expertise || ""}
-                        className="w-full p-2 mt-1 border border-gray-300 rounded-lg bg-gray-100"
-                        readOnly
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-gray-600">Occupation</label>
-                      <input
-                        type="text"
-                        value={userData.occupation || ""}
-                        className="w-full p-2 mt-1 border border-gray-300 rounded-lg bg-gray-100"
-                        readOnly
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-gray-600">Experience</label>
-                      <input
-                        type="text"
-                        value={userData.experience || ""}
-                        className="w-full p-2 mt-1 border border-gray-300 rounded-lg bg-gray-100"
-                        read実は
-                      />
-                    </div>
-                  </>
-                )}
+                  </div>
+                </div>
 
-                {currentStep === 2 && (
-                  <>
-                    <div>
-                      <label className="block text-gray-600">About</label>
-                      <textarea
-                        value={userData.about || ""}
-                        className="w-full p-2 mt-1 border border-gray-300 rounded-lg bg-gray-100"
-                        rows="4"
-                        readOnly
-                      />
+                {/* Profile Info */}
+                <div className="pt-20 pb-6 px-6 text-center">
+                  <h2 className="text-2xl font-bold text-white mb-1 flex items-center justify-center gap-2">
+                    {userData.first_name} {userData.last_name}
+                    <VerifiedIcon className="text-blue-400" />
+                  </h2>
+                  <span className="text-purple-400 text-lg">({userData.age})</span>
+                  <p className="text-gray-400 mb-4 flex items-center justify-center gap-2 mt-2">
+                    <WorkIcon className="w-4 h-4" />
+                    {userData.occupation}
+                  </p>
+                  
+                  <div className="space-y-3 mb-6">
+                    <div className="bg-slate-700/50 rounded-xl p-3">
+                      <p className="text-purple-400 font-semibold flex items-center justify-center gap-2 mb-1">
+                        <EmojiObjectsIcon className="w-4 h-4" />
+                        Expertise
+                      </p>
+                      <p className="text-white">{userData.expertise}</p>
                     </div>
-                    <div>
-                      <label className="block text-gray-600 mb-4">
-                        Verification File
+                    <div className="bg-slate-700/50 rounded-xl p-3">
+                      <p className="text-blue-400 font-semibold flex items-center justify-center gap-2 mb-1">
+                        <SchoolIcon className="w-4 h-4" />
+                        Education
+                      </p>
+                      <p className="text-white">{userData.education}</p>
+                    </div>
+                  </div>
+
+                  {/* Subscription Card */}
+                  <div className="bg-gradient-to-br from-slate-700/50 to-slate-800/50 p-4 rounded-2xl border border-white/10 shadow-xl">
+                    <div className="flex items-center justify-center gap-2 mb-3">
+                      <TiStarOutline className="text-yellow-400 text-2xl" />
+                      <h3 className="text-lg font-bold text-white">Subscription</h3>
+                    </div>
+                    
+                    <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl p-4 mb-3">
+                      <p className="text-white font-bold text-xl">{user.plan_details.name}</p>
+                      <p className="text-white/90 text-sm">{user.plan_details.plan_category}</p>
+                    </div>
+
+                    <div className="space-y-2 text-left">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-400">Plan Type:</span>
+                        <span className="text-white font-semibold">{user.plan_details.plan_type}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-400">Price:</span>
+                        <span className="text-emerald-400 font-bold">₹{user.plan_details.price}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-400">Expires:</span>
+                        <span className="text-orange-400 font-semibold">{expiresOn?.toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Main Content - Left Side */}
+            <div className="lg:col-span-2 order-2 lg:order-1 space-y-6">
+              {/* Step Navigation */}
+              <div className="flex items-center justify-between bg-slate-800/50 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setCurrentStep(1)}
+                    className={`px-4 py-2 rounded-lg font-semibold transition-all duration-300 ${
+                      currentStep === 1
+                        ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
+                        : 'bg-slate-700/50 text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    Step 1
+                  </button>
+                  <button
+                    onClick={() => setCurrentStep(2)}
+                    className={`px-4 py-2 rounded-lg font-semibold transition-all duration-300 ${
+                      currentStep === 2
+                        ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
+                        : 'bg-slate-700/50 text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    Step 2
+                  </button>
+                </div>
+                
+                <div className="flex gap-2">
+                  {currentStep > 1 && (
+                    <button
+                      onClick={() => setCurrentStep(currentStep - 1)}
+                      className="bg-slate-700/50 hover:bg-slate-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300"
+                    >
+                      <ArrowBackIcon />
+                      Previous
+                    </button>
+                  )}
+                  {currentStep < 2 && (
+                    <button
+                      onClick={() => setCurrentStep(currentStep + 1)}
+                      className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300"
+                    >
+                      Next
+                      <ArrowForwardIcon />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Personal Information - Step 1 */}
+              {currentStep === 1 && (
+                <div className="bg-slate-800/50 backdrop-blur-sm rounded-3xl p-6 shadow-2xl border border-white/10">
+                  <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                    <div className="w-1 h-6 bg-gradient-to-b from-purple-400 to-pink-400 rounded-full"></div>
+                    Personal Information
+                  </h3>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <InfoField icon={<EmailIcon />} label="First Name" value={userData.first_name} />
+                    <InfoField icon={<EmailIcon />} label="Last Name" value={userData.last_name} />
+                    <InfoField icon={<EmailIcon />} label="Email Address" value={userData.email} />
+                    <InfoField icon={<CakeIcon />} label="Date of Birth" value={userData.dob} />
+                    <InfoField icon={<PhoneIcon />} label="Phone" value={userData.phone} />
+                    <InfoField icon={<SchoolIcon />} label="Education" value={userData.education} />
+                    <InfoField icon={<EmojiObjectsIcon />} label="Expertise" value={userData.expertise} />
+                    <InfoField icon={<WorkIcon />} label="Occupation" value={userData.occupation} />
+                    <InfoField icon={<TrendingUpIcon />} label="Experience" value={userData.experience + " years"} />
+                  </div>
+                </div>
+              )}
+
+              {/* Additional Information - Step 2 */}
+              {currentStep === 2 && (
+                <>
+                  <div className="bg-slate-800/50 backdrop-blur-sm rounded-3xl p-6 shadow-2xl border border-white/10">
+                    <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                      <div className="w-1 h-6 bg-gradient-to-b from-purple-400 to-pink-400 rounded-full"></div>
+                      About
+                    </h3>
+                    <p className="text-gray-300 leading-relaxed bg-slate-700/30 p-4 rounded-xl border border-white/5">
+                      {userData.about}
+                    </p>
+                  </div>
+
+                  <div className="bg-slate-800/50 backdrop-blur-sm rounded-3xl p-6 shadow-2xl border border-white/10">
+                    <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                      <div className="w-1 h-6 bg-gradient-to-b from-purple-400 to-pink-400 rounded-full"></div>
+                      Verification Documents
+                    </h3>
+
+                    {/* PDF Document */}
+                    <div className="mb-6">
+                      <label className="block text-sm font-semibold text-gray-400 mb-3 uppercase tracking-wider">
+                        Verification Document
                       </label>
                       {userData.verification_file ? (
                         <a
                           href={userData.verification_file}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-black border-2 border-black p-2 inline-flex items-center space-x-2"
+                          className="flex items-center gap-4 bg-gradient-to-r from-red-500/20 to-pink-500/20 hover:from-red-500/30 hover:to-pink-500/30 border border-red-500/30 rounded-xl p-4 transition-all duration-300 group"
                         >
-                          <FileOpenIcon />
-                          <span>View Verification PDF</span>
+                          <div className="bg-red-500/20 p-3 rounded-lg group-hover:scale-110 transition-transform">
+                            <FileOpenIcon className="w-8 h-8 text-red-400" />
+                          </div>
+                          <div>
+                            <p className="text-white font-semibold">View Verification PDF</p>
+                            <p className="text-gray-400 text-sm">Click to open document</p>
+                          </div>
                         </a>
                       ) : (
-                        <p className="text-gray-500">No file available</p>
+                        <div className="text-red-400 bg-red-500/10 border border-red-500/30 rounded-xl p-4">
+                          No document uploaded
+                        </div>
                       )}
                     </div>
+
+                    {/* Presentation Video */}
                     <div>
-                      <label className="block text-gray-600">
+                      <label className="block text-sm font-semibold text-gray-400 mb-3 uppercase tracking-wider">
                         Verification Video
                       </label>
                       {userData.verification_video ? (
-                        <video
-                          controls
-                          style={{ width: "900px", height: "200px" }}
-                          className="mt-1 border border-gray-300 rounded-lg bg-gray-100"
-                        >
-                          <source
+                        <div className="rounded-2xl overflow-hidden border border-white/10 shadow-xl">
+                          <video
                             src={userData.verification_video}
-                            type="video/mp4"
+                            controls
+                            className="w-full aspect-video bg-black"
                           />
-                          Your browser does not support the video tag.
-                        </video>
+                        </div>
                       ) : (
-                        <p className="text-gray-500">No video available</p>
+                        <div className="text-gray-400 bg-slate-700/30 border border-white/10 rounded-xl p-4">
+                          No video uploaded
+                        </div>
                       )}
                     </div>
-                  </>
-                )}
-              </>
-            ) : (
-              <p>Loading...</p>
-            )}
-          </div>
-        </div>
-
-        <div className="bg-white shadow-lg rounded-lg p-9 w-full md:w-1/3 mt-8 md:mt-0 md:ml-6 text-center">
-          {userData ? (
-            <>
-              <div className="relative w-32 h-32 mx-auto">
-                {userData?.profile_picture ? (
-                  <img
-                    src={userData.profile_picture || ""}
-                    alt="Profile"
-                    className="w-32 h-32 rounded-full object-cover border-4 border-black shadow-lg"
-                  />
-                ) : (
-                  <div className="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center border-4 border-black shadow-lg">
-                    <span className="text-gray-500">No Image</span>
                   </div>
-                )}
-                <button
-                  className="absolute bottom-0 right-0 bg-black text-white p-1.5 rounded-full border-2 border-white shadow-md hover:bg-gray-800"
-                  title="Edit Profile Picture"
-                  onClick={() => handleProfileClick(userData.profile_picture)}
-                >
-                  <MdEdit />
-                </button>
-              </div>
-              <h2 className="mt-4 text-2xl font-bold">
-                {userData.first_name} {userData.last_name} ({userData.age}){" "}
-                <VerifiedIcon />
-              </h2>
-              <p className="text-gray-600 font-semibold">
-                {userData.occupation}
-              </p>
-              <p className="text-gray-500 text-sm mt-2">
-                Expertise In - {userData.expertise}
-              </p>
-              <p className="text-gray-500 text-sm">{userData.education}</p>
-
-              <div className="text-white p-2 rounded-xl shadow-xl border border-white max-w-sm mx-auto">
-                <h1 className="bg-black text-white text-2xl mb-2 px-6 py-3 rounded-lg flex items-center justify-center mx-auto gap-2 hover:bg-white hover:text-black border border-white transition-all duration-300 shadow">
-                  Subscription Plan
-                </h1>
-
-                <button className="bg-black text-white text-lg px-6 py-3 rounded-lg flex items-center justify-center mx-auto gap-2 hover:bg-white hover:text-black border border-white transition-all duration-300 shadow">
-                  <TiStarOutline fontSize="1.5rem" />
-                  <span className="font-semibold">
-                    {user.plan_details.name || ""}
-                  </span>
-                </button>
-
-                <div className="mt-2 bg-black text-white p-4 rounded-md space-y-2 shadow-inner border border-black">
-                  <p className="text-lg font-bold">
-                    {user.plan_details.plan_category || ""}
-                  </p>
-                  <p className="text-sm font-extrabold">
-                    {user.plan_details.plan_type || ""} Plan • ₹
-                    {user.plan_details.price || ""}
-                  </p>
-                  <p className="text-xl font-extrabold">Expires In</p>
-                  <p className="text-xl rounded-md font-extrabold">
-                    {expiresOn?.toLocaleDateString()}
-                  </p>
-                </div>
-              </div>
-            </>
-          ) : (
-            <p>Loading...</p>
-          )}
+                </>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
+      {/* Edit Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 font-serif bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div
-            className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md relative"
-            style={{ height: "auto" }}
-          >
-            <button
-              className="absolute top-2 right-2 text-xl font-bold text-gray-600 hover:text-black"
-              onClick={handleCloseModal}
-            >
-              ×
-            </button>
-            <h2 className="text-2xl font-semibold mb-4">Edit Profile</h2>
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-800 rounded-3xl shadow-2xl w-full max-w-2xl border border-white/10 max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-gradient-to-r from-purple-600 to-pink-600 p-6 rounded-t-3xl flex justify-between items-center">
+              <h2 className="text-2xl font-bold text-white">Edit Profile</h2>
+              <button
+                onClick={handleCloseModal}
+                className="text-white hover:bg-white/20 rounded-full w-8 h-8 flex items-center justify-center transition-all"
+              >
+                ×
+              </button>
+            </div>
 
-            {currentEditStep === 1 && (
-              <>
-                <div>
-                  <label className="block text-gray-600">First Name</label>
-                  <input
-                    name="first_name"
-                    type="text"
-                    value={edited.first_name}
-                    onChange={handleChange}
-                    className="w-full p-2 mt-1 border border-gray-300 rounded-lg bg-gray-100"
-                  />
-                </div>
-                <div>
-                  <label className="block text-gray-600">Last Name</label>
-                  <input
-                    name="last_name"
-                    type="text"
-                    value={edited.last_name}
-                    onChange={handleChange}
-                    className="w-full p-2 mt-1 border border-gray-300 rounded-lg bg-gray-100"
-                  />
-                </div>
-                <div>
-                  <label className="block text-gray-600">Phone</label>
-                  <input
-                    name="phone"
-                    type="text"
-                    value={edited.phone}
-                    onChange={handleChange}
-                    className="w-full p-2 mt-1 border border-gray-300 rounded-lg bg-gray-100"
-                  />
-                </div>
+            <div className="p-6">
+              {currentEditStep === 1 && (
+                <div className="space-y-4">
+                  <EditField label="First Name" name="first_name" value={edited.first_name} onChange={handleChange} />
+                  <EditField label="Last Name" name="last_name" value={edited.last_name} onChange={handleChange} />
+                  <EditField label="Phone" name="phone" value={edited.phone} onChange={handleChange} />
 
-                <button
-                  className="mt-4 bg-black text-white px-4 py-2 rounded-md"
-                  onClick={() => setCurrentEditStep(2)}
-                >
-                  Next
-                </button>
-              </>
-            )}
-
-            {currentEditStep === 2 && (
-              <>
-                <div>
-                  <label className="block text-gray-600">Date of Birth</label>
-                  <input
-                    name="dob"
-                    type="text"
-                    value={edited.dob}
-                    onChange={handleChange}
-                    className="w-full p-2 mt-1 border border-gray-300 rounded-lg bg-gray-100"
-                  />
-                </div>
-                <div>
-                  <label className="block text-gray-600">Education</label>
-                  <input
-                    name="education"
-                    type="text"
-                    value={edited.education}
-                    onChange={handleChange}
-                    className="w-full p-2 mt-1 border border-gray-300 rounded-lg bg-gray-100"
-                  />
-                </div>
-                <div>
-                  <label className="block text-gray-600">Expertise</label>
-                  <input
-                    name="expertise"
-                    type="text"
-                    value={edited.expertise}
-                    onChange={handleChange}
-                    className="w-full p-2 mt-1 border border-gray-300 rounded-lg bg-gray-100"
-                  />
-                </div>
-                <div>
-                  <label className="block text-gray-600">Occupation</label>
-                  <input
-                    name="occupation"
-                    type="text"
-                    value={edited.occupation}
-                    onChange={handleChange}
-                    className="w-full p-2 mt-1 border border-gray-300 rounded-lg bg-gray-100"
-                  />
-                </div>
-                <div>
-                  <label className="block text-gray-600">Experience</label>
-                  <input
-                    name="experience"
-                    type="text"
-                    value={edited.experience}
-                    onChange={handleChange}
-                    className="w-full p-2 mt-1 border border-gray-300 rounded-lg bg-gray-100"
-                  />
-                </div>
-                <div>
-                  <label className="block text-gray-600">About</label>
-                  <textarea
-                    name="about"
-                    type="text"
-                    value={edited.about}
-                    onChange={handleChange}
-                    className="w-full p-2 mt-1 border border-gray-300 rounded-lg bg-gray-100"
-                  />
-                </div>
-
-                <div className="flex justify-between mt-4">
                   <button
-                    className="bg-black text-white px-4 py-2 rounded-md"
-                    onClick={() => setCurrentEditStep(1)}
+                    onClick={() => setCurrentEditStep(2)}
+                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-all duration-300"
                   >
-                    Back
-                  </button>
-                  <button
-                    className="bg-green-500 text-white px-4 py-2 rounded-md"
-                    onClick={handleSubmit}
-                  >
-                    Save
+                    Next
+                    <ArrowForwardIcon />
                   </button>
                 </div>
-              </>
-            )}
+              )}
+
+              {currentEditStep === 2 && (
+                <div className="space-y-4">
+                  <EditField label="Date of Birth" name="dob" value={edited.dob} onChange={handleChange} />
+                  <EditField label="Education" name="education" value={edited.education} onChange={handleChange} />
+                  <EditField label="Expertise" name="expertise" value={edited.expertise} onChange={handleChange} />
+                  <EditField label="Occupation" name="occupation" value={edited.occupation} onChange={handleChange} />
+                  <EditField label="Experience" name="experience" value={edited.experience} onChange={handleChange} />
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-300 mb-2">About</label>
+                    <textarea
+                      name="about"
+                      value={edited.about}
+                      onChange={handleChange}
+                      rows="4"
+                      className="w-full p-3 bg-slate-700/50 border border-white/10 rounded-xl text-white focus:border-purple-500 focus:outline-none transition-all"
+                    />
+                  </div>
+
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => setCurrentEditStep(1)}
+                      className="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-all duration-300"
+                    >
+                      <ArrowBackIcon />
+                      Back
+                    </button>
+                    <button
+                      onClick={handleSubmit}
+                      className="flex-1 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-bold py-3 rounded-xl transition-all duration-300"
+                    >
+                      Save Changes
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -639,5 +591,31 @@ const TutorProfile = () => {
     </Layout>
   );
 };
+
+const InfoField = ({ icon, label, value }) => (
+  <div className="bg-slate-700/30 rounded-xl p-4 border border-white/5 hover:border-purple-500/30 transition-all duration-300 text-white">
+    <div className="flex items-center gap-2 mb-2">
+      <span className="text-purple-400">{icon}</span>
+      <label className="text-sm font-semibold uppercase tracking-wider">
+        {label}
+      </label>
+    </div>
+    <p className="font-medium">{value}</p>
+  </div>
+);
+
+
+const EditField = ({ label, name, value, onChange }) => (
+  <div>
+    <label className="block text-sm font-semibold text-gray-300 mb-2">{label}</label>
+    <input
+      type="text"
+      name={name}
+      value={value}
+      onChange={onChange}
+      className="w-full p-3 bg-slate-700/50 border border-white/10 rounded-xl text-white focus:border-purple-500 focus:outline-none transition-all"
+    />
+  </div>
+);
 
 export default TutorProfile;

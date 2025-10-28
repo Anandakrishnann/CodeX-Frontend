@@ -33,7 +33,7 @@ const TutorHome = () => {
     if (!tutor?.id) return;
       tutorSubscribed();
       fetchTutor();
-  }, [tutor]);
+  }, []);
 
   const fetchTutor = async () => {
       try {
