@@ -2,13 +2,28 @@ import React, { useState } from "react";
 import Sidebar from "../Sidebar/Sidebar";
 import Navbar from "../Navbar/Navbar";
 import BackgroundAnimation from "../../../../Component/BackgroundAnimation";
+import NotificationSocket from "../../../../Component/NotificationSocket";
+import { NotificationProvider, useNotifications } from "../../../../context/NotificationContext";
 
-export default function Layout({ children, page }) {
+function LayoutContent({ children, page }) {
   const [activeItem, setActiveItem] = useState(page || "Home");
+  const { addNotification } = useNotifications();
+
+  const handleNotification = (data) => {
+    if (data && data.message) {
+      addNotification({
+        ...data,
+        id: data.id || Date.now(),
+        is_read: data.is_read !== undefined ? data.is_read : false,
+      });
+    }
+  };
+
   return (
     <div className="flex h-screen overflow-hidden relative">
       {/* Background Animation - Fixed behind everything */}
       <BackgroundAnimation />
+      <NotificationSocket onMessage={handleNotification} />
       
       {/* Main Content */}
       <div className="flex flex-1 relative z-10">
@@ -29,5 +44,15 @@ export default function Layout({ children, page }) {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function Layout({ children, page }) {
+  return (
+    <NotificationProvider userType="user">
+      <LayoutContent page={page}>
+        {children}
+      </LayoutContent>
+    </NotificationProvider>
   );
 }

@@ -12,49 +12,47 @@ import { tutorAxios, userAxios } from "../../../../axiosConfig";
 
 const TutorHome = () => {
   const [isSubscribed, setIdSubscribed] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
   const tutor = useSelector((state) => state.user.user);
   const subscribed = useSelector((state) => state.user.subscribed);
-  console.log("subscribed", subscribed);
-
-  console.log(tutor);
-  console.log(subscribed);
   const dispatch = useDispatch();
-  console.log("is subscribed", isSubscribed);
-  console.log("tutor role", tutor?.role);
-  
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
   useEffect(() => {
-    if (!tutor?.id) return;
-      tutorSubscribed();
-      fetchTutor();
+    const loadTutorData = async () => {
+      try {
+        await fetchTutor();        
+        await tutorSubscribed();   
+      } catch (error) {
+        console.error("Error initializing tutor data:", error);
+      } finally {
+        setLoading(false); // Move setLoading here
+      }
+    };
+    loadTutorData();
   }, []);
 
   const fetchTutor = async () => {
-      try {
-        const response = await userAxios.get("tutor_home/");
-        if (response.status === 200) {
-          dispatch(loginUser(response.data.user));
-          console.log(response.data.user);
-
-        }
-      } catch (error) {
-        console.error(
-          "❌ Error fetching tutor:",
-          error.response || error.message || error
-        );
-        toast.error("Something Went Wrong.");
+    try {
+      const response = await userAxios.get("tutor_home/");
+      if (response.status === 200) {
+        dispatch(loginUser(response.data.user));
+        return response.data.user;
       }
-    };
+    } catch (error) {
+      console.error("❌ Error fetching tutor:", error.response || error.message || error);
+    }
+  };
 
   const tutorSubscribed = async () => {
     try {
       const response = await tutorAxios.get("tutor_subscribed/");
+      console.log(response.data); // FIXED: Changed from print() to console.log()
       if (response.data.subscribed) {
         setIdSubscribed(true);
         dispatch(setSubscribedTrue());
@@ -63,7 +61,7 @@ const TutorHome = () => {
       }
     } catch (error) {
       console.log("Error while checking subscription:", error);
-      setIdSubscribed(false); // fallback
+      setIdSubscribed(false);
     }
   };
 
@@ -75,6 +73,15 @@ const TutorHome = () => {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.8 } },
   };
+
+  // FIXED: Better loading state with proper check
+  if (loading || !tutor) {
+    return (
+      <div className="min-h-screen bg-codex-darkBg flex items-center justify-center">
+        <div className="text-white text-xl">Loading...</div>
+      </div>
+    );
+  }
 
   return ( 
     <>
@@ -123,7 +130,7 @@ const TutorHome = () => {
                       </Button>
                     </div>
                   </div>
-                ) : tutor.role === "tutor" && subscribed === false ? (
+                ) : tutor?.role === "tutor" && subscribed === false ? (
                   // Case 2: Is a tutor but not subscribed (Show subscription card)
                   <div className="grid">
                     <div className="bg-black bg-opacity-50 border border-green-800 p-4 rounded-lg transform hover:scale-105 transition-all">
@@ -142,7 +149,7 @@ const TutorHome = () => {
                       </Button>
                     </div>
                   </div>
-                ) : tutor.role === "tutor" && isSubscribed === true ? (
+                ) : tutor?.role === "tutor" && isSubscribed === true ? (
                   // Case 3: Is a tutor and subscribed
                   <div className="grid">
                     <div className="bg-black bg-opacity-50 border border-green-800 p-8 rounded-lg transform hover:scale-105 transition-all">

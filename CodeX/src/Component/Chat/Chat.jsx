@@ -11,6 +11,7 @@ import { IoIosArrowForward } from "react-icons/io";
 import { FiPaperclip, FiMic } from "react-icons/fi";
 import { HiDotsVertical } from "react-icons/hi";
 import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
 
 const Chat = ({ roomId: initialRoomId, currentUserId }) => {
   const user = useSelector((state) => state.user.user);
@@ -59,6 +60,15 @@ const Chat = ({ roomId: initialRoomId, currentUserId }) => {
         console.log("WebSocket message received:", data);
         fetchMessages();
         fetchRooms();
+
+        if (
+          data?.sender_id &&
+          data.sender_id !== currentUserId && // not my message
+          data?.message && // message exists
+          data?.room_id !== selectedRoomId // not the room I'm viewing
+        ) {
+          toast.info("📩 New message received!");
+        }
       } catch (error) {
         console.error("Error parsing WebSocket message:", error);
       }
@@ -207,7 +217,6 @@ const Chat = ({ roomId: initialRoomId, currentUserId }) => {
           const payload = { message, sender_id: currentUserId };
           console.log("Sending message:", payload);
           socketRef.current.send(JSON.stringify(payload));
-          fetchMessages();
           setMessage("");
         } else {
           console.error("WebSocket still not open after reconnect attempt");
@@ -218,7 +227,6 @@ const Chat = ({ roomId: initialRoomId, currentUserId }) => {
       console.log("Sending message:", payload);
       socketRef.current.send(JSON.stringify(payload));
       setMessage("");
-      fetchMessages();
     }
   };
 

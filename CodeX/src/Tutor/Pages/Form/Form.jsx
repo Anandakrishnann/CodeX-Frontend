@@ -23,26 +23,36 @@ const Form = () => {
     verificationFile: null,
     verificationVideo: null,
   });
-
-  const handlePrev = () => setStep(step - 1);
-  const totalSteps = 6;
-  const progressPercentage = (step / totalSteps) * 100;
-
+  const [loading, setLoading] = useState(false);
   const [profilePicturePreview, setProfilePicturePreview] = useState(null);
-  console.log(formData);
   const [videoPreview, setVideoPreview] = useState(null);
   const [selectedDocumentType, setSelectedDocumentType] = useState("");
   const user = useSelector((state) => state.user.user.email);
   const navigate = useNavigate();
 
+  const totalSteps = 6;
+  const progressPercentage = (step / totalSteps) * 100;
+
+  const sanitizeInput = (value) => {
+    return value
+      .replace(/<\/?[^>]+(>|$)/g, "")
+      .replace(/[\{\}\[\]]/g, "")
+      .trim();
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (/<[^>]*script|<[^>]+>/.test(value)) {
+      toast.error("HTML or script tags are not allowed.");
+      return;
+    }
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
   const validate = () => {
     let isValid = true;
-
     if (step === 1) {
-      if (
-        !formData.fullName.trim() ||
-        !/^[a-zA-Z\s]+$/.test(formData.fullName)
-      ) {
+      if (!formData.fullName.trim() || !/^[a-zA-Z\s]+$/.test(formData.fullName)) {
         toast.error("Enter a valid full name (letters & spaces only)");
         isValid = false;
       }
@@ -55,54 +65,37 @@ const Form = () => {
         isValid = false;
       }
     }
-
     if (step === 2) {
-      if (!formData.education.trim()) {
-        toast.error("Education level is required");
-        isValid = false;
-      }
-      if (!formData.expertise.trim()) {
-        toast.error("Expertise field is required");
-        isValid = false;
-      }
-      if (!formData.occupation.trim()) {
-        toast.error("Occupation is required");
-        isValid = false;
+      const fields = ["education", "expertise", "occupation"];
+      for (let field of fields) {
+        if (!formData[field].trim()) {
+          toast.error(`${field.charAt(0).toUpperCase() + field.slice(1)} is required`);
+          isValid = false;
+        }
       }
       if (!/^\d+$/.test(formData.experience)) {
         toast.error("Experience should be a valid number");
         isValid = false;
       }
     }
-
     if (step === 3) {
       if (formData.about.length < 50) {
         toast.error("About section must be at least 50 characters");
         isValid = false;
       }
     }
-
-    if (step === 4) {
-      if (!formData.profilePicture) {
-        toast.error("Upload a profile picture");
-        isValid = false;
-      }
+    if (step === 4 && !formData.profilePicture) {
+      toast.error("Upload a profile picture");
+      isValid = false;
     }
-
-    if (step === 5) {
-      if (!formData.verificationFile) {
-        toast.error("Upload a verification document");
-        isValid = false;
-      }
+    if (step === 5 && !formData.verificationFile) {
+      toast.error("Upload a verification document");
+      isValid = false;
     }
-
-    if (step === 6) {
-      if (!formData.verificationVideo) {
-        toast.error("Upload a verification video");
-        isValid = false;
-      }
+    if (step === 6 && !formData.verificationVideo) {
+      toast.error("Upload a verification video");
+      isValid = false;
     }
-
     return isValid;
   };
 
@@ -129,48 +122,49 @@ const Form = () => {
     }
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+  const handlePrev = () => setStep(step - 1);
+  const handleNext = () => {
+    if (validate()) setStep(step + 1);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!validate()) return;
-
+    setLoading(true);
+    const cleanedData = {
+      ...formData,
+      fullName: sanitizeInput(formData.fullName),
+      education: sanitizeInput(formData.education),
+      expertise: sanitizeInput(formData.expertise),
+      occupation: sanitizeInput(formData.occupation),
+      about: sanitizeInput(formData.about),
+    };
     const formDataToSend = new FormData();
-    formDataToSend.append("full_name", formData.fullName);
+    formDataToSend.append("full_name", cleanedData.fullName);
     formDataToSend.append("email", user);
-    formDataToSend.append("phone", formData.phone);
-    formDataToSend.append("dob", formData.dob);
-    formDataToSend.append("education", formData.education);
-    formDataToSend.append("expertise", formData.expertise);
-    formDataToSend.append("occupation", formData.occupation);
-    formDataToSend.append("experience", formData.experience);
-    formDataToSend.append("about", formData.about);
-
-    formDataToSend.append("profile_picture", formData.profilePicture);
-    formDataToSend.append("verification_file", formData.verificationFile);
-    formDataToSend.append("verification_video", formData.verificationVideo);
+    formDataToSend.append("phone", cleanedData.phone);
+    formDataToSend.append("dob", cleanedData.dob);
+    formDataToSend.append("education", cleanedData.education);
+    formDataToSend.append("expertise", cleanedData.expertise);
+    formDataToSend.append("occupation", cleanedData.occupation);
+    formDataToSend.append("experience", cleanedData.experience);
+    formDataToSend.append("about", cleanedData.about);
+    formDataToSend.append("profile_picture", cleanedData.profilePicture);
+    formDataToSend.append("verification_file", cleanedData.verificationFile);
+    formDataToSend.append("verification_video", cleanedData.verificationVideo);
 
     try {
       const response = await adminAxios.post("applications/", formDataToSend, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-
       if (response.status === 201) {
         toast.success("Application submitted successfully!");
         navigate("/tutor/order-complete");
       }
     } catch (error) {
       toast.error("Failed to submit application.");
-    }
-  };
-
-  const handleNext = () => {
-    if (validate()) {
-      setStep(step + 1);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -192,7 +186,10 @@ const Form = () => {
               style={{ width: `${progressPercentage}%` }}
             ></div>
           </div>
-          <div className="max-w-xl mx-auto p-6 text-white rounded-lg shadow-lg">
+          <form
+            onSubmit={handleSubmit}
+            className="max-w-xl mx-auto p-6 text-white rounded-lg shadow-lg relative overflow-hidden"
+          >
             <h2 className="text-2xl font-extrabold font-serif mb-4">
               Step {step} of 6
             </h2>
@@ -303,7 +300,6 @@ const Form = () => {
                 )}
               </>
             )}
-
             {step === 5 && (
               <>
                 <h1 className="text-3xl font-serif font-semibold mb-5">
@@ -312,25 +308,22 @@ const Form = () => {
                 <h1 className="text-3xl font-serif font-semibold mb-3">
                   Document
                 </h1>
-                {[
-                  "ID Verification",
-                  "Identity Proof",
-                  "Professional Cert",
-                  "Resume",
-                ].map((docType) => (
-                  <button
-                    key={docType}
-                    type="button"
-                    className={`p-2 rounded text-sm ml-4 ${
-                      selectedDocumentType === docType
-                        ? "bg-blue-500 text-white"
-                        : "bg-gray-800 text-white"
-                    }`}
-                    onClick={() => setSelectedDocumentType(docType)} // ✅ Fix: Set document type separately
-                  >
-                    {docType}
-                  </button>
-                ))}
+                {["ID Verification", "Identity Proof", "Professional Cert", "Resume"].map(
+                  (docType) => (
+                    <button
+                      key={docType}
+                      type="button"
+                      className={`p-2 rounded text-sm ml-4 ${
+                        selectedDocumentType === docType
+                          ? "bg-blue-500 text-white"
+                          : "bg-gray-800 text-white"
+                      }`}
+                      onClick={() => setSelectedDocumentType(docType)}
+                    >
+                      {docType}
+                    </button>
+                  )
+                )}
                 {selectedDocumentType && (
                   <div className="mt-4">
                     <label className="text-gray-400 text-sm">
@@ -357,7 +350,6 @@ const Form = () => {
                   onChange={handleVideoChange}
                   className="w-full bg-gray-800 text-white p-2 rounded"
                 />
-                {/* Video Preview */}
                 {videoPreview && (
                   <div
                     className="bg-white"
@@ -374,29 +366,44 @@ const Form = () => {
             <div className="flex justify-between mt-4">
               {step > 1 && (
                 <button
+                  type="button"
                   onClick={handlePrev}
-                  className="px-4 py-2 bg-gray-600 rounded"
+                  className="px-4 py-2 bg-gray-600 rounded hover:bg-gray-700 transition"
                 >
                   Back
                 </button>
               )}
               {step < 6 ? (
                 <button
+                  type="button"
                   onClick={handleNext}
-                  className="px-4 py-2 bg-green-600 rounded"
+                  className="px-4 py-2 bg-green-600 rounded hover:bg-green-700 transition"
                 >
                   Next
                 </button>
               ) : (
                 <button
-                  onClick={handleSubmit}
-                  className="px-4 py-2 bg-green-600 rounded cursor-pointer"
+                  type="submit"
+                  className={`px-4 py-2 rounded transition ${
+                    loading
+                      ? "bg-green-400 cursor-not-allowed"
+                      : "bg-green-600 hover:bg-green-700"
+                  }`}
+                  disabled={loading}
                 >
-                  Submit
+                  {loading ? "Submitting..." : "Submit"}
                 </button>
               )}
             </div>
-          </div>
+            {loading && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/70 backdrop-blur-sm z-50 rounded-lg">
+                <div className="w-14 h-14 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
+                <p className="text-white mt-4 text-lg font-semibold">
+                  Uploading files... Please wait
+                </p>
+              </div>
+            )}
+          </form>
         </div>
       </div>
       <Footer />

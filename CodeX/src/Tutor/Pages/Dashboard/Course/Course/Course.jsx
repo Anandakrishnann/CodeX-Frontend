@@ -264,6 +264,19 @@ const Course = () => {
     }
   }
 
+
+  const toggle_status = async (e, course_id) => {
+      e.preventDefault();
+      try {
+        await tutorAxios.post(`course_status/${course_id}/`);
+        toast.success("Status Changed Successfully");
+        fetchCourses();
+      } catch (error) {
+        toast.error("Course not Found");
+        console.error("Error:", error);
+      }
+    };
+
   useEffect(() => {
     const result = courses.filter((course) => {
       if (filter === "accepted") return course.status === "accepted";

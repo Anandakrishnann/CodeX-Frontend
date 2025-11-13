@@ -2,6 +2,7 @@ import BackgroundAnimation from "../../../Component/BackgroundAnimation";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { setSubscribedTrue } from "@/redux/slices/userSlice";
 
 const OrderCompletion = () => {
   const navigate = useNavigate();

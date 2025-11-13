@@ -280,7 +280,6 @@ const Login = () => {
               {/* Login Button */}
               <button
                 type="submit"
-                onClick={login}
                 className="w-full p-4 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-black font-bold text-lg rounded-xl shadow-lg transform hover:scale-105 transition-all duration-300"
               >
                 Log In

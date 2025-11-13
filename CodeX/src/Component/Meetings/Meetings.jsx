@@ -25,13 +25,12 @@ export default function TutorMeeting() {
   const [userBookedMeetings, setUserBookedMeetings] = useState([]);
   const [recentMeetings, setRecentMeetings] = useState([]);
   const [isSubscribed, setIsSubscribed] = useState(false);
+
   const role = useSelector((state) => state.user.role);
   const user = useSelector((state) => state.user.user);
   const today = new Date().toISOString().split("T")[0];
   const navigate = useNavigate();
-
-  const location = window.location.href
-  
+  const location = window.location.href;
 
   useEffect(() => {
     if (role === "tutor") {
@@ -54,8 +53,7 @@ export default function TutorMeeting() {
         setIsSubscribed(false);
       }
     } catch (error) {
-      console.log("Error while checking subscription:", error);
-      setIsSubscribed(false); // fallback
+      setIsSubscribed(false);
     }
   };
 
@@ -63,45 +61,35 @@ export default function TutorMeeting() {
     try {
       const response = await userAxios.get("available-meetings/");
       setAvailableMeetings(response.data);
-    } catch (error) {
-      console.log(error || "Error While Fetching Available Meetings");
-    }
+    } catch (error) {}
   };
 
   const userBookedMeetingFetch = async () => {
     try {
       const response = await userAxios.get("booked-meetings/");
       setUserBookedMeetings(response.data);
-    } catch (error) {
-      console.log(error || "Error While Fetching Booked Meetings");
-    }
+    } catch (error) {}
   };
 
   const userRecentMeetings = async () => {
     try {
       const response = await userAxios.get("recent-meetings/");
       setRecentMeetings(response.data);
-    } catch (error) {
-      console.log(error || "Error While Fetching Recent Meetings");
-    }
+    } catch (error) {}
   };
 
   const tutorRecentMeetings = async () => {
     try {
       const response = await tutorAxios.get("recent-meetings/");
       setRecentMeetings(response.data);
-    } catch (error) {
-      console.log(error || "Error While Fetching Recent Meetings");
-    }
+    } catch (error) {}
   };
 
   const tutorSheduledMeetings = async () => {
     try {
       const response = await tutorAxios.get("sheduled-meetings/");
       setSheduledMeetings(response.data);
-    } catch (error) {
-      console.log(error || "Error While Fetching Scheduled Meetings");
-    }
+    } catch (error) {}
   };
 
   const handleCloseModal = () => {
@@ -161,16 +149,14 @@ export default function TutorMeeting() {
 
   const handleBooking = async (meetId) => {
     try {
-      const response = await userAxios.post("book-meeting/", {
+      await userAxios.post("book-meeting/", {
         meeting_id: meetId,
       });
       toast.success("Meeting Slot Booked Successfully");
       userAvailableMeetings();
       userBookedMeetingFetch();
       handleCloseModal();
-    } catch (error) {
-      console.log(error || "Error while booking a meeting");
-    }
+    } catch (error) {}
   };
 
   const handleEditChange = async (meeting_id) => {
@@ -228,13 +214,11 @@ export default function TutorMeeting() {
   return (
     <div className="min-h-screen p-6 relative z-10">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
         <div className="text-center mb-10">
           <h1 className="text-6xl font-bold text-white mb-2">Meeting's</h1>
           <div className="w-24 h-1 bg-blue-600 mx-auto"></div>
         </div>
 
-        {/* Tabs */}
         <div className="flex justify-center mb-8">
           <div className="bg-white rounded-xl p-2 shadow-lg border border-gray-200">
             {["your-meetings", "schedule", "recent-meetings"].map((tab) => (
@@ -253,7 +237,6 @@ export default function TutorMeeting() {
           </div>
         </div>
 
-        {/* Cards Grid */}
         {(activeTab !== "schedule" || role !== "tutor") && (
           <>
             {getMeetingsToDisplay().length === 0 ? (
@@ -271,6 +254,7 @@ export default function TutorMeeting() {
                     `${meeting.date}T${meeting.time}`
                   );
                   const isJoinEnabled = new Date() >= meetingDateTime;
+
                   return (
                     <div
                       key={meeting.id}
@@ -300,10 +284,12 @@ export default function TutorMeeting() {
                             {new Date(meeting.date).toLocaleDateString()}
                           </span>
                         </div>
+
                         <div className="flex items-center text-gray-600">
                           <Clock className="w-4 h-4 mr-3 text-blue-600" />
                           <span className="text-sm">{meeting.time}</span>
                         </div>
+
                         <div className="flex items-center text-gray-600">
                           <Users className="w-4 h-4 mr-3 text-blue-600" />
                           <span className="text-sm">
@@ -313,43 +299,72 @@ export default function TutorMeeting() {
                       </div>
 
                       <div className="p-6 pt-0">
-                        {role === "tutor" && isSubscribed === true ? (
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => {
-                                setEditDate(meeting.date);
-                                setEditTime(meeting.time);
-                                setEditLimit(meeting.limit);
-                                setModalData(meeting);
-                                setOpenEditModal(true);
-                              }}
-                              className="flex-1 border-2 border-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:border-blue-600 hover:text-blue-600 flex justify-center"
-                            >
-                              <Edit className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteChange(meeting.id)}
-                              className="flex-1 border-2 border-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:border-red-500 hover:text-red-500 flex justify-center"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
+                        {role === "tutor" && activeTab === "your-meetings" ? (
+                          (() => {
+                            const meetingDateTime = new Date(
+                              `${meeting.date}T${meeting.time}`
+                            );
+                            const currentTime = new Date();
+
+                            const diffInMs = meetingDateTime - currentTime;
+                            const diffInMinutes = diffInMs / (1000 * 60);
+
+                            const tutorCanJoin =
+                              diffInMinutes <= 5 && diffInMinutes >= -120;
+                            // tutor can join 5 min before until 2 hrs after (safety)
+
+                            const showEditDelete = diffInMinutes > 5;
+                            // edit & delete only before 5 mins
+
+                            return (
+                              <>
+                                {showEditDelete ? (
+                                  <div className="flex gap-2">
+                                    <button
+                                      onClick={() => {
+                                        setEditDate(meeting.date);
+                                        setEditTime(meeting.time);
+                                        setEditLimit(meeting.limit);
+                                        setModalData(meeting);
+                                        setOpenEditModal(true);
+                                      }}
+                                      className="flex-1 border-2 border-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:border-blue-600 hover:text-blue-600 flex justify-center"
+                                    >
+                                      <Edit className="w-4 h-4" />
+                                    </button>
+
+                                    <button
+                                      onClick={() =>
+                                        handleDeleteChange(meeting.id)
+                                      }
+                                      className="flex-1 border-2 border-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:border-red-500 hover:text-red-500 flex justify-center"
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <button
+                                    onClick={() =>
+                                      handleJoinMeeting(meeting.id)
+                                    }
+                                    className="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-lg font-medium"
+                                  >
+                                    Join Meeting
+                                  </button>
+                                )}
+                              </>
+                            );
+                          })()
                         ) : (
                           <>
                             {activeTab === "schedule" &&
                               (meeting.left <= meeting.limit ? (
-                                <div className="space-y-2">
-                                  <button
-                                    onClick={() => handleBook(meeting)}
-                                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-medium transition"
-                                  >
-                                    Book Meeting
-                                  </button>
-                                  <p className="text-xs text-red-600 text-center font-medium">
-                                    Note: Booking closes 15 minutes before the
-                                    scheduled start time.
-                                  </p>
-                                </div>
+                                <button
+                                  onClick={() => handleBook(meeting)}
+                                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-medium"
+                                >
+                                  Book Meeting
+                                </button>
                               ) : (
                                 <div className="w-full bg-red-100 text-red-700 py-3 px-4 rounded-lg text-center font-medium flex items-center justify-center gap-2">
                                   <XCircle className="w-5 h-5" />
@@ -357,18 +372,32 @@ export default function TutorMeeting() {
                                 </div>
                               ))}
 
-                            {activeTab === "your-meetings" &&  (
-                              <button
-                                className={`w-full py-3 px-4 rounded-lg font-medium transition ${
-                                  isJoinEnabled
-                                    ? "bg-green-600 hover:bg-green-700 text-white"
-                                    : "bg-gray-300 text-gray-600"
-                                }`}
-                                onClick={() => handleJoinMeeting(meeting.id)}
-                              >
-                                Join Meeting
-                              </button>
-                            )}
+                            {activeTab === "your-meetings" &&
+                              role === "user" &&
+                              (() => {
+                                const meetingDateTime = new Date(
+                                  `${meeting.date}T${meeting.time}`
+                                );
+                                const currentTime = new Date();
+                                const userCanJoin =
+                                  currentTime >= meetingDateTime;
+
+                                return (
+                                  <button
+                                    className={`w-full py-3 px-4 rounded-lg font-medium transition ${
+                                      userCanJoin
+                                        ? "bg-green-600 hover:bg-green-700 text-white"
+                                        : "bg-gray-300 text-gray-600"
+                                    }`}
+                                    disabled={!userCanJoin}
+                                    onClick={() =>
+                                      handleJoinMeeting(meeting.id)
+                                    }
+                                  >
+                                    Join Meeting
+                                  </button>
+                                );
+                              })()}
                           </>
                         )}
                       </div>
@@ -380,10 +409,10 @@ export default function TutorMeeting() {
           </>
         )}
 
-        {/* Create Meeting Form */}
         {activeTab === "schedule" &&
           role === "tutor" &&
-          isSubscribed === true && location != 'http://localhost:3000/user/meet' &&(
+          isSubscribed === true &&
+          location !== "http://localhost:3000/user/meet" && (
             <div className="max-w-2xl mx-auto">
               <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8">
                 <h2 className="text-2xl font-bold text-center text-gray-900 mb-6">
@@ -402,6 +431,7 @@ export default function TutorMeeting() {
                       className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-600"
                     />
                   </div>
+
                   <div>
                     <label className="block mb-1 font-semibold text-sm">
                       Meeting Time
@@ -413,6 +443,7 @@ export default function TutorMeeting() {
                       className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-600"
                     />
                   </div>
+
                   <div>
                     <label className="block mb-1 font-semibold text-sm">
                       Participant Limit
@@ -425,6 +456,7 @@ export default function TutorMeeting() {
                       className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-600"
                     />
                   </div>
+
                   <div className="flex gap-4 mt-6">
                     <button
                       onClick={handleCreateMeeting}
@@ -432,6 +464,7 @@ export default function TutorMeeting() {
                     >
                       Create Meeting
                     </button>
+
                     <button
                       onClick={() => {
                         setSelectedDate("");
@@ -448,7 +481,6 @@ export default function TutorMeeting() {
             </div>
           )}
 
-        {/* Booking Modal */}
         {openModal && modalData && (
           <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-md border border-gray-200 overflow-hidden">
@@ -461,19 +493,23 @@ export default function TutorMeeting() {
                 </button>
                 <h2 className="text-xl font-bold">Confirm Booking</h2>
               </div>
+
               <div className="p-6 space-y-3">
                 <div className="flex justify-between text-sm">
                   <span className="font-semibold text-gray-500">Tutor:</span>
                   <span>{modalData.tutor_name}</span>
                 </div>
+
                 <div className="flex justify-between text-sm">
                   <span className="font-semibold text-gray-500">Date:</span>
                   <span>{new Date(modalData.date).toLocaleDateString()}</span>
                 </div>
+
                 <div className="flex justify-between text-sm">
                   <span className="font-semibold text-gray-500">Time:</span>
                   <span>{modalData.time}</span>
                 </div>
+
                 <div className="flex justify-between text-sm">
                   <span className="font-semibold text-gray-500">Spots:</span>
                   <span>
@@ -481,15 +517,15 @@ export default function TutorMeeting() {
                   </span>
                 </div>
               </div>
+
               <div className="p-6 pt-0 flex gap-3">
                 <button
-                  onClick={() => {
-                    handleBooking(modalData.id);
-                  }}
+                  onClick={() => handleBooking(modalData.id)}
                   className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold"
                 >
                   Confirm Booking
                 </button>
+
                 <button
                   onClick={handleCloseModal}
                   className="border-2 border-gray-200 text-gray-700 py-3 px-6 rounded-lg font-semibold"
@@ -500,6 +536,7 @@ export default function TutorMeeting() {
             </div>
           </div>
         )}
+
         {openEditModal && modalData && (
           <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
             <div className="bg-white rounded-xl shadow-lg w-full max-w-md">
@@ -512,6 +549,7 @@ export default function TutorMeeting() {
                   <X className="w-5 h-5" />
                 </button>
               </div>
+
               <div className="p-6 space-y-4">
                 <div>
                   <label className="block text-sm font-medium">Date</label>
@@ -523,6 +561,7 @@ export default function TutorMeeting() {
                     className="w-full border border-gray-300 rounded-lg p-2"
                   />
                 </div>
+
                 <div>
                   <label className="block text-sm font-medium">Time</label>
                   <input
@@ -532,6 +571,7 @@ export default function TutorMeeting() {
                     className="w-full border border-gray-300 rounded-lg p-2"
                   />
                 </div>
+
                 <div>
                   <label className="block text-sm font-medium">Limit</label>
                   <input
@@ -542,6 +582,7 @@ export default function TutorMeeting() {
                   />
                 </div>
               </div>
+
               <div className="p-6 flex gap-3">
                 <button
                   onClick={() => {
@@ -552,6 +593,7 @@ export default function TutorMeeting() {
                 >
                   Save Changes
                 </button>
+
                 <button
                   onClick={() => setOpenEditModal(false)}
                   className="border border-gray-300 py-3 px-6 rounded-lg font-semibold"

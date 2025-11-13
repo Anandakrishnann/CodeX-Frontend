@@ -19,6 +19,7 @@ const Signup = () => {
     confirmPassword: "",
   });
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false); // 🌀 Loader state
   const navigate = useNavigate();
 
   const fadeIn = {
@@ -102,6 +103,8 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validate()) {
+      setLoading(true); // 🌀 Start loader
+
       localStorage.setItem("userEmail", formData.email);
       const expireAt = Date.now() + 120 * 1000;
       localStorage.setItem("otpExpireTime", expireAt.toString());
@@ -127,13 +130,25 @@ const Signup = () => {
         } else {
           toast.error("Request setup failed.");
         }
+      } finally {
+        setLoading(false); // 🛑 Stop loader
       }
     }
   };
 
   return (
-    <div className="h-screen flex overflow-hidden bg-black">
-      {/* Left Side - Branding (Same as Login) */}
+    <div className="h-screen flex overflow-hidden bg-black relative">
+      {/* 🌀 Fullscreen Loader */}
+      {loading && (
+        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/70 backdrop-blur-sm">
+          <div className="w-14 h-14 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-white mt-4 text-lg font-semibold">
+            Creating your account...
+          </p>
+        </div>
+      )}
+
+      {/* Left Side */}
       <motion.div
         className="hidden lg:flex lg:w-1/2 bg-gradient-to-br relative overflow-hidden"
         initial="hidden"
@@ -210,7 +225,7 @@ const Signup = () => {
           animate="visible"
           variants={fadeIn}
         >
-          <div className="backdrop-blur-sm rounded-3xl shadow-2xl p-8 lg:p-12 w-full">
+          <div className="backdrop-blur-sm rounded-3xl shadow-2xl p-8 lg:p-12 w-full relative">
             <button
               onClick={() => navigate("/")}
               className="mb-6 flex items-center gap-2 text-gray-400 hover:text-green-500 transition-colors group"
@@ -280,9 +295,14 @@ const Signup = () => {
 
               <button
                 type="submit"
-                className="w-full p-4 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-black font-bold text-lg rounded-xl shadow-lg transform hover:scale-105 transition-all duration-300"
+                disabled={loading}
+                className={`w-full p-4 rounded-xl text-black font-bold text-lg shadow-lg transform transition-all duration-300 ${
+                  loading
+                    ? "bg-green-400 cursor-not-allowed"
+                    : "bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 hover:scale-105"
+                }`}
               >
-                Sign Up
+                {loading ? "Signing Up..." : "Sign Up"}
               </button>
             </form>
           </div>

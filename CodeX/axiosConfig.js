@@ -22,8 +22,13 @@ const chatAxios = axios.create({
   withCredentials: true,
 });
 
+const notificationAxios = axios.create({
+  baseURL: `${API_BASE_URL}notifications/`,
+  withCredentials: true,
+});
+
 // Apply interceptors for token refresh
-[userAxios, adminAxios, tutorAxios, chatAxios].forEach((axiosInstance) => {
+[userAxios, adminAxios, tutorAxios, chatAxios, notificationAxios].forEach((axiosInstance) => {
   axiosInstance.interceptors.response.use(
     (response) => response,
     async (error) => {
@@ -60,4 +65,4 @@ const chatAxios = axios.create({
   );
 });
 
-export { userAxios, adminAxios, tutorAxios, chatAxios };
+export { userAxios, adminAxios, tutorAxios, chatAxios, notificationAxios };
