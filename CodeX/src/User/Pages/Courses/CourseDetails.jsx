@@ -7,6 +7,10 @@ import { useNavigate } from "react-router-dom";
 import { setTutorId } from "../../../redux/slices/userSlice";
 import { PayPalButtons } from "@paypal/react-paypal-js";
 import { toast } from "react-toastify";
+import { IoStar } from "react-icons/io5";
+import { motion } from "framer-motion";
+import { IoMdStarOutline } from "react-icons/io";
+import { Trash2 } from "lucide-react";
 
 const CourseDetails = () => {
   const [openSection, setOpenSection] = useState(null);
@@ -15,11 +19,26 @@ const CourseDetails = () => {
   const [showModal, setShowModal] = useState(false);
   const [isEnrolled, setIsEnrolled] = useState(false);
 
+  // Review states
+  const [feedbackList, setFeedbackList] = useState([]);
+  const [averageRating, setAverageRating] = useState(0);
+  const [totalFeedback, setTotalFeedback] = useState(0);
+  const [userRating, setUserRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [reviewText, setReviewText] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const course_id = useSelector((state) => state.user.courseId);
   const user = useSelector((state) => state.user.user);
+  const user_id = user.id;
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const fadeIn = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -37,6 +56,17 @@ const CourseDetails = () => {
       setCourse(response.data);
     } catch (error) {
       console.error("Error fetching course details:", error);
+    }
+  };
+
+  const fetchFeedback = async () => {
+    try {
+      const response = await userAxios.get(`course/${course_id}/feedback/`);
+      setAverageRating(response.data.average_rating || 0);
+      setTotalFeedback(response.data.total_feedback || 0);
+      setFeedbackList(response.data.feedback || []);
+    } catch (error) {
+      console.error("Error fetching feedback:", error);
     }
   };
 
@@ -58,12 +88,108 @@ const CourseDetails = () => {
   };
 
   useEffect(() => {
-    fetchCourse();
+    if (course_id) {
+      fetchCourse();
+      fetchFeedback();
+    }
 
     if (user && user.email) {
       checkUserEnrollment();
     }
   }, [course_id, user]);
+
+  const handleSubmitReview = async () => {
+    if (userRating === 0 || reviewText.trim() === "") {
+      toast.error("Please provide both rating and review");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await userAxios.post("course/feedback/", {
+        course: course_id,
+        rating: userRating,
+        review: reviewText,
+      });
+
+      setUserRating(0);
+      setReviewText("");
+      toast.success("Review submitted successfully!");
+      fetchFeedback();
+    } catch (error) {
+      console.error("Error submitting review:", error);
+      toast.error(
+        error.response?.data?.error || "Failed to submit review. Try again."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteReview = async () => {
+    try {
+      await userAxios.delete(`course/${course_id}/feedback/`);
+      toast.success("Review deleted successfully!");
+      fetchFeedback();
+    } catch (error) {
+      console.error("Error deleting review:", error);
+      toast.error("Failed to delete review");
+    }
+  };
+
+  const renderStars = (
+    rating,
+    size = "text-xl",
+    interactive = false,
+    onStarClick = null,
+    onStarHover = null
+  ) => {
+    const displayRating = interactive ? hoverRating || userRating : rating;
+
+    return (
+      <div className="flex items-center gap-1">
+        {[1, 2, 3, 4, 5].map((star) => {
+          const filled = displayRating >= star;
+          const halfFilled =
+            displayRating >= star - 0.5 && displayRating < star;
+
+          return (
+            <div
+              key={star}
+              className={`relative ${interactive ? "cursor-pointer" : ""}`}
+              onClick={() => interactive && onStarClick && onStarClick(star)}
+              onMouseEnter={() =>
+                interactive && onStarHover && onStarHover(star)
+              }
+              onMouseLeave={() => interactive && onStarHover && onStarHover(0)}
+            >
+              {halfFilled ? (
+                <div className="relative">
+                  <IoMdStarOutline className={`${size} text-green-400/30`} />
+                  <div
+                    className="absolute inset-0 overflow-hidden"
+                    style={{ width: "50%" }}
+                  >
+                    <IoStar
+                      className={`${size} text-green-400 drop-shadow-[0_0_8px_rgba(74,222,128,0.6)]`}
+                    />
+                  </div>
+                </div>
+              ) : filled ? (
+                <IoStar
+                  className={`${size} text-green-400 drop-shadow-[0_0_8px_rgba(74,222,128,0.6)] transition-all duration-200`}
+                />
+              ) : (
+                <IoMdStarOutline
+                  className={`${size} text-green-400/30 transition-all duration-200`}
+                />
+              )}
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
 
   const toggleSection = useCallback((index) => {
     setOpenSection((prev) => (prev === index ? null : index));
@@ -113,8 +239,9 @@ const CourseDetails = () => {
                   <span className="bg-white text-black px-2 py-1 rounded">
                     Category: {course.category}
                   </span>
-                  <span className="text-green-500 font-medium">
-                    (335,678 ratings)
+                  <span className="text-green-500 font-medium flex items-center gap-2">
+                    {renderStars(averageRating, "text-sm")}({totalFeedback}{" "}
+                    ratings)
                   </span>
                   <span>
                     {new Date(course.created_at).toLocaleDateString()}
@@ -141,7 +268,7 @@ const CourseDetails = () => {
                     By {course.first_name} {course.last_name}
                   </p>
                   <p className="text-2xl font-bold text-green-500 mt-2 mb-4">
-                    ₹{course.price}
+                    $ {course.price}
                   </p>
                   {user ? (
                     isEnrolled ? (
@@ -255,6 +382,190 @@ const CourseDetails = () => {
                 </div>
               </div>
             </div>
+
+            {/* Reviews & Rating Section */}
+            <motion.div
+              variants={fadeIn}
+              initial="hidden"
+              animate="visible"
+              className="mt-16"
+            >
+              <h2 className="text-5xl font-bold text-white mb-8 text-center">
+                Reviews & Ratings
+              </h2>
+
+              {/* Average Rating Display */}
+              <div className="bg-gradient-to-br from-black to-gray-900 rounded-2xl p-8 border border-green-500/20 shadow-xl mb-8 relative overflow-hidden">
+                <div className="absolute -top-10 -right-10 w-40 h-40 bg-green-500/10 rounded-full blur-2xl"></div>
+
+                <div className="flex items-center justify-center gap-8 flex-wrap relative z-10">
+                  <div className="text-center">
+                    <div className="text-6xl font-bold text-green-400 mb-2">
+                      {averageRating.toFixed(1)}
+                    </div>
+                    {renderStars(averageRating, "text-3xl")}
+                    <p className="text-gray-400 mt-2 text-lg">
+                      {totalFeedback} reviews
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Add Review Form - Only if enrolled */}
+              {isEnrolled && (
+                <div className="bg-gradient-to-br from-black to-gray-900 rounded-2xl p-8 border border-green-500/20 shadow-xl mb-8 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-green-500/5 rounded-full blur-3xl"></div>
+                  <div className="absolute bottom-0 left-0 w-48 h-48 bg-green-500/5 rounded-full blur-3xl"></div>
+
+                  <h3 className="text-3xl font-bold mb-6 text-green-400 relative z-10">
+                    Share Your Experience
+                  </h3>
+
+                  <div className="relative z-10">
+                    <div className="mb-6">
+                      <label className="block text-gray-300 mb-3 text-lg font-semibold">
+                        Your Rating
+                      </label>
+                      {renderStars(
+                        userRating,
+                        "text-4xl",
+                        true,
+                        setUserRating,
+                        setHoverRating
+                      )}
+                      {userRating > 0 && (
+                        <p className="text-green-400 mt-2 text-sm">
+                          You rated: {userRating} star
+                          {userRating > 1 ? "s" : ""}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="mb-6">
+                      <label className="block text-gray-300 mb-3 text-lg font-semibold">
+                        Your Review
+                      </label>
+                      <textarea
+                        value={reviewText}
+                        onChange={(e) => setReviewText(e.target.value)}
+                        placeholder="Share your thoughts about this course..."
+                        className="w-full bg-gray-900/50 border border-green-500/30 rounded-xl p-4 text-white placeholder-gray-500 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all duration-300 min-h-[120px]"
+                        rows="4"
+                      />
+                    </div>
+
+                    <button
+                      onClick={handleSubmitReview}
+                      disabled={
+                        isSubmitting ||
+                        userRating === 0 ||
+                        reviewText.trim() === ""
+                      }
+                      className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-xl transition-all duration-300 hover:shadow-xl hover:shadow-green-500/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                          Submitting...
+                        </>
+                      ) : (
+                        <>
+                          <IoStar className="text-xl" />
+                          Submit Review
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  <div className="absolute inset-0 opacity-5 pointer-events-none">
+                    <div
+                      className="absolute inset-0"
+                      style={{
+                        backgroundImage: `linear-gradient(rgba(74, 222, 128, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(74, 222, 128, 0.1) 1px, transparent 1px)`,
+                        backgroundSize: "20px 20px",
+                      }}
+                    ></div>
+                  </div>
+                </div>
+              )}
+
+              {/* Reviews List */}
+              <div className="space-y-4">
+                <h3 className="text-3xl font-bold mb-4 text-green-400">
+                  Student Reviews
+                </h3>
+
+                {feedbackList.length > 0 ? (
+                  feedbackList.map((feedback) => (
+                    <motion.div
+                      key={feedback.id}
+                      variants={fadeIn}
+                      initial="hidden"
+                      animate="visible"
+                      className="bg-gradient-to-br from-black to-gray-900 rounded-2xl p-6 border border-green-500/20 shadow-xl relative overflow-hidden group hover:border-green-500/40 transition-all duration-300"
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-r from-green-500/0 via-green-500/5 to-green-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+                      <div className="relative z-10">
+                        <div className="flex items-start justify-between mb-3">
+                          <div>
+                            <h4 className="text-lg font-semibold text-green-400">
+                              {feedback.user_name}
+                            </h4>
+                            <p className="text-sm text-gray-500">
+                              {new Date(feedback.created_at).toLocaleDateString(
+                                "en-US",
+                                {
+                                  year: "numeric",
+                                  month: "long",
+                                  day: "numeric",
+                                }
+                              )}
+                            </p>
+                          </div>
+
+                          <div className="flex items-center gap-3">
+                            {renderStars(feedback.rating, "text-lg")}
+
+                            {/* ⭐ DELETE BUTTON (ADDED) */}
+                            {feedback.user == user_id && (
+                              <button
+                                onClick={() => handleDeleteReview(feedback.id)}
+                                className="text-green-500 hover:text-red-500 transition-colors duration-200"
+                              >
+                                <Trash2 size={20} />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+
+                        <p className="text-gray-300 leading-relaxed">
+                          {feedback.review}
+                        </p>
+                      </div>
+
+                      <div className="absolute inset-0 opacity-5 pointer-events-none">
+                        <div
+                          className="absolute inset-0"
+                          style={{
+                            backgroundImage: `linear-gradient(rgba(74, 222, 128, 0.1) 1px, transparent 1px),
+           linear-gradient(90deg, rgba(74, 222, 128, 0.1) 1px, transparent 1px)`,
+                            backgroundSize: "15px 15px",
+                          }}
+                        ></div>
+                      </div>
+                    </motion.div>
+                  ))
+                ) : (
+                  <div className="text-center py-12 text-gray-500 bg-gradient-to-br from-black to-gray-900 rounded-2xl border border-green-500/20">
+                    <IoMdStarOutline className="text-6xl mx-auto mb-4 opacity-30" />
+                    <p className="text-lg">
+                      No reviews yet. Be the first to review!
+                    </p>
+                  </div>
+                )}
+              </div>
+            </motion.div>
           </>
         ) : (
           <p className="text-center text-gray-400 mt-20">

@@ -153,7 +153,7 @@ const Courses = () => {
                     {/* Price and Action Buttons */}
                     <div className="flex items-center justify-between">
                       <span className="text-gray-900 font-bold text-lg">
-                        ₹ {course.price}
+                        $ {course.price}
                       </span>
 
                       <div className="flex items-center space-x-2">

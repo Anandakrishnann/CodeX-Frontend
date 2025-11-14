@@ -89,7 +89,7 @@ const TutorDashboard = () => {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
               <QuickStat icon={<BookOpen className="text-cyan-300" />} value={summary.total_courses} label="Total Courses" />
               <QuickStat icon={<Users className="text-green-300" />} value={summary.total_students} label="Total Students" />
-              <QuickStat icon={<DollarSign className="text-yellow-300" />} value={`₹${summary.total_revenue}`} label="Total Revenue" />
+              <QuickStat icon={<DollarSign className="text-yellow-300" />} value={`$${summary.total_revenue}`} label="Total Revenue" />
               <QuickStat icon={<Clock className="text-pink-300" />} value={`${summary.avg_progress}%`} label="Avg Course Progress" />
             </div>
           </motion.div>

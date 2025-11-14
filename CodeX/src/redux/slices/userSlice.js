@@ -14,6 +14,7 @@ const initialState = {
   moduleId: null,
   lessonId: null,
   tutorId: null,
+  
 };
 
 const userSlice = createSlice({

@@ -193,7 +193,7 @@ const Courses = () => {
                       <div className="flex justify-between">
                         <span className="text-gray-400 font-medium">Price:</span>
                         <span className="text-green-400 font-bold text-base">
-                          ₹{course.price}
+                          $ {course.price}
                         </span>
                       </div>
                       <div className="flex justify-between">
