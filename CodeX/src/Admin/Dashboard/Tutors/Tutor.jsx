@@ -44,7 +44,6 @@ const Tutors = () => {
     "First Name",
     "Last Name",
     "Email",
-    "Leetcode ID",
     "Phone",
     "Status",
     "Actions",

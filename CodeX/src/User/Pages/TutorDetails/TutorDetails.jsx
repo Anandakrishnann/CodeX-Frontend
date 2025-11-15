@@ -8,9 +8,9 @@ import { motion } from "framer-motion";
 import { IoMdStarOutline } from "react-icons/io";
 import { CiCircleInfo } from "react-icons/ci";
 import { useNavigate } from "react-router-dom";
-import { setCourseId, setTutorId } from "../../../redux/slices/userSlice";
+import { setCourseId } from "../../../redux/slices/userSlice";
 import { toast } from "react-toastify";
-import { Trash2 } from "lucide-react";
+import { Trash2, Flag } from "lucide-react";
 
 const TutorDetails = () => {
   const [tutor, setTutor] = useState(null);
@@ -24,9 +24,14 @@ const TutorDetails = () => {
   const [reviewText, setReviewText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Report modal states
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportReason, setReportReason] = useState("");
+  const [isSubmittingReport, setIsSubmittingReport] = useState(false);
+
   const tutor_id = useSelector((state) => state.user.tutorId);
   const user = useSelector((state) => state.user.user);
-  const user_id = user.id
+  const user_id = user?.id;
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -76,7 +81,7 @@ const TutorDetails = () => {
 
   const handleSubmitReview = async () => {
     if (userRating === 0 || reviewText.trim() === "") {
-      alert("Please provide both rating and review");
+      toast.error("Please provide both rating and review");
       return;
     }
 
@@ -112,6 +117,33 @@ const TutorDetails = () => {
       fetchFeedback();
     } catch (error) {
       console.error("Error deleting review:", error);
+      toast.error(error.data.error || "Failed to delete review");
+    }
+  };
+
+  const handleSubmitReport = async () => {
+    if (reportReason.trim() === "") {
+      toast.error("Please provide a reason for reporting");
+      return;
+    }
+
+    setIsSubmittingReport(true);
+    try {
+      await userAxios.post("tutor/report/", {
+        tutor: tutorId,
+        reason: reportReason,
+      });
+
+      setReportReason("");
+      setShowReportModal(false);
+      toast.success("Report submitted successfully! We'll review it shortly.");
+    } catch (error) {
+      console.error("Error submitting report:", error);
+      toast.error(
+        error.response?.data?.error || "Failed to submit report. Try again."
+      );
+    } finally {
+      setIsSubmittingReport(false);
     }
   };
 
@@ -195,10 +227,17 @@ const TutorDetails = () => {
               </div>
 
               <div className="md:w-2/3 space-y-4 font-serif">
-                <div className="flex">
-                  <h1 className="text-5xl font-bold">
+                <div className="flex items-start justify-between">
+                  <h1 className="text-4xl font-bold flex-1">
                     {tutor.full_name} ( {tutor.age} )
                   </h1>
+                  <button
+                    onClick={() => setShowReportModal(true)}
+                    className="ml-4 p-2 text-white bg-red-600 hover:text-red-500 transition-colors duration-200 hover:bg-red-500/10 rounded-lg flex items-center gap-2"
+                    title="Report Tutor"
+                  >
+                    <span>Report</span><Flag size={20} />
+                  </button>
                 </div>
                 <p className="text-gray-300 text-lg">{tutor.about}</p>
                 <div className="flex flex-wrap gap-3 text-sm text-gray-400">
@@ -447,7 +486,6 @@ const TutorDetails = () => {
                           <div className="flex items-center gap-3">
                             {renderStars(feedback.rating, "text-lg")}
 
-                            {/* ⭐ DELETE BUTTON (ADDED) */}
                             {feedback.user == user_id && (
                               <button
                                 onClick={() => handleDeleteReview(feedback.id)}
@@ -579,6 +617,91 @@ const TutorDetails = () => {
           </p>
         )}
       </div>
+
+      {/* Report Modal */}
+      {showReportModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 backdrop-blur-sm">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-gradient-to-br from-gray-900 to-black rounded-2xl p-8 w-full max-w-md shadow-2xl border border-green-600/30 relative overflow-hidden"
+          >
+            {/* Decorative elements */}
+            <div className="absolute -top-10 -right-10 w-40 h-40 bg-green-600/10 rounded-full blur-2xl"></div>
+            <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-green-600/10 rounded-full blur-2xl"></div>
+
+            <button
+              onClick={() => setShowReportModal(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl font-bold transition-colors"
+            >
+              ×
+            </button>
+
+            <div className="relative z-10">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-3 bg-green-600/20 rounded-lg">
+                  <Flag className="text-red-500" size={24} />
+                </div>
+                <h2 className="text-2xl font-bold text-white">Report Tutor</h2>
+              </div>
+
+              <p className="text-gray-400 mb-6">
+                Help us maintain quality by reporting inappropriate content or violations.
+              </p>
+
+              <div className="mb-6">
+                <label className="block text-gray-300 mb-3 text-sm font-semibold">
+                  Reason for Report
+                </label>
+                <textarea
+                  value={reportReason}
+                  onChange={(e) => setReportReason(e.target.value)}
+                  placeholder="Please describe the issue with this tutor..."
+                  className="w-full bg-gray-900/50 border border-green-600/30 rounded-xl p-4 text-white placeholder-gray-500 focus:outline-none focus:border-green-600 focus:ring-2 focus:ring-green-600/20 transition-all duration-300 min-h-[120px]"
+                  rows="4"
+                />
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowReportModal(false)}
+                  className="flex-1 bg-gray-800 hover:bg-gray-700 text-white font-semibold py-3 rounded-xl transition-all duration-300"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSubmitReport}
+                  disabled={isSubmittingReport || reportReason.trim() === ""}
+                  className="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-xl transition-all duration-300 hover:shadow-xl hover:shadow-red-500/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {isSubmittingReport ? (
+                    <>
+                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                      Submitting...
+                    </>
+                  ) : (
+                    <>
+                      <Flag size={18} />
+                      Submit Report
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Grid pattern overlay */}
+            <div className="absolute inset-0 opacity-5 pointer-events-none">
+              <div
+                className="absolute inset-0"
+                style={{
+                  backgroundImage: `linear-gradient(rgba(239, 68, 68, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(239, 68, 68, 0.1) 1px, transparent 1px)`,
+                  backgroundSize: "20px 20px",
+                }}
+              ></div>
+            </div>
+          </motion.div>
+        </div>
+      )}
 
       <Footer />
     </div>

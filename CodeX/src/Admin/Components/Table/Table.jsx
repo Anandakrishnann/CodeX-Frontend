@@ -4,12 +4,19 @@ import TaskAltIcon from "@mui/icons-material/TaskAlt";
 import CancelIcon from "@mui/icons-material/Cancel";
 import RestoreFromTrashIcon from "@mui/icons-material/RestoreFromTrash";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import EditUserModal from "../../../Component/EditModal/EditUserModal";
+import { useDispatch } from "react-redux";
+import { setTutorId } from "../../../redux/slices/userSlice";
 
 const Table = ({ datas, fucntions, columns, name }) => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+  console.log(datas);
+  
+
 
   const handleEditClick = (user) => {
     setSelectedUser(user);
@@ -25,6 +32,11 @@ const Table = ({ datas, fucntions, columns, name }) => {
     // Updating the local table state with the new user data
     setSelectedUser(updatedUser);
   };
+
+  const handleNavigate = (id) => {
+    dispatch(setTutorId(id))
+    navigate("/admin/tutor-view/")
+  }
 
   return (
     <div className="grid">
@@ -68,9 +80,6 @@ const Table = ({ datas, fucntions, columns, name }) => {
                       {user.email}
                     </td>
                     <td className="p-4 text-md font-extrabold text-gray-800">
-                      {user.leetcode_id}
-                    </td>
-                    <td className="p-4 text-md font-extrabold text-gray-800">
                       {user.phone}
                     </td>
                     <td className="p-4">
@@ -101,11 +110,11 @@ const Table = ({ datas, fucntions, columns, name }) => {
                         </button>
                       )}
                       {user.role === "tutor" ? (
-                        <Link to={`/admin/tutor-view/${user.email}`}>
-                          <button className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-900 transition">
+                          <button className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-900 transition"
+                          onClick={() => handleNavigate(user.id)}
+                          >
                             <VisibilityIcon />
                           </button>
-                        </Link>
                       ) : (
                         <button className="hover:bg-gray-200"></button>
                       )}

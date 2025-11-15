@@ -18,16 +18,17 @@ import { toast } from "react-toastify";
 import Loading from "../../Components/Loading/Loading";
 import Layout from "../Layout/Layout";
 import { RotateCcw } from "lucide-react";
+import { useSelector } from "react-redux";
 
 const TutorView = () => {
-  const { userId } = useParams();
+  const tutorId = useSelector((state) => state.user.tutorId);
   const [userData, setUserData] = useState(null);
   console.log(userData);
   
 
   const fetchUserData = async () => {
       try {
-        const response = await adminAxios.get(`tutor_view/${userId}/`);
+        const response = await adminAxios.get(`tutor_view/${tutorId}/`);
         setUserData(response.data);
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -35,10 +36,10 @@ const TutorView = () => {
     };
 
   useEffect(() => {
-    if (userId) {
+    if (tutorId) {
       fetchUserData();
     }
-  }, [userId]);
+  }, [tutorId]);
 
   const acceptApplication = async (id) => {
     try {
@@ -64,11 +65,11 @@ const TutorView = () => {
     return <Loading />;
   }
 
-  const toggle_status = async (e, user_id) => {
+  const toggle_status = async (e, tutorId) => {
       e.preventDefault();
   
       try {
-        await adminAxios.post("tutor-status/", { id: user_id });
+        await adminAxios.post("tutor-status/", { id: tutorId });
         toast.success("Status Changed Successfully");
         fetchUserData()
       } catch (error) {
@@ -107,7 +108,7 @@ const TutorView = () => {
           {/* Header with Status Badge */}
           <div className="mb-8 flex items-center justify-between">
             <div>
-              <h1 className="text-4xl font-bold text-white mb-2 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+              <h1 className="text-4xl font-bold text-white mb-2 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text">
                 Tutor Application
               </h1>
               <p className="text-gray-400">Review and verify tutor credentials</p>

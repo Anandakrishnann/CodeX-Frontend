@@ -1,4 +1,4 @@
-import React, { useEffect, useState, version } from "react";
+import React, { useDebugValue, useEffect, useState, version } from "react";
 import { adminAxios } from "../../../../axiosConfig.js";
 import TaskAltIcon from "@mui/icons-material/TaskAlt";
 import CancelIcon from "@mui/icons-material/Cancel";
@@ -6,10 +6,13 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import { Link, useNavigate } from "react-router-dom";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import Layout from "../Layout/Layout";
+import { useDispatch } from "react-redux";
+import { setApplicationEmail } from "../../../redux/slices/userSlice.js";
 
 const Applications = () => {
   const [applications, setApplications] = useState([]);
   const navigate = useNavigate();
+  const dispatch = useDispatch()
 
   useEffect(() => {
     const fetchApplications = async () => {
@@ -27,6 +30,12 @@ const Applications = () => {
   }, []);
 
   const columns = ["ID", "Name", "Email", "Phone", "Status", "Actions"];
+
+
+  const handleNavigate = (email) => {
+    dispatch(setApplicationEmail(email))
+    navigate("/admin/application-view/")
+  }
 
   return (
     <Layout>
@@ -84,31 +93,11 @@ const Applications = () => {
                         ) : null}
                       </td>
                       <td className="p-4 flex space-x-3">
-                        {/* <button
-                            className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+                          <button className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-900 transition"
+                          onClick={() => handleNavigate(application.email)}
                           >
-                            <EditIcon />
-                          </button> */}
-                        {/* {user.status === false ? (
-                        <button
-                          className="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
-                          onClick={(e) => toggleStatus(e, user.id)}
-                        >
-                          <DeleteForeverIcon />
-                        </button>
-                      ) : (
-                        <button
-                          className="p-2 bg-green-500 text-white rounded-lg hover:bg-green-900 transition"
-                          onClick={(e) => toggleStatus(e, user.id)}
-                        >
-                          <RestoreFromTrashIcon />
-                        </button>
-                      )} */}
-                        <Link to={`/admin/application-view/${application.id}`}>
-                          <button className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-900 transition">
                             <VisibilityIcon />
                           </button>
-                        </Link>
                       </td>
                     </tr>
                   ))

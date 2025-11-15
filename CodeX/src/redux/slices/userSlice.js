@@ -14,7 +14,7 @@ const initialState = {
   moduleId: null,
   lessonId: null,
   tutorId: null,
-  
+  applicationEmail: null,
 };
 
 const userSlice = createSlice({
@@ -76,6 +76,10 @@ const userSlice = createSlice({
       state.tutorId = action.payload;
     },
 
+    setApplicationEmail: (state, action) => {
+      state.applicationEmail = action.payload;
+    },
+
   },
 });
 
@@ -91,6 +95,7 @@ export const {
   setLessonId,
   setTutorId,
   setPurchasedCourses,
+  setApplicationEmail
 } = userSlice.actions;
 
 export default userSlice.reducer;

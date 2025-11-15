@@ -67,6 +67,7 @@ import MeetingRoom from "./Component/MeetingRoom/MeetingRoom";
 import Review from "./User/Review";
 import CourseAnalytics from "./Tutor/Pages/Dashboard/Course/Course/CourseAnalytics";
 import AdminCourseAnalytics from "./Admin/Dashboard/Courses/AdminCourseAnalytics";
+import Report from "./Admin/Dashboard/Reports/Report";
 
 
 const queryClient = new QueryClient();  // ✅ Fix QueryClient initialization
@@ -161,10 +162,11 @@ function App() {
                   <Route path="/admin/courses/lessons/overview" element={<AdminLessonOverview />} />
                   <Route path="/admin/applications" element={<Applications />} />
                   <Route path="/admin/course-requests" element={<CourseRequests />} />
+                  <Route path="/admin/reports" element={<Report />} />
                   <Route path="/admin/plans" element={<Plans />} /> 
                   <Route path="/admin/category" element={<Category />} />
-                  <Route path="/admin/application-view/:userId" element={<Overview />} />
-                  <Route path="/admin/tutor-view/:userId" element={<TutorView />} />
+                  <Route path="/admin/application-view/" element={<Overview />} />
+                  <Route path="/admin/tutor-view/" element={<TutorView />} />
                 </Route>
 
                 <Route path="*" element={<NotFound />} />

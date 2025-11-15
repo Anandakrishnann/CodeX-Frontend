@@ -17,25 +17,26 @@ import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import { toast } from "react-toastify";
 import Loading from "../../Components/Loading/Loading";
 import Layout from "../Layout/Layout";
+import { useSelector } from "react-redux";
 
 const Overview = () => {
-  const { userId } = useParams();
+  const email = useSelector((state) => state.user.applicationEmail);
   const [userData, setUserData] = useState(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await adminAxios.get(`application_view/${userId}/`);
+        const response = await adminAxios.get(`application_view/${email}/`);
         setUserData(response.data);
       } catch (error) {
         console.error("Error fetching user data:", error);
       }
     };
 
-    if (userId) {
+    if (email) {
       fetchUserData();
     }
-  }, [userId]);
+  }, [email]);
 
   const acceptApplication = async (applicationId) => {
     if (!applicationId) {
@@ -109,7 +110,7 @@ const Overview = () => {
           {/* Header with Status Badge */}
           <div className="mb-8 flex items-center justify-between">
             <div>
-              <h1 className="text-4xl font-bold text-white mb-2 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+              <h1 className="text-4xl font-bold text-white mb-2 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text">
                 Application Overview
               </h1>
               <p className="text-gray-400">Review and manage tutor application</p>
@@ -179,14 +180,14 @@ const Overview = () => {
                     {userData.status === "pending" && (
                       <>
                         <button
-                          onClick={() => acceptApplication(userId)}
+                          onClick={() => acceptApplication(userData.id)}
                           className="w-full bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-bold py-3 px-6 rounded-xl flex items-center justify-center gap-2 transition-all duration-300 transform hover:scale-105 shadow-lg"
                         >
                           <DoneOutlineIcon className="w-5 h-5" />
                           Accept Application
                         </button>
                         <button
-                          onClick={() => rejectApplication(userId)}
+                          onClick={() => rejectApplication(userData.id)}
                           className="w-full bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white font-bold py-3 px-6 rounded-xl flex items-center justify-center gap-2 transition-all duration-300 transform hover:scale-105 shadow-lg"
                         >
                           <CloseIcon className="w-5 h-5" />

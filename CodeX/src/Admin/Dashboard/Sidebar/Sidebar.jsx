@@ -12,6 +12,7 @@ import ViewListIcon from "@mui/icons-material/ViewList";
 import StarIcon from "@mui/icons-material/Star";
 import LogoutIcon from "@mui/icons-material/Logout";
 import PostAddIcon from "@mui/icons-material/PostAdd";
+import { Trash2, Flag } from "lucide-react";
 
 export default function Sidebar() {
   const navigate = useNavigate();
@@ -63,6 +64,11 @@ export default function Sidebar() {
       path: "/admin/course-requests",
       icon: <PostAddIcon fontSize="medium" className="h-6 w-6" />,
       label: "Coures Requests",
+    },
+    {
+      path: "/admin/Reports",
+      icon: <Flag fontSize="medium" className="h-6 w-6"/>,
+      label: "Reports",
     },
     {
       path: "/admin/category",
