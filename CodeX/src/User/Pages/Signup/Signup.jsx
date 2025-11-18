@@ -8,6 +8,7 @@ import SchoolIcon from "@mui/icons-material/School";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import PeopleIcon from "@mui/icons-material/People";
 import EmojiObjectsIcon from "@mui/icons-material/EmojiObjects";
+import Loading from "../../Components/Loading/Loading"
 
 const Signup = () => {
   const [formData, setFormdata] = useState({
@@ -19,7 +20,7 @@ const Signup = () => {
     confirmPassword: "",
   });
   const [errors, setErrors] = useState({});
-  const [loading, setLoading] = useState(false); // 🌀 Loader state
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const fadeIn = {
@@ -103,7 +104,7 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validate()) {
-      setLoading(true); // 🌀 Start loader
+      setLoading(true); 
 
       localStorage.setItem("userEmail", formData.email);
       const expireAt = Date.now() + 120 * 1000;
@@ -140,12 +141,7 @@ const Signup = () => {
     <div className="h-screen flex overflow-hidden bg-black relative">
       {/* 🌀 Fullscreen Loader */}
       {loading && (
-        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/70 backdrop-blur-sm">
-          <div className="w-14 h-14 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-white mt-4 text-lg font-semibold">
-            Creating your account...
-          </p>
-        </div>
+        <Loading />
       )}
 
       {/* Left Side */}

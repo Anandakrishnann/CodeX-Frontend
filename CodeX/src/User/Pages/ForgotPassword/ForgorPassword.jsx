@@ -2,10 +2,14 @@ import React, { useState } from "react";
 import Mail from "../../../assets/MailBox.jpg";
 import { userAxios } from "../../../../axiosConfig";
 import { toast } from "react-toastify";
+import { Flag } from "lucide-react";
+import Loading from "../../Components/Loading/Loading";
+import BackgroundAnimation from "../../../Component/BackgroundAnimation";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
     try {
@@ -13,51 +17,60 @@ const ForgotPassword = () => {
         toast.error("Please Enter Valid Email");
         return;
       }
-
+      setLoading(true);
       await userAxios.post(`forgot_password/${email}/`);
       toast.success("📧 Password reset email sent successfully!");
       setIsModalOpen(true);
     } catch (error) {
       console.error("Forgot password error:", error);
       toast.error("❌ Failed to send password reset email. Please try again.");
+    } finally {
+      setLoading(false);
     }
     setIsModalOpen(true);
   };
 
   return (
     <>
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="bg-gray-900 p-8 rounded-lg w-full max-w-md shadow-lg font-serif">
-          <h2 className="text-2xl font-bold text-white text-center mb-6">
-            Forgot Password
-          </h2>
+      {loading ? (
+        <Loading />
+      ) : (
+        <>
+        <BackgroundAnimation/>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="border border-green-500 p-8 rounded-lg w-full max-w-md shadow-lg font-serif">
+            <h2 className="text-2xl font-bold text-white text-center mb-6">
+              Forgot Password
+            </h2>
 
-          <div className="space-y-4">
-            <div>
-              <h3 htmlFor="email" className="block text-white mb-1">
-                Email
-              </h3>
-              <input
-                type="email"
-                id="email"
-                placeholder="Enter your email"
-                className="w-full px-4 py-2 rounded-md bg-[#000000] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+            <div className="space-y-4">
+              <div>
+                <h3 htmlFor="email" className="block text-white mb-1">
+                  Email
+                </h3>
+                <input
+                  type="email"
+                  id="email"
+                  placeholder="Enter your email" 
+                  className="w-full px-4 py-2 rounded-md bg-[#000000] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 border border-green-500"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="w-full py-3 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors duration-200 font-medium text-base disabled:bg-zinc-800 disabled:text-zinc-500 cursor-pointer"
+                onClick={handleSubmit}
+              >
+                Send Mail
+              </button>
             </div>
-
-            <button
-              type="submit"
-              className="w-full py-3 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors duration-200 font-medium text-base disabled:bg-zinc-800 disabled:text-zinc-500 cursor-pointer"
-              onClick={handleSubmit}
-            >
-              Send Mail
-            </button>
           </div>
         </div>
-      </div>
+        </>
+      )}
       {isModalOpen === true ? (
         <div className="relative z-50">
           <div className="fixed inset-0 bg-black" aria-hidden="true" />

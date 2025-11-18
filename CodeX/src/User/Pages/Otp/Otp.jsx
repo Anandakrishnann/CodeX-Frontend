@@ -10,11 +10,14 @@ import SchoolIcon from "@mui/icons-material/School";
 import MailLockIcon from "@mui/icons-material/MailLock";
 import VerifiedIcon from "@mui/icons-material/Verified";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import Loading from "../../Components/Loading/Loading";
+
 
 const OTPVerification = () => {
   const [otp, setOtp] = useState("");
   const [email, setEmail] = useState("");
   const [expired, setExpired] = useState(false);
+  const [loading, setLoading] = useState(false)
   const seconds = useSelector((state) => state.user.second);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -29,7 +32,7 @@ const OTPVerification = () => {
     visible: { opacity: 1, x: 0, transition: { duration: 0.6 } },
   };
 
-  // ✅ Load email and start timer
+
   useEffect(() => {
     const emailFromStorage = localStorage.getItem("userEmail");
     setEmail(emailFromStorage);
@@ -65,10 +68,12 @@ const OTPVerification = () => {
     return () => clearInterval(timer);
   }, [seconds, dispatch]);
 
-  // ✅ Resend OTP
+
   const handleResend = async (e) => {
     e.preventDefault();
     try {
+      setLoading(true)
+
       const response = await userAxios.post("resend_otp/", { email });
       toast.success(response.data.message || "OTP has been resent!");
       const expireAt = Date.now() + 120 * 1000;
@@ -78,6 +83,8 @@ const OTPVerification = () => {
     } catch (error) {
       console.error("Error:", error);
       toast.error("Failed to resend OTP.");
+    } finally {
+      setLoading(false)
     }
   };
 
@@ -85,6 +92,8 @@ const OTPVerification = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      setLoading(true)
+      
       await userAxios.post("verify_otp/", { otp, email });
       toast.success("Your Account Activated Successfully. Please Login!");
       dispatch(otpTime(0));
@@ -96,10 +105,16 @@ const OTPVerification = () => {
     } catch (error) {
       console.error("Error:", error);
       toast.error("Invalid OTP.");
+    } finally {
+      setLoading(false)
     }
   };
 
   return (
+    <>
+    {loading ? (
+      <Loading />
+    ):(
     <div className="h-screen flex overflow-hidden bg-black">
       {/* Left Side - Branding */}
       <motion.div
@@ -243,6 +258,8 @@ const OTPVerification = () => {
         </motion.div>
       </div>
     </div>
+    )}
+    </>
   );
 };
 
