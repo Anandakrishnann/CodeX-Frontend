@@ -13,6 +13,9 @@ const UserCourses = () => {
   const [courses, setCourses] = useState([]);
   const [filteredCourses, setFilteredCourses] = useState([]);
   const [filter, setFilter] = useState("pending");
+  const [isPending, setIsPending] = useState(0);
+  const [isInProgress, setIsInProgress] = useState(0);
+  const [isCompleted, setIsCompleted] = useState(0);
   const user = useSelector((state) => state.user.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -31,11 +34,19 @@ const UserCourses = () => {
   }, []);
 
   useEffect(() => {
+    const pending = courses.filter((c) => c.status === "pending").length;
+    const progress = courses.filter((c) => c.status === "progress").length;
+    const completed = courses.filter((c) => c.status === "completed").length;
+
     const result = courses.filter((course) => {
       if (filter === "pending") return course.status === "pending";
       return course.status === filter;
     });
     setFilteredCourses(result);
+
+    setIsPending(pending);
+    setIsInProgress(progress);
+    setIsCompleted(completed);
   }, [courses, filter]);
 
   const handleStartCourse = async (id) => {
@@ -86,7 +97,10 @@ const UserCourses = () => {
               } rounded-lg border-2 border-white hover:bg-black hover:text-white transition-all duration-300`}
               onClick={() => setFilter("pending")}
             >
-              Pending
+              Pending{" "}
+                <span className="bg-orange-500 border border-black rounded-full px-2 py-1 ml-2">
+                  {isPending}
+                </span>
             </button>
             <button
               className={`text-xl font-bold px-5 py-2 ml-2 mt-2 ${
@@ -96,7 +110,10 @@ const UserCourses = () => {
               } rounded-lg border-2 border-white hover:bg-black hover:text-white transition-all duration-300`}
               onClick={() => setFilter("progress")}
             >
-              In Progress
+              In Progress{" "}
+                <span className="bg-blue-500 border border-black rounded-full px-2 py-1 ml-2">
+                  {isInProgress}
+                </span>
             </button>
             <button
               className={`text-xl font-bold px-5 py-2 ml-2 mt-2 ${
@@ -106,7 +123,10 @@ const UserCourses = () => {
               } rounded-lg border-2 border-white hover:bg-black hover:text-white transition-all duration-300`}
               onClick={() => setFilter("completed")}
             >
-              Completed
+              Completed{" "}
+                <span className="bg-green-500 border border-black rounded-full px-2 py-1 ml-2">
+                  {isCompleted}
+                </span>
             </button>
           </div>
 
@@ -120,7 +140,6 @@ const UserCourses = () => {
               <h2 className="text-3xl font-semibold text-gray-300">
                 No Courses Purchased Yet
               </h2>
-            
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -162,7 +181,10 @@ const UserCourses = () => {
                               <span>
                                 {Math.round(courseObj.progress)}% completed
                               </span>
-                              <span>Last accessed: 2 days ago</span>
+                              <span>
+                                Enrolled On:{" "}
+                                {new Date(courseObj.enrolled_on).toDateString()}
+                              </span>
                             </div>
                           </div>
                           <button
@@ -210,7 +232,10 @@ const UserCourses = () => {
                               <span>
                                 {Math.round(courseObj.progress)}% completed
                               </span>
-                              <span>Last accessed: 2 days ago</span>
+                              <span>
+                                Enrolled On:{" "}
+                                {new Date(courseObj.enrolled_on).toDateString()}
+                              </span>
                             </div>
                           </div>
                           <button

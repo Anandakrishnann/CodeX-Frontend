@@ -1,9 +1,21 @@
 import React, { useEffect, useState } from "react";
 import Layout from "../../Layout/Layout";
-import { User, Tag, Calendar, FileClock, FileText, Save, Pencil, Edit3, LineChart } from "lucide-react";
+import {
+  User,
+  Tag,
+  Calendar,
+  FileClock,
+  FileText,
+  Save,
+  Pencil,
+  Edit3,
+  LineChart,
+  FilePen,
+  FileCheck,
+} from "lucide-react";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import RestoreFromTrashIcon from "@mui/icons-material/RestoreFromTrash";
-import Tooltip from '@mui/material/Tooltip';
+import Tooltip from "@mui/material/Tooltip";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import { useDispatch, useSelector } from "react-redux";
 import { adminAxios, tutorAxios } from "../../../../../../axiosConfig";
@@ -16,6 +28,7 @@ import { setCourseId } from "../../../../../redux/slices/userSlice";
 
 const Course = () => {
   const [courses, setCourses] = useState([]);
+  const [courseRejections, setCoursesRejections] = useState([])
   const [formData, setFormData] = useState({});
   const [module, setModule] = useState({});
   const [editFormData, setEditFormData] = useState({});
@@ -31,12 +44,16 @@ const Course = () => {
   const [editStep, setEditStep] = useState(1);
   const [filteredLessons, setFilteredLessons] = useState([]);
   const [filter, setFilter] = useState("accepted");
+  const [isPending, setIsPending] = useState(0);
+  const [isAccepted, setIsAccepted] = useState(0);
+  const [isRejected, setIsRejected] = useState(0);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   console.log(tutor.email);
   console.log(categories);
   console.log("courses ", courses);
+  console.log("courses rejections", courseRejections);
   console.log("form data ", formData);
   console.log("selected data", selectedData);
   console.log("selected category", selectedCategory);
@@ -74,12 +91,22 @@ const Course = () => {
 
   useEffect(() => {
     fetchCourses();
+    fetchCoursesRejections()
   }, [formData, editFormData]);
 
   const fetchCourses = async () => {
     try {
       const response = await tutorAxios.get("list_course/");
       setCourses(response.data);
+    } catch (error) {
+      toast.error("Error While Fetching Data");
+    }
+  };
+
+  const fetchCoursesRejections = async () => {
+    try {
+      const response = await tutorAxios.get("course_rejections/");
+      setCoursesRejections(response.data);
     } catch (error) {
       toast.error("Error While Fetching Data");
     }
@@ -172,6 +199,71 @@ const Course = () => {
     return Object.keys(errors).length === 0;
   };
 
+  const validateStep1 = (formData, selectedCategory) => {
+    let isValid = true;
+
+    if (!formData.name?.trim()) {
+      toast.error("Course Name is required");
+      isValid = false;
+    }
+
+    if (!formData.title?.trim()) {
+      toast.error("Course Title is required");
+      isValid = false;
+    }
+
+    if (!formData.requirements?.trim()) {
+      toast.error("Requirements are required");
+      isValid = false;
+    }
+
+    if (!formData.benefits?.trim()) {
+      toast.error("Benefits are required");
+      isValid = false;
+    }
+
+    if (!selectedCategory) {
+      toast.error("Select a Category");
+      isValid = false;
+    }
+
+    return isValid;
+  };
+
+  const validateStep2 = (formData, selectedLevel) => {
+    let isValid = true;
+
+    if (!selectedLevel) {
+      toast.error("Select a Level");
+      isValid = false;
+    }
+
+    if (!formData.price) {
+      toast.error("Price is required");
+      isValid = false;
+    } else if (isNaN(formData.price)) {
+      toast.error("Price must be a number");
+      isValid = false;
+    } else if (Number(formData.price) <= 0) {
+      toast.error("Price must be greater than 0");
+      isValid = false;
+    }
+
+    if (!formData.description?.trim()) {
+      toast.error("Description is required");
+      isValid = false;
+    }
+
+    return isValid;
+  };
+
+  const handleNext = () => {
+    if (step === 1) {
+      if (!validateStep1(formData, selectedCategory)) return;
+      setStep(2);
+    }
+  };
+
   const handleSubmit = async () => {
     try {
       if (validateForm(formData)) {
@@ -198,7 +290,7 @@ const Course = () => {
           setFormData({});
           setSelectedCategory(null);
           setIsModalOpen(false);
-          handleNavigation(response.data.id)
+          handleNavigation(response.data.id);
           setStep(1);
         }
       }
@@ -250,39 +342,50 @@ const Course = () => {
   };
 
   const handleCourseAnalytics = (id) => {
-    dispatch(setCourseId(id))
+    dispatch(setCourseId(id));
     navigate("/tutor/course/analytics");
-  }
+  };
 
   const setDraft = async (id) => {
-    try{
-      await tutorAxios.post(`set_draft/${id}/`)
-      toast.success("Course set to Draft")
-      fetchCourses()
-    }catch(error){
-      toast.error(error || "Error While Set Draft")
+    try {
+      await tutorAxios.post(`set_draft/${id}/`);
+      toast.success("Course set to Draft");
+      fetchCourses();
+    } catch (error) {
+      toast.error(error || "Error While Set Draft");
     }
-  }
-
+  };
 
   const toggle_status = async (e, course_id) => {
-      e.preventDefault();
-      try {
-        await tutorAxios.post(`course_status/${course_id}/`);
-        toast.success("Status Changed Successfully");
-        fetchCourses();
-      } catch (error) {
-        toast.error("Course not Found");
-        console.error("Error:", error);
-      }
-    };
+    e.preventDefault();
+    try {
+      await tutorAxios.post(`course_status/${course_id}/`);
+      toast.success("Status Changed Successfully");
+      fetchCourses();
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error(
+        error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Course not Found"
+      );
+    }
+  };
 
   useEffect(() => {
+    const pending = courses.filter((c) => c.status === "pending").length;
+    const accepted = courses.filter((c) => c.status === "accepted").length;
+    const rejected = courses.filter((c) => c.status === "rejected").length;
+
     const result = courses.filter((course) => {
       if (filter === "accepted") return course.status === "accepted";
       return course.status === filter;
     });
     setFilteredLessons(result);
+
+    setIsPending(pending);
+    setIsAccepted(accepted);
+    setIsRejected(rejected);
   }, [courses, filter]);
 
   return (
@@ -317,7 +420,10 @@ const Course = () => {
               } rounded-lg border-2 border-white hover:bg-black hover:text-white transition-all duration-300`}
               onClick={() => setFilter("pending")}
             >
-              Pending
+              Pending{" "}
+                <span className="bg-yellow-300 border border-black rounded-full px-2 py-1 ml-2">
+                  {isPending}
+                </span>
             </button>
             <button
               className={`text-xl font-bold px-5 py-2 ml-2 mt-2 ${
@@ -327,7 +433,10 @@ const Course = () => {
               } rounded-lg border-2 border-white hover:bg-black hover:text-white transition-all duration-300`}
               onClick={() => setFilter("accepted")}
             >
-              Accepted
+              Accepted{" "}
+                <span className="bg-green-500 border border-black rounded-full px-2 py-1 ml-2">
+                  {isAccepted}
+                </span>
             </button>
             <button
               className={`text-xl font-bold px-5 py-2 ml-2 mt-2 ${
@@ -337,7 +446,10 @@ const Course = () => {
               } rounded-lg border-2 border-white hover:bg-black hover:text-white transition-all duration-300`}
               onClick={() => setFilter("rejected")}
             >
-              Rejected
+              Rejected{" "}
+                <span className="bg-red-500 border border-black rounded-full px-2 py-1 ml-2">
+                  {isRejected}
+                </span>
             </button>
           </div>
 
@@ -359,7 +471,17 @@ const Course = () => {
                         <h3 className="text-xl font-bold text-gray-900 group-hover:text-cyan-600 transition-colors duration-300">
                           {course.name}
                         </h3>
-                        <span className="bg-gray-100 text-gray-800 text-xs font-semibold px-3 py-1 rounded-full shadow-sm">
+                        <span
+                          className={`text-xs font-semibold px-3 py-1 rounded-full shadow-sm
+                          ${
+                            course.level === "beginer"
+                              ? "bg-green-100 text-green-800"
+                              : course.level === "intermediate"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : "bg-red-100 text-red-800"
+                          }
+                        `}
+                        >
                           {course.level}
                         </span>
                       </div>
@@ -413,59 +535,68 @@ const Course = () => {
                           </button>
                         ) : (
                           <>
-                          <Tooltip title="View Analytics" arrow>
-                             <button
-                              onClick={() => handleCourseAnalytics(course.id)}
-                              className="p-2 text-white bg-blue-500 rounded-lg hover:bg-white hover:text-blue-500 hover:border hover:border-blue-500 transition"
-                            >
-                              <LineChart fontSize="small" />
-                            </button>
-                          </Tooltip>
-                           <Tooltip title="Details" arrow>
-                            <button
-                              className="p-2 text-white bg-blue-500 rounded-lg hover:bg-white hover:text-blue-500 hover:border hover:border-blue-500 transition"
-                              onClick={() => handleCourseClick(course.id)}
-                            >
-                              <VisibilityIcon fontSize="small" />
-                            </button>
+                            <Tooltip title="View Analytics" arrow>
+                              <button
+                                onClick={() => handleCourseAnalytics(course.id)}
+                                className="p-2 text-white bg-blue-500 rounded-lg hover:bg-white hover:text-blue-500 hover:border hover:border-blue-500 transition"
+                              >
+                                <LineChart fontSize="small" />
+                              </button>
+                            </Tooltip>
+                            <Tooltip title="Details" arrow>
+                              <button
+                                className="p-2 text-white bg-blue-500 rounded-lg hover:bg-white hover:text-blue-500 hover:border hover:border-blue-500 transition"
+                                onClick={() => handleCourseClick(course.id)}
+                              >
+                                <VisibilityIcon fontSize="small" />
+                              </button>
                             </Tooltip>
                             <Tooltip title="Edit" arrow>
-                            <button
-                              className="p-2 text-white bg-blue-500 rounded-lg hover:bg-white hover:text-blue-500 hover:border hover:border-blue-500 transition"
-                              onClick={() => handleEditModal(course.id)}
-                            >
-                              <ModeEditIcon fontSize="small" />
-                            </button>
-                            </Tooltip>
-                            <Tooltip title="Set as Draft" arrow>
                               <button
-                              className="p-2 text-white bg-blue-500 rounded-lg hover:bg-white hover:text-blue-500 hover:border hover:border-blue-500 transition"
-                              onClick={() => setDraft(course.id)}
-                            >
-                              <FileClock fontSize="small" />
-                            </button>
+                                className="p-2 text-white bg-blue-500 rounded-lg hover:bg-white hover:text-blue-500 hover:border hover:border-blue-500 transition"
+                                onClick={() => handleEditModal(course.id)}
+                              >
+                                <ModeEditIcon fontSize="small" />
+                              </button>
                             </Tooltip>
-                            
+                            {course.is_draft ? (
+                              <Tooltip title="Published" arrow>
+                                <button
+                                  className="p-2 bg-green-600 text-white rounded-lg hover:bg-white hover:text-green-600 hover:border hover:border-green-600 transition"
+                                  onClick={() => setDraft(course.id)}
+                                >
+                                  <FileCheck fontSize="small" />
+                                </button>
+                              </Tooltip>
+                            ) : (
+                              <Tooltip title="Set as Draft" arrow>
+                                <button
+                                  className="p-2 bg-yellow-500 text-white rounded-lg hover:bg-white hover:text-yellow-600 hover:border hover:border-yellow-600 transition"
+                                  onClick={() => setDraft(course.id)}
+                                >
+                                  <FilePen fontSize="small" />
+                                </button>
+                              </Tooltip>
+                            )}
 
                             {course.is_active ? (
                               <Tooltip title="Delete" arrow>
-                              <button
-                                className="p-2 text-white bg-red-500 rounded-lg hover:bg-white hover:text-red-500 hover:border hover:border-red-500 transition"
-                                onClick={(e) => toggle_status(e, course.id)}
-                              >
-                                <DeleteForeverIcon fontSize="small" />
-                              </button>
+                                <button
+                                  className="p-2 text-white bg-red-500 rounded-lg hover:bg-white hover:text-red-500 hover:border hover:border-red-500 transition"
+                                  onClick={(e) => toggle_status(e, course.id)}
+                                >
+                                  <DeleteForeverIcon fontSize="small" />
+                                </button>
                               </Tooltip>
                             ) : (
                               <Tooltip title="Restore" arrow>
                                 <button
-                                className="p-2 text-white bg-green-500 rounded-lg hover:bg-white hover:text-green-500 hover:border hover:border-green-500 transition"
-                                onClick={(e) => toggle_status(e, course.id)}
-                              >
-                                <RestoreFromTrashIcon fontSize="small" />
-                              </button>
+                                  className="p-2 text-white bg-green-500 rounded-lg hover:bg-white hover:text-green-500 hover:border hover:border-green-500 transition"
+                                  onClick={(e) => toggle_status(e, course.id)}
+                                >
+                                  <RestoreFromTrashIcon fontSize="small" />
+                                </button>
                               </Tooltip>
-                              
                             )}
                           </>
                         )}
@@ -479,11 +610,11 @@ const Course = () => {
 
         {isModalOpen && (
           <>
-            <div className="fixed inset-0 font-sans bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 transition-all duration-300 animate-fadeIn">
+            <div className="fixed inset-0 font-sans backdrop-blur-sm flex items-center justify-center z-50 transition-all duration-300 animate-fadeIn">
               <div className="bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-2xl relative w-full max-w-2xl max-h-full overflow-y-auto border border-gray-200 dark:border-gray-700 animate-slideUp">
                 {/* Close button */}
                 <button
-                  className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white bg-gray-100 dark:bg-gray-800 rounded-full p-2 transition-all duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-black"
+                  className="absolute top-4 right-4 text-gray-500 hover:text-green-600 dark:text-gray-400 dark:hover:text-green-400 bg-gray-100 dark:bg-gray-800 rounded-full p-2 transition-all duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-green-500"
                   onClick={() => setIsModalOpen(false)}
                 >
                   <svg
@@ -501,13 +632,13 @@ const Course = () => {
                 </button>
 
                 {/* Header with gradient */}
-                <div className="mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
-                  <div className="bg-gradient-to-r from-black to-blue-500 text-transparent bg-clip-text">
-                    <h2 className="text-3xl font-extrabold mb-1 text-white">
+                <div className="mb-6 pb-4 border-b border-green-200 dark:border-green-700">
+                  <div className="bg-gradient-to-r from-green-600 to-green-400 text-transparent bg-clip-text">
+                    <h2 className="text-3xl font-extrabold mb-1">
                       Create Course
                     </h2>
                   </div>
-                  <p className="text-gray-500 dark:text-gray-400 ">
+                  <p className="text-gray-600 dark:text-gray-400 ">
                     Fill in the details to create a new course
                   </p>
                 </div>
@@ -519,7 +650,9 @@ const Course = () => {
                     <button
                       type="button"
                       className={`text-sm font-medium ${
-                        step === 1 ? "text-white" : "text-gray-500"
+                        step === 1
+                          ? "text-green-600 dark:text-green-400"
+                          : "text-gray-500"
                       }`}
                       onClick={() => setStep(1)}
                     >
@@ -528,7 +661,9 @@ const Course = () => {
                     <button
                       type="button"
                       className={`text-sm font-medium ${
-                        step === 2 ? "text-white" : "text-gray-500"
+                        step === 2
+                          ? "text-green-600 dark:text-green-400"
+                          : "text-gray-500"
                       }`}
                       onClick={() => setStep(2)}
                     >
@@ -549,7 +684,7 @@ const Course = () => {
                             type="text"
                             value={formData.name || ""}
                             placeholder="e.g. Web Development Masterclass"
-                            className="w-full p-3 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200"
+                            className="w-full p-3 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
                             onChange={handleChange}
                           />
                         </div>
@@ -562,7 +697,7 @@ const Course = () => {
                             type="text"
                             value={formData.title || ""}
                             placeholder="e.g. Become a Full-Stack Developer"
-                            className="w-full p-3 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200"
+                            className="w-full p-3 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
                             onChange={handleChange}
                           />
                         </div>
@@ -575,7 +710,7 @@ const Course = () => {
                             type="text"
                             value={formData.requirements || ""}
                             placeholder="e.g. Basic HTML, CSS knowledge"
-                            className="w-full p-3 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200"
+                            className="w-full p-3 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
                             onChange={handleChange}
                           />
                         </div>
@@ -588,7 +723,7 @@ const Course = () => {
                             type="text"
                             value={formData.benefits || ""}
                             placeholder="e.g. Job-ready skills, Portfolio projects"
-                            className="w-full p-3 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200"
+                            className="w-full p-3 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
                             onChange={handleChange}
                           />
                         </div>
@@ -604,7 +739,7 @@ const Course = () => {
                             onChange={(e) =>
                               setSelectedCategory(e.target.value)
                             }
-                            className="w-full p-3 pr-10 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200 appearance-none"
+                            className="w-full p-3 pr-10 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 appearance-none"
                           >
                             <option value="" disabled>
                               Select a category
@@ -635,7 +770,7 @@ const Course = () => {
                         {/* Optional: Display selected category as a pill/tag for visual consistency */}
                         {selectedCategory && categories && (
                           <div className="mt-2">
-                            <span className="inline-block rounded-full px-4 py-2 bg-black text-white border-2 border-black">
+                            <span className="inline-block rounded-full px-4 py-2 bg-green-600 text-white border-2 border-green-600">
                               {
                                 categories.find(
                                   (cat) => cat.id === selectedCategory
@@ -661,8 +796,8 @@ const Course = () => {
                               key={lev.id}
                               className={`rounded-full px-4 py-2 cursor-pointer border-2 transition-all duration-200 ${
                                 selectedLevel === lev.id
-                                  ? "bg-black text-white border-black"
-                                  : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-black dark:hover:border-black"
+                                  ? "bg-green-600 text-white border-green-600"
+                                  : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-green-500 dark:hover:border-green-500"
                               }`}
                             >
                               <input
@@ -692,7 +827,7 @@ const Course = () => {
                             name="price"
                             type="number"
                             placeholder="99.99"
-                            className="w-full pl-8 p-3 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200"
+                            className="w-full pl-8 p-3 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
                             onChange={handleChange}
                           />
                         </div>
@@ -706,7 +841,7 @@ const Course = () => {
                           name="description"
                           value={formData.description || ""}
                           placeholder="Provide a detailed description of your course..."
-                          className="w-full p-3 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200"
+                          className="w-full p-3 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
                           rows="4"
                           onChange={handleChange}
                         />
@@ -726,8 +861,8 @@ const Course = () => {
                               key={lev.id}
                               className={`rounded-full px-4 py-2 cursor-pointer border-2 transition-all duration-200 ${
                                 selectedLevel === lev.id
-                                  ? "bg-black text-white border-black"
-                                  : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-black dark:hover:border-black"
+                                  ? "bg-green-600 text-white border-green-600"
+                                  : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-green-500 dark:hover:border-green-500"
                               }`}
                             >
                               <input
@@ -757,7 +892,7 @@ const Course = () => {
                             name="price"
                             type="number"
                             placeholder="99.99"
-                            className="w-full pl-8 p-3 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200"
+                            className="w-full pl-8 p-3 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
                             onChange={handleChange}
                           />
                         </div>
@@ -771,7 +906,7 @@ const Course = () => {
                           name="description"
                           value={formData.description || ""}
                           placeholder="Provide a detailed description of your course..."
-                          className="w-full p-3 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200"
+                          className="w-full p-3 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
                           rows="4"
                           onChange={handleChange}
                         />
@@ -791,8 +926,8 @@ const Course = () => {
                               key={lev.id}
                               className={`rounded-full px-4 py-2 cursor-pointer border-2 transition-all duration-200 ${
                                 selectedLevel === lev.id
-                                  ? "bg-black text-white border-black"
-                                  : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-black dark:hover:border-black"
+                                  ? "bg-green-600 text-white border-green-600"
+                                  : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-green-500 dark:hover:border-green-500"
                               }`}
                             >
                               <input
@@ -822,7 +957,7 @@ const Course = () => {
                             name="price"
                             type="number"
                             placeholder="99.99"
-                            className="w-full pl-8 p-3 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200"
+                            className="w-full pl-8 p-3 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
                             onChange={handleChange}
                           />
                         </div>
@@ -836,7 +971,7 @@ const Course = () => {
                           name="description"
                           value={formData.description || ""}
                           placeholder="Provide a detailed description of your course..."
-                          className="w-full p-3 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200"
+                          className="w-full p-3 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
                           rows="4"
                           onChange={handleChange}
                         />
@@ -850,7 +985,7 @@ const Course = () => {
                       <>
                         <button
                           type="button"
-                          className="px-5 py-2.5 rounded-lg bg-black font-extrabold text-xl hover:bg-white hover:text-black dark:hover:bg-gray-700 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400"
+                          className="px-5 py-2.5 rounded-lg bg-gray-700 text-white font-extrabold text-xl hover:bg-gray-600 dark:hover:bg-gray-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400"
                           onClick={() => setStep(1)}
                         >
                           Back
@@ -860,15 +995,15 @@ const Course = () => {
                     {step === 1 ? (
                       <button
                         type="button"
-                        className="px-5 py-2.5 rounded-lg text-white bg-black font-extrabold text-xl hover:bg-white hover:text-black shadow-lg hover:shadow-black-500/30 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-black"
-                        onClick={() => setStep(2)}
+                        className="px-5 py-2.5 rounded-lg text-white bg-green-600 font-extrabold text-xl hover:bg-green-700 shadow-lg hover:shadow-green-500/30 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                        onClick={handleNext}
                       >
                         Next
                       </button>
                     ) : (
                       <button
                         type="button"
-                        className="px-5 py-2.5 rounded-lg text-white bg-black font-extrabold text-xl hover:bg-white hover:text-black shadow-lg hover:shadow-black-500/30 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-black"
+                        className="px-5 py-2.5 rounded-lg text-white bg-green-600 font-extrabold text-xl hover:bg-green-700 shadow-lg hover:shadow-green-500/30 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500"
                         onClick={handleSubmit}
                       >
                         Create Course

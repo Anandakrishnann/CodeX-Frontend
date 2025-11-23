@@ -12,11 +12,9 @@ import { setTutorId } from "../../../redux/slices/userSlice";
 const Table = ({ datas, fucntions, columns, name }) => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const navigate = useNavigate()
-  const dispatch = useDispatch()
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   console.log(datas);
-  
-
 
   const handleEditClick = (user) => {
     setSelectedUser(user);
@@ -34,9 +32,9 @@ const Table = ({ datas, fucntions, columns, name }) => {
   };
 
   const handleNavigate = (id) => {
-    dispatch(setTutorId(id))
-    navigate("/admin/tutor-view/")
-  }
+    dispatch(setTutorId(id));
+    navigate("/admin/tutor-view/");
+  };
 
   return (
     <div className="grid">
@@ -79,9 +77,15 @@ const Table = ({ datas, fucntions, columns, name }) => {
                     <td className="p-4 text-md font-extrabold text-gray-800">
                       {user.email}
                     </td>
-                    <td className="p-4 text-md font-extrabold text-gray-800">
-                      {user.phone}
-                    </td>
+                    {user.phone ? (
+                      <td className="p-4 text-md font-extrabold text-gray-800">
+                        {user.phone}
+                      </td>
+                    ) : (
+                      <td className="p-4 text-md font-extrabold text-gray-800">
+                        Google Verified
+                      </td>
+                    )}
                     <td className="p-4">
                       {user.status === false ? (
                         <span className="px-3 py-1 pb-2 text-white bg-green-500 rounded-full">
@@ -110,11 +114,12 @@ const Table = ({ datas, fucntions, columns, name }) => {
                         </button>
                       )}
                       {user.role === "tutor" ? (
-                          <button className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-900 transition"
+                        <button
+                          className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-900 transition"
                           onClick={() => handleNavigate(user.id)}
-                          >
-                            <VisibilityIcon />
-                          </button>
+                        >
+                          <VisibilityIcon />
+                        </button>
                       ) : (
                         <button className="hover:bg-gray-200"></button>
                       )}

@@ -73,25 +73,10 @@ const AdminLessonOverview = () => {
                   <div>
                     <button
                       className="text-xl font-bold px-5 py-2 ml-2 mt-2 mr-4 bg-white text-black rounded-lg border-2 border-white hover:bg-black hover:text-white transition-all duration-300"
-                      onClick={() => navigate("/admin/courses/lessons")}
+                      onClick={() => navigate(-1)}
                     >
                       Back
                     </button>
-                    {lesson.is_active ? (
-                      <button
-                        className="text-xl font-bold px-5 py-2 ml-2 mt-2 mr-4 bg-white text-black rounded-lg border-2 border-white hover:bg-red-500 hover:text-white transition-all duration-300"
-                        onClick={(e) => toggle_status(e, id)}
-                      >
-                        Delete <DeleteForeverIcon fontSize="small" />
-                      </button>
-                    ) : (
-                      <button
-                        className="text-xl font-bold px-5 py-2 ml-2 mt-2 mr-4 bg-white text-black rounded-lg border-2 border-white hover:bg-green-500 hover:text-white transition-all duration-300"
-                        onClick={(e) => toggle_status(e, id)}
-                      >
-                        Restore <RestoreFromTrashIcon fontSize="small" />
-                      </button>
-                    )}
                   </div>
                 </div>
                 <div className="absolute -bottom-4 left-0 right-0 h-1 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-full opacity-50 blur-md"></div>
@@ -128,7 +113,7 @@ const AdminLessonOverview = () => {
                       </div>
                     </div>
                     <div className="flex flex-col justify-between h-full p-4">
-                      <div className="bg-white p-4 rounded rounded-lg">
+                      <div className="bg-white p-4 rounded-lg">
                         <div className="flex justify-between items-start mb-2">
                           <h3 className="text-lg font-extrabold text-gray-800">
                             Lesson Document

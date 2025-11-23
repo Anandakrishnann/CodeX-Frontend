@@ -8,6 +8,8 @@ import { Provider } from 'react-redux';
 import store, { persistor } from "../src/redux/store.js";
 import { PersistGate } from "redux-persist/integration/react";
 
+window.store = store;
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ToastContainer />

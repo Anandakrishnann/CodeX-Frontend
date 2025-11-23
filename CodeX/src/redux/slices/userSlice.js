@@ -14,7 +14,7 @@ const initialState = {
   moduleId: null,
   lessonId: null,
   tutorId: null,
-  applicationEmail: null,
+  applicationId: null,
 };
 
 const userSlice = createSlice({
@@ -28,8 +28,6 @@ const userSlice = createSlice({
         (state.subscribed = action.payload.subscribed),
         (state.plan_details = action.payload.plan_details),
         (state.categories = action.payload.categories);
-      console.log(state.role);
-      console.log(state.plan_details);
     },
 
     logoutUser: (state) => {
@@ -37,7 +35,6 @@ const userSlice = createSlice({
       state.subscribed = false;
       state.plan_details = null;
       state.categories = null;
-      console.log(state.isAuthenticated);
     },
 
     setPurchasedCourses: (state) => {
@@ -76,8 +73,8 @@ const userSlice = createSlice({
       state.tutorId = action.payload;
     },
 
-    setApplicationEmail: (state, action) => {
-      state.applicationEmail = action.payload;
+    setApplicationId: (state, action) => {
+      state.applicationId = action.payload;
     },
 
   },
@@ -95,7 +92,7 @@ export const {
   setLessonId,
   setTutorId,
   setPurchasedCourses,
-  setApplicationEmail
+  setApplicationId
 } = userSlice.actions;
 
 export default userSlice.reducer;

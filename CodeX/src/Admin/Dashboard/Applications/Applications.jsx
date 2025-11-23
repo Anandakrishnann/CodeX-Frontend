@@ -7,7 +7,7 @@ import { Link, useNavigate } from "react-router-dom";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import Layout from "../Layout/Layout";
 import { useDispatch } from "react-redux";
-import { setApplicationEmail } from "../../../redux/slices/userSlice.js";
+import { setApplicationId } from "../../../redux/slices/userSlice.js";
 
 const Applications = () => {
   const [applications, setApplications] = useState([]);
@@ -20,7 +20,7 @@ const Applications = () => {
         const response = await adminAxios.get("list_applicaions/");
         console.log(response);
 
-        setApplications(response.data || []); // Directly setting response.data
+        setApplications(response.data || []);
       } catch (error) {
         console.error("Error fetching applications:", error.response || error);
       }
@@ -32,8 +32,8 @@ const Applications = () => {
   const columns = ["ID", "Name", "Email", "Phone", "Status", "Actions"];
 
 
-  const handleNavigate = (email) => {
-    dispatch(setApplicationEmail(email))
+  const handleNavigate = (id) => {
+    dispatch(setApplicationId(id))
     navigate("/admin/application-view/")
   }
 
@@ -94,7 +94,7 @@ const Applications = () => {
                       </td>
                       <td className="p-4 flex space-x-3">
                           <button className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-900 transition"
-                          onClick={() => handleNavigate(application.email)}
+                          onClick={() => handleNavigate(application.id)}
                           >
                             <VisibilityIcon />
                           </button>

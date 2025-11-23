@@ -54,10 +54,10 @@ const OrderCompletion = () => {
     <>
       <BackgroundAnimation />
       <div className="min-h-screen  from-gray-50 to-gray-100 flex flex-col items-center justify-center p-6">
-        <div className="max-w-md w-full  rounded-2xl shadow-xl overflow-hidden transform transition-all hover:scale-105 duration-300">
+        <div className="max-w-md w-full border border-green-500 rounded-2xl shadow-xl overflow-hidden transform transition-all hover:scale-105 duration-300">
           <div className="p-8">
             {/* Success Icon with Animation */}
-            <div className="flex justify-center">
+            <div className="flex justify-center ">
               <div className="relative">
                 {/* Outer circle with pulse animation */}
                 <div className="absolute inset-0 rounded-full bg-green-500 opacity-20 animate-ping"></div>

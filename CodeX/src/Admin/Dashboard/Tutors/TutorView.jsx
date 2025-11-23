@@ -126,7 +126,18 @@ const TutorView = () => {
               </div>
               )}
               
-              <button
+              {userData.is_blocked ? (
+                <button
+                onClick={(e) => {
+                  toggle_status(e, userData.id)
+                }}
+                className="bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-700 hover:to-rose-800 text-white font-bold px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-2 transform hover:scale-105 transition-all duration-300 cursor-pointer"
+              >
+                <RotateCcw className="w-5 h-5" />
+                Unblock
+              </button>
+              ) : (
+                <button
                 onClick={(e) => {
                   toggle_status(e, userData.id)
                 }}
@@ -135,6 +146,7 @@ const TutorView = () => {
                 <CloseIcon className="w-5 h-5" />
                 Block
               </button>
+              )}
             </div>
           </div>
 

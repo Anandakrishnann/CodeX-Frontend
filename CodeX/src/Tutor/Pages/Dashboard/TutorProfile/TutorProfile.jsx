@@ -18,6 +18,7 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ProfilePictureModal from "../../../../Component/ProfilePictureModal/ProfilePictureModal";
 import { toast } from "react-toastify";
+import Loading from "@/User/Components/Loading/Loading";
 
 const TutorProfile = () => {
   const [userData, setUserData] = useState(null);
@@ -245,12 +246,7 @@ const TutorProfile = () => {
   if (!userData) {
     return (
       <Layout page={"Profile"}>
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="text-center">
-            <div className="inline-block animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500 mb-4"></div>
-            <div className="text-white text-xl font-semibold">Loading profile...</div>
-          </div>
-        </div>
+        <Loading />
       </Layout>
     );
   }

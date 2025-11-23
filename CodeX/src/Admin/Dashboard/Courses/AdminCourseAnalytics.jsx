@@ -4,6 +4,8 @@ import { Users, TrendingUp, DollarSign, ShoppingCart, Calendar } from 'lucide-re
 import Layout from '../Layout/Layout';
 import { tutorAxios } from '../../../../axiosConfig';
 import { useSelector } from 'react-redux';
+import Loading from '@/User/Components/Loading/Loading';
+import { useNavigate } from 'react-router-dom';
 
 const AdminCourseAnalytics = () => {
   const [analyticsData, setAnalyticsData] = useState(null);
@@ -11,6 +13,7 @@ const AdminCourseAnalytics = () => {
   const [yearlyData, setYearlyData] = useState([]);
   const [loading, setLoading] = useState(true);
   const course_id = useSelector((state) => state.user.courseId);
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchAnalytics = async () => {
@@ -65,9 +68,7 @@ const AdminCourseAnalytics = () => {
   if (loading) {
     return (
       <Layout>
-        <div className="flex items-center justify-center h-screen text-white text-lg">
-          Loading analytics...
-        </div>
+        <Loading />
       </Layout>
     );
   }
@@ -87,12 +88,18 @@ const AdminCourseAnalytics = () => {
       <div className="p-8 min-h-screen relative z-10 text-white">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <div className="mb-10">
+          <div className="mb-5">
             <h1 className="text-5xl font-extrabold text-white mb-2">
               Analytics Dashboard
             </h1>
             <p className="text-white/60 text-lg">Track your course performance and revenue</p>
           </div>
+          <button
+                    className="text-xl font-bold px-5 py-2 ml-2 mt-2 mr-40 mb-5 bg-white text-black rounded-lg border-2 border-white hover:bg-black hover:text-white transition-all duration-300"
+                    onClick={() => navigate(-1)}
+                  >
+                    Back
+                  </button>
 
           {/* Stats Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

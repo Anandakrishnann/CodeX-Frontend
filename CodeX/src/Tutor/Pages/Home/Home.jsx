@@ -9,9 +9,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { loginUser, setSubscribedTrue } from "../../../redux/slices/userSlice";
 import { tutorAxios, userAxios } from "../../../../axiosConfig";
+import Loading from "@/User/Components/Loading/Loading";
 
 const TutorHome = () => {
-  const [isSubscribed, setIdSubscribed] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isApplication, setIsApplication] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
@@ -26,8 +28,9 @@ const TutorHome = () => {
   useEffect(() => {
     const loadTutorData = async () => {
       try {
-        await fetchTutor();        
-        await tutorSubscribed();   
+        await fetchTutor();
+        await tutorSubscribed();
+        await tutorapplication()
       } catch (error) {
         console.error("Error initializing tutor data:", error);
       } finally {
@@ -40,30 +43,49 @@ const TutorHome = () => {
   const fetchTutor = async () => {
     try {
       const response = await userAxios.get("tutor_home/");
-      if (response.status === 200) {
+
+      if (response.status === 200 && response.data.user) {
         dispatch(loginUser(response.data.user));
         return response.data.user;
+      } else {
+        console.warn("⚠️ Tutor API did not return a user:", response.data);
+        return null;
       }
     } catch (error) {
-      console.error("❌ Error fetching tutor:", error.response || error.message || error);
+      console.error("❌ Error fetching tutor:", error);
     }
   };
 
   const tutorSubscribed = async () => {
     try {
       const response = await tutorAxios.get("tutor_subscribed/");
-      console.log(response.data); // FIXED: Changed from print() to console.log()
+      console.log(response.data);
       if (response.data.subscribed) {
-        setIdSubscribed(true);
+        setIsSubscribed(true);
         dispatch(setSubscribedTrue());
       } else {
-        setIdSubscribed(false);
+        setIsSubscribed(false);
       }
     } catch (error) {
       console.log("Error while checking subscription:", error);
-      setIdSubscribed(false);
+      setIsSubscribed(false);
     }
   };
+
+  const tutorapplication = async () => {
+    try {
+      const response = await tutorAxios.get("tutor_application/");
+      console.log(response.data);
+      if (response.data.application) {
+        setIsApplication(true);
+      } else {
+        setIsApplication(false);
+      }
+    } catch (error) {
+      console.log("Error while checking subscription:", error);
+      setIsApplication(false);
+    }
+  }
 
   const form = () => {
     navigate("/tutor/form");
@@ -76,14 +98,10 @@ const TutorHome = () => {
 
   // FIXED: Better loading state with proper check
   if (loading || !tutor) {
-    return (
-      <div className="min-h-screen bg-codex-darkBg flex items-center justify-center">
-        <div className="text-white text-xl">Loading...</div>
-      </div>
-    );
+    <Loading />
   }
 
-  return ( 
+  return (
     <>
       <Navbar />
       <div className="min-h-screen bg-codex-darkBg text-white relative">
@@ -115,7 +133,7 @@ const TutorHome = () => {
 
               <div className=" w-full max-w-3xl">
                 <h2 className="text-2xl font-bold mb-6">I'm ready to...</h2>
-                {tutor.role !== "tutor" && subscribed === false ? (
+                {tutor.role !== "tutor" && subscribed === false && isApplication === false? (
                   // Case 1: Not a tutor but subscribed
                   <div className="grid gap-6">
                     <div className="bg-black bg-opacity-50 border border-green-800 p-8 rounded-lg transform hover:scale-105 transition-all">
@@ -130,7 +148,7 @@ const TutorHome = () => {
                       </Button>
                     </div>
                   </div>
-                ) : tutor?.role === "tutor" && subscribed === false ? (
+                ) : tutor?.role === "tutor" && subscribed === false && isApplication === false ? (
                   // Case 2: Is a tutor but not subscribed (Show subscription card)
                   <div className="grid">
                     <div className="bg-black bg-opacity-50 border border-green-800 p-4 rounded-lg transform hover:scale-105 transition-all">
@@ -149,7 +167,7 @@ const TutorHome = () => {
                       </Button>
                     </div>
                   </div>
-                ) : tutor?.role === "tutor" && isSubscribed === true ? (
+                ) : tutor?.role === "tutor" && isSubscribed === true && isApplication === false? (
                   // Case 3: Is a tutor and subscribed
                   <div className="grid">
                     <div className="bg-black bg-opacity-50 border border-green-800 p-8 rounded-lg transform hover:scale-105 transition-all">
@@ -164,7 +182,18 @@ const TutorHome = () => {
                       </Button>
                     </div>
                   </div>
-                ) : null}
+                ) : <div className="grid">
+                    <div className="bg-black bg-opacity-50 border border-green-800 p-8 rounded-lg transform hover:scale-105 transition-all">
+                      <h3 className="text-2xl font-bold mb-6 text-green-500">
+                        Application Pending
+                      </h3>
+                      <Button
+                        className="border border-green-500 bg-black text-green-500 hover:bg-green-500 hover:text-white px-8 py-6 text-lg rounded-lg transition-all"
+                      >
+                        Wait For The Admin Approval
+                      </Button>
+                    </div>
+                  </div>}
               </div>
             </div>
             <motion.section

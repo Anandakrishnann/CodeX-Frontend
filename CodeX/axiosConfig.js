@@ -1,4 +1,5 @@
 import axios from "axios";
+import { logoutUser } from "@/redux/slices/userSlice";
 
 const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}`;
 
@@ -28,41 +29,53 @@ const notificationAxios = axios.create({
 });
 
 // Apply interceptors for token refresh
-[userAxios, adminAxios, tutorAxios, chatAxios, notificationAxios].forEach((axiosInstance) => {
-  axiosInstance.interceptors.response.use(
-    (response) => response,
-    async (error) => {
-      console.log(`Error status: ${error.response?.status}`);
+[userAxios, adminAxios, tutorAxios, chatAxios, notificationAxios].forEach(
+  (axiosInstance) => {
+    axiosInstance.interceptors.response.use(
+      (response) => response,
+      async (error) => {
+        console.log(`Error status: ${error.response?.status}`);
 
-      if (error.response && error.response.status === 401) {
-        console.log("401 error occurred, trying to refresh token...");
+        if (error.response && error.response.status === 401) {
+          console.log("401 error occurred, trying to refresh token...");
 
-        try {
-          const refreshResponse = await axios.post(
-            `${API_BASE_URL}api/token/refresh/`,
-            { refresh: "dummy" }, 
-            { withCredentials: true } // Ensure cookies are sent
-          );
+          try {
+            const refreshResponse = await axios.post(
+              `${API_BASE_URL}api/token/refresh/`,
+              { refresh: "dummy" },
+              { withCredentials: true } // Ensure cookies are sent
+            );
 
-          console.log("Token refreshed successfully!");
+            console.log("Token refreshed successfully!");
 
-          const newAccessToken = refreshResponse.data.access;
+            const newAccessToken = refreshResponse.data.access;
 
-          // ✅ Update token in headers
-          error.config.headers["Authorization"] = `Bearer ${newAccessToken}`;
+            // ✅ Update token in headers
+            error.config.headers["Authorization"] = `Bearer ${newAccessToken}`;
 
-          // ✅ Retry the original request
-          return axiosInstance(error.config);
-        } catch (refreshError) {
-          console.error("Refresh token expired, logging out...");
-          window.location.href = "/login"; // Redirect user to login page
-          return Promise.reject(refreshError);
+            // ✅ Retry the original request
+            return axiosInstance(error.config);
+          } catch (refreshError) {
+            console.error("Refresh token expired, logging out...");
+            window.location.href = "/login"; // Redirect user to login page
+            return Promise.reject(refreshError);
+          }
         }
-      }
 
-      return Promise.reject(error);
-    }
-  );
-});
+        if (error.response && error.response.status === 403) {
+          console.log("403 Forbidden — logging out user");
+
+          store.dispatch(logoutUser());
+
+          window.location.href = "/login/";
+
+          return Promise.reject(error);
+        }
+
+        return Promise.reject(error);
+      }
+    );
+  }
+);
 
 export { userAxios, adminAxios, tutorAxios, chatAxios, notificationAxios };

@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import {
   setCourseId,
   setModuleId,
-  setTutorId
+  setTutorId,
 } from "../../../../../redux/slices/userSlice";
 import { LuActivity } from "react-icons/lu";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
@@ -20,6 +20,9 @@ const CourseModules = () => {
   const [selectedData, setSelectedData] = useState(null);
   const [filteredModules, setFilteredModules] = useState([]);
   const [filter, setFilter] = useState("pending");
+  const [isPending, setIsPending] = useState(0);
+  const [isInProgress, setIsInProgress] = useState(0);
+  const [isCompleted, setIsCompleted] = useState(0);
   const user = useSelector((state) => state.user.user);
   const course_id = useSelector((state) => state.user.courseId);
 
@@ -42,17 +45,16 @@ const CourseModules = () => {
   };
 
   const fetchTutor = async () => {
-    try{
+    try {
       const response = await userAxios.get(`course_tutor/${course_id}/`);
       console.log("requestes data of tutor", response.data);
 
       setTutor(response.data);
-      dispatch(setTutorId(response.data))
-    }catch(error){
+      dispatch(setTutorId(response.data));
+    } catch (error) {
       console.log(error || "Error while fetching tutor");
-      
     }
-  }
+  };
 
   const fetchModules = async () => {
     try {
@@ -69,15 +71,23 @@ const CourseModules = () => {
   useEffect(() => {
     fetchCourse();
     fetchModules();
-    fetchTutor()
+    fetchTutor();
   }, []);
 
   useEffect(() => {
+    const pending = modules.filter((c) => c.status === "pending").length;
+    const progress = modules.filter((c) => c.status === "progress").length;
+    const completed = modules.filter((c) => c.status === "completed").length;
+
     const result = modules.filter((module) => {
       if (filter === "pending") return module.status === "pending";
       return module.status === filter;
     });
     setFilteredModules(result);
+
+    setIsPending(pending);
+    setIsInProgress(progress);
+    setIsCompleted(completed);
   }, [modules, filter]);
 
   const moduleInProgress = modules.some(
@@ -106,10 +116,27 @@ const CourseModules = () => {
     }
   };
 
+  const Course = () => {
+    navigate("/user/courses");
+  };
+
   return (
     <Layout page="Courses">
       <div className="p-8 min-h-screen relative z-10  text-white">
         <div className="max-w-7xl mx-auto">
+          <div className="mb-2 bg-gradient-to-br from-cyan-900/40 to-purple-800/40 p-6 rounded-3xl shadow-2xl flex items-center space-x-3 text-white text-lg font-semibold">
+            <span
+              className="opacity-70 hover:opacity-100 cursor-pointer transition-all"
+              onClick={Course}
+            >
+              Course
+            </span>
+
+            <span className="opacity-50">{">"}</span>
+
+            <span className="text-white">Modules</span>
+          </div>
+
           {/* Header */}
           {course ? (
             <div className="mb-2 bg-gradient-to-br from-cyan-900/40 to-purple-800/40 p-6 rounded-3xl shadow-2xl relative">
@@ -142,11 +169,11 @@ const CourseModules = () => {
           ) : null}
           {/* Filter Buttons */}
           <button
-              className={`text-xl font-bold px-5 py-2 ml-6 mt-2 bg-white text-black rounded-lg border-2 border-white hover:bg-black hover:text-white transition-all duration-300`} 
-              onClick={() => navigate("/user/chat")} 
-            >
-              Chat With Tutor
-            </button>
+            className={`text-xl font-bold px-5 py-2 ml-6 mt-2 bg-white text-black rounded-lg border-2 border-white hover:bg-black hover:text-white transition-all duration-300`}
+            onClick={() => navigate("/user/chat")}
+          >
+            Chat With Tutor
+          </button>
           <div className="mb-10">
             <button
               className="text-2xl ml-6 mr-24 text-black bg-white  rounded-md font-extrabold m-3  hover:text-white hover:bg-black hover:border-white"
@@ -161,7 +188,10 @@ const CourseModules = () => {
               } rounded-lg border-2 border-white hover:bg-black hover:text-white transition-all duration-300`}
               onClick={() => setFilter("pending")}
             >
-              Pending
+              Pending{" "}
+                <span className="bg-orange-500 border border-black rounded-full px-2 py-1 ml-2">
+                  {isPending}
+                </span>
             </button>
             <button
               className={`text-xl font-bold px-5 py-2 ml-2 mt-2 ${
@@ -171,7 +201,10 @@ const CourseModules = () => {
               } rounded-lg border-2 border-white hover:bg-black hover:text-white transition-all duration-300`}
               onClick={() => setFilter("progress")}
             >
-              In Progress
+              In Progress{" "}
+                <span className="bg-blue-500 border border-black rounded-full px-2 py-1 ml-2">
+                  {isInProgress}
+                </span>
             </button>
             <button
               className={`text-xl font-bold px-5 py-2 ml-2 mt-2 ${
@@ -181,9 +214,11 @@ const CourseModules = () => {
               } rounded-lg border-2 border-white hover:bg-black hover:text-white transition-all duration-300`}
               onClick={() => setFilter("completed")}
             >
-              Completed
+              Completed{" "}
+                <span className="bg-green-500 border border-black rounded-full px-2 py-1 ml-2">
+                  {isCompleted}
+                </span>
             </button>
-            
           </div>
           <h3 className="text-4xl font-bold mb-10 text-left text-white mt-6">
             Your Learning Journey
@@ -232,7 +267,12 @@ const CourseModules = () => {
                               </div>
                               <div className="flex justify-between text-xs text-gray-500">
                                 <span>{moduleObj.progress}% completed</span>
-                                <span>Last accessed: 2 days ago</span>
+                                <span>
+                                  Started At:{" "}
+                                  {new Date(
+                                    moduleObj.started_at
+                                  ).toDateString()}
+                                </span>
                               </div>
                             </div>
 
@@ -305,8 +345,10 @@ const CourseModules = () => {
                               ></div>
                             </div>
                             <div className="flex justify-between text-xs text-gray-500">
-                              <span>{moduleObj.progress}% completed</span>
-                              <span>Last accessed: 2 days ago</span>
+                              <span>
+                                Started At:{" "}
+                                {new Date(moduleObj.started_at).toDateString()}
+                              </span>
                             </div>
                           </div>
 

@@ -6,6 +6,8 @@ import { toast } from "react-toastify";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import RestoreFromTrashIcon from "@mui/icons-material/RestoreFromTrash";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import CloseIcon from "@mui/icons-material/Close";
+import CancelIcon from "@mui/icons-material/Cancel";
 import { useNavigate } from "react-router-dom";
 import { setLessonId } from "../../../../redux/slices/userSlice";
 
@@ -15,8 +17,17 @@ const AdminLessons = () => {
   const [filter, setFilter] = useState("accepted");
   const id = useSelector((state) => state.user.moduleId);
   const [filteredLessons, setFilteredLessons] = useState([]);
+  const [isPending, setIsPending] = useState(0);
+  const [isAccepted, setIsAccepted] = useState(0);
+  const [isRejected, setIsRejected] = useState(0);
+  const [selectedData, setSelectedData] = useState(null);
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  console.log("selected data", selectedData);
+  console.log("rejection Reason", rejectionReason);
 
   useEffect(() => {
     const fetchModuleDetails = async () => {
@@ -69,23 +80,47 @@ const AdminLessons = () => {
     }
   };
 
-  const handleReject = async (e, lessonId) => {
+  const rejectModalOpen = (id) => {
+    setSelectedData(id);
+    setShowRejectModal(true);
+  };
+
+  const handleReject = async (e) => {
     e.preventDefault();
     try {
-      await adminAxios.post(`reject_lesson/${lessonId}/`);
+      await adminAxios.post(`reject_lesson/${selectedData}/`, {
+        reason: rejectionReason,
+      });
+      toast.success("Lesson Rejected Successfully");
       fetchLessons();
-      toast.success("Lesson Rejected");
+
+      setSelectedData(null);
+      setRejectionReason("");
+      setShowRejectModal(false);
     } catch (error) {
       toast.error(error || "Error While Rejecting Lesson");
     }
   };
 
+  const handleRejectCancel = () => {
+    setShowRejectModal(false);
+    setRejectionReason("");
+  };
+
   useEffect(() => {
+    const pending = lessons.filter((c) => c.status === "pending").length;
+    const accepted = lessons.filter((c) => c.status === "accepted").length;
+    const rejected = lessons.filter((c) => c.status === "rejected").length;
+
     const result = lessons.filter((lesson) => {
       if (filter === "accepted") return lesson.status === "accepted";
       return lesson.status === filter;
     });
     setFilteredLessons(result);
+
+    setIsPending(pending);
+    setIsAccepted(accepted);
+    setIsRejected(rejected);
   }, [lessons, filter]);
 
   const handleLessonClick = (lessonId) => {
@@ -126,7 +161,7 @@ const AdminLessons = () => {
                   <div>
                     <button
                       className="text-xl font-bold px-5 py-2 ml-2 mt-2 mr-40 bg-white text-black rounded-lg border-2 border-white hover:bg-black hover:text-white transition-all duration-300"
-                      onClick={() => navigate("/admin/courses/Overview")}
+                      onClick={() => navigate(-1)}
                     >
                       Back
                     </button>
@@ -138,7 +173,10 @@ const AdminLessons = () => {
                       } rounded-lg border-2 border-white hover:bg-black hover:text-white transition-all duration-300`}
                       onClick={() => setFilter("pending")}
                     >
-                      Pending
+                      Pending{" "}
+                      <span className="bg-yellow-300 border border-black rounded-full px-2 py-1 ml-2">
+                        {isPending}
+                      </span>
                     </button>
                     <button
                       className={`text-xl font-bold px-5 py-2 ml-2 mt-2 ${
@@ -148,7 +186,10 @@ const AdminLessons = () => {
                       } rounded-lg border-2 border-white hover:bg-black hover:text-white transition-all duration-300`}
                       onClick={() => setFilter("accepted")}
                     >
-                      Accepted
+                      Accepted{" "}
+                      <span className="bg-green-500 border border-black rounded-full px-2 py-1 ml-2">
+                        {isAccepted}
+                      </span>
                     </button>
                     <button
                       className={`text-xl font-bold px-5 py-2 ml-2 mt-2 ${
@@ -158,7 +199,10 @@ const AdminLessons = () => {
                       } rounded-lg border-2 border-white hover:bg-black hover:text-white transition-all duration-300`}
                       onClick={() => setFilter("rejected")}
                     >
-                      Rejected
+                      Rejected{" "}
+                      <span className="bg-red-500 border border-black rounded-full px-2 py-1 ml-2">
+                        {isRejected}
+                      </span>
                     </button>
                   </div>
                 </div>
@@ -174,86 +218,149 @@ const AdminLessons = () => {
                   >
                     <div className="h-2 bg-gradient-to-r from-cyan-500 to-purple-600 w-full transition-all duration-300 group-hover:h-3"></div>
 
-                    <div className="p-6 flex flex-col justify-between h-full">
+                    {/* Fixed Thumbnail Container */}
+                    <div className="w-full h-48 bg-gray-100 overflow-hidden">
+                      <img
+                        src={lesson.thumbnail || ""}
+                        alt={lesson.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                      />
+                    </div>
+
+                    <div className="p-6 flex flex-col justify-between flex-grow">
                       <div>
-                        <div className="flex justify-between items-start mb-2">
-                          <img
-                            src={lesson.thumbnail || ""}
-                            className=" font-bold text-gray-900 group-hover:text-cyan-600 transition-colors duration-300 h-full w-full"
-                          />
-                        </div>
-                        <p className="text-gray-800 font-semibold  text-lg">
+                        <p className="text-gray-800 font-semibold text-lg mb-3">
                           {lesson.title}
                         </p>
 
                         <div className="space-y-2 text-sm">
                           <div className="flex items-center text-gray-600">
                             <span className="text-xs font-medium">
-                              Created At : {lesson.created_at}
+                              Created At: {lesson.created_at}
                             </span>
                           </div>
                         </div>
                       </div>
 
-                      <div
-                        className="flex justify-between"
-                        style={{ marginLeft: "170px" }}
-                      >
-                        <div className="flex items-center space-x-2">
-                          {lesson.status === "pending" ? (
-                            <>
-                              <button
-                                className="p-2 text-white bg-green-500 rounded-lg hover:bg-white hover:text-green-500 hover:border hover:border-green-500 transition"
-                                onClick={(e) => handleAccept(e, lesson.id)}
-                              >
-                                Accept
-                              </button>
-                              <button
-                                className="p-2 text-white bg-red-500 rounded-lg hover:bg-white hover:text-red-500 hover:border hover:border-red-500 transition"
-                                onClick={(e) => handleReject(e, lesson.id)}
-                              >
-                                Reject
-                              </button>
-                            </>
-                          ) : lesson.status === "accepted" ? (
-                            lesson.is_active ? (
-                              <button
-                                className="p-2 text-white bg-red-500 rounded-lg hover:bg-white hover:text-red-500 hover:border hover:border-red-500 transition"
-                                onClick={(e) => toggle_status(e, lesson.id)}
-                                style={{ marginLeft: "80px" }}
-                              >
-                                <DeleteForeverIcon fontSize="small" />
-                              </button>
-                            ) : (
-                              <button
-                                className="p-2 text-white bg-green-500 rounded-lg hover:bg-white hover:text-green-500 hover:border hover:border-green-500 transition"
-                                onClick={(e) => toggle_status(e, lesson.id)}
-                                style={{ marginLeft: "80px" }}
-                              >
-                                <RestoreFromTrashIcon fontSize="small" />
-                              </button>
-                            )
-                          ) : (
-                            <span className="p-2 text-white font-semibold bg-red-500 rounded-lg hover:bg-white hover:text-red-500 hover:border hover:border-red-500 transition">
-                              Rejected
-                            </span>
-                          )}
+                      {/* Button Container - Aligned to Right Bottom with 2px gaps */}
+                      <div className="flex justify-end items-center gap-0.5 mt-4">
+                        {lesson.status === "pending" ? (
                           <>
                             <button
+                              className="p-2 text-white bg-green-500 rounded-lg hover:bg-white hover:text-green-500 hover:border hover:border-green-500 transition"
+                              onClick={(e) => handleAccept(e, lesson.id)}
+                            >
+                              Accept
+                            </button>
+                            <button
+                              className="p-2 text-white bg-red-500 rounded-lg hover:bg-white hover:text-red-500 hover:border hover:border-red-500 transition"
+                              onClick={() => rejectModalOpen(lesson.id)}
+                            >
+                              Reject
+                            </button>
+                            <button
                               className="p-2 text-white bg-blue-500 rounded-lg hover:bg-white hover:text-blue-500 hover:border hover:border-blue-500 transition"
-                              style={{ marginLeft: "10px" }}
                               onClick={() => handleLessonClick(lesson.id)}
                             >
                               <VisibilityIcon fontSize="small" />
                             </button>
                           </>
-                        </div>
+                        ) : lesson.status === "accepted" ? (
+                          lesson.is_active ? (
+                            <>
+                              <button
+                                className="p-2 text-white bg-blue-500 rounded-lg hover:bg-white hover:text-blue-500 hover:border hover:border-blue-500 transition"
+                                onClick={() => handleLessonClick(lesson.id)}
+                              >
+                                <VisibilityIcon fontSize="small" />
+                              </button>
+                              <button
+                                className="p-2 text-white bg-red-500 rounded-lg hover:bg-white hover:text-red-500 hover:border hover:border-red-500 transition"
+                                onClick={(e) => toggle_status(e, lesson.id)}
+                              >
+                                <DeleteForeverIcon fontSize="small" />
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <button
+                                className="p-2 text-white bg-blue-500 rounded-lg hover:bg-white hover:text-blue-500 hover:border hover:border-blue-500 transition"
+                                onClick={() => handleLessonClick(lesson.id)}
+                              >
+                                <VisibilityIcon fontSize="small" />
+                              </button>
+                              <button
+                                className="p-2 text-white bg-green-500 rounded-lg hover:bg-white hover:text-green-500 hover:border hover:border-green-500 transition"
+                                onClick={(e) => toggle_status(e, lesson.id)}
+                              >
+                                <RestoreFromTrashIcon fontSize="small" />
+                              </button>
+                            </>
+                          )
+                        ) : (
+                          <button
+                            className="p-2 text-white bg-red-500 rounded-lg hover:bg-white hover:text-blue-500 hover:border hover:border-blue-500 transition"
+                            onClick={() => handleEditModal(lesson.id)}
+                          >
+                            Rejected <DeleteForeverIcon fontSize="small" />
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
                 ))}
-              </div>
+              </div>  
             </>
+          )}
+          {showRejectModal && (
+            <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+              <div className="bg-slate-800 rounded-3xl shadow-2xl border border-white/10 max-w-md w-full">
+                <div className="p-6">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-12 h-12 bg-gradient-to-r from-red-500 to-rose-600 rounded-full flex items-center justify-center">
+                      <CancelIcon className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-bold text-white">
+                        Reject Lesson
+                      </h3>
+                      <p className="text-gray-400 text-sm">
+                        Please provide a reason for rejection
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mb-6">
+                    <span className="block text-sm font-semibold text-gray-400 mb-2">
+                      Rejection Reason
+                    </span>
+                    <textarea
+                      value={rejectionReason}
+                      onChange={(e) => setRejectionReason(e.target.value)}
+                      placeholder="Enter the reason for rejecting this Lesson..."
+                      className="w-full bg-slate-700/50 border border-white/10 rounded-xl p-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none"
+                      rows="4"
+                    />
+                  </div>
+
+                  <div className="flex gap-3">
+                    <button
+                      onClick={handleRejectCancel}
+                      className="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleReject}
+                      className="flex-1 bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-2"
+                    >
+                      <CloseIcon className="w-5 h-5" />
+                      Reject
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
           )}
         </div>
       </div>

@@ -4,6 +4,7 @@ import { User, Tag, Calendar } from "lucide-react";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import RestoreFromTrashIcon from "@mui/icons-material/RestoreFromTrash";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
+import CloseIcon from "@mui/icons-material/Close";
 import { useDispatch, useSelector } from "react-redux";
 import { adminAxios, tutorAxios } from "../../../../axiosConfig";
 import { toast } from "react-toastify";
@@ -17,14 +18,20 @@ import { setCourseId } from "../../../redux/slices/userSlice";
 const CourseRequests = () => {
   const [pendingCourseRequests, setPendingCourseRequests] = useState([]);
   const [rejectedCourseRequests, setRejectedCourseRequests] = useState([]);
-  const tutor = useSelector((state) => state.user.user);
+  const [isPendingRequests, setIsPendingRequests] = useState(0);
+  const [isRejectedRequests, setIsRejectedRequests] = useState(0);
   const [selectedData, setSelectedData] = useState(null);
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState("");
   const [step, setStep] = useState(1);
+  const tutor = useSelector((state) => state.user.user);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   console.log(tutor.email);
   console.log("selected data", selectedData);
+  console.log("rejection Reason", rejectionReason);
   console.log("pending data", pendingCourseRequests);
   console.log("rejected data", rejectedCourseRequests);
 
@@ -36,8 +43,19 @@ const CourseRequests = () => {
       const pending = data.filter((course) => course.status === "pending");
       const rejected = data.filter((course) => course.status === "rejected");
 
+      const pendingRequests = data.filter(
+        (course) => course.status === "pending"
+      ).length;
+      const rejectedRequests = data.filter(
+        (course) => course.status === "rejected"
+      ).length;
+
       setPendingCourseRequests(pending);
       setRejectedCourseRequests(rejected);
+
+      setIsPendingRequests(pendingRequests);
+      setIsRejectedRequests(rejectedRequests);
+
       console.log(response.data);
     } catch (error) {
       toast.error("Error While Fetching Data");
@@ -73,16 +91,31 @@ const CourseRequests = () => {
     }
   };
 
-  const handleReject = async (e, courseId) => {
+  const rejectModalOpen = (id) => {
+    setSelectedData(id);
+    setShowRejectModal(true);
+  };
+
+  const handleReject = async (e) => {
     e.preventDefault();
     try {
-      await adminAxios.post(`reject_course_request/${courseId}/`);
+      await adminAxios.post(`reject_course_request/${selectedData}/`, {
+        reason: rejectionReason,
+      });
       toast.success("Course Rejected Successfully");
       fetchCourseRequests();
+      selectedData(null)
+      setRejectionReason("")
+      setShowRejectModal(false)
     } catch (error) {
       toast.error(error || "Course not Found");
       console.error("Error:", error);
     }
+  };
+
+  const handleRejectCancel = () => {
+    setShowRejectModal(false);
+    setRejectionReason("");
   };
 
   const handleCourseClick = (id) => {
@@ -106,28 +139,38 @@ const CourseRequests = () => {
             </div>
           </div>
           <div
-            className="flex mb-9 items-center space-x-4 "
+            className="flex mb-9 items-center"
             style={{ marginLeft: "450px" }}
           >
             <button
               onClick={() => setStep(1)}
-              className={`px-4 py-2 text-lg font-semibold rounded-md transition-all duration-200 ${
-                step === 1
-                  ? "bg-cyan-500"
-                  : "bg-white text-black hover:bg-gray-600"
-              }`}
+              className={`text-xl font-bold px-5 py-2 mt-2 ${
+                step === 1 ? "bg-white text-black" : "bg-black text-white"
+              } rounded-lg border-2 border-white hover:bg-black hover:text-white transition-all duration-300`}
             >
-              Pending
+              Pending{" "}
+              {isPendingRequests ? (
+                <span className="bg-yellow-300 border border-black rounded-full px-2 py-1 ml-2">
+                  {isPendingRequests}
+                </span>
+              ) : (
+                <span></span>
+              )}
             </button>
             <button
               onClick={() => setStep(2)}
-              className={`px-4 py-2 text-lg font-semibold rounded-md transition-all duration-200 ${
-                step === 2
-                  ? "bg-cyan-500"
-                  : "bg-white text-black hover:bg-gray-600"
-              }`}
+              className={`text-xl font-bold px-5 py-2 ml-4 mt-2 ${
+                step === 2 ? "bg-white text-black" : "bg-black text-white"
+              } rounded-lg border-2 border-white hover:bg-black hover:text-white transition-all duration-300`}
             >
-              Rejected
+              Rejected{" "}
+              {isRejectedRequests ? (
+                <span className="bg-red-500 border border-black rounded-full px-2 py-1 ml-2">
+                  {isRejectedRequests}
+                </span>
+              ) : (
+                <span></span>
+              )}
             </button>
           </div>
 
@@ -160,7 +203,7 @@ const CourseRequests = () => {
                             </h3>
                             <span
                               className={`text-xs font-semibold px-3 py-1 rounded-full shadow-sm text-white ${
-                                course.level.toLowerCase() === "beginner"
+                                course.level.toLowerCase() === "beginer"
                                   ? "bg-green-500"
                                   : course.level.toLowerCase() ===
                                     "intermediate"
@@ -232,7 +275,7 @@ const CourseRequests = () => {
                                 </button>
                                 <button
                                   className="p-2 text-white bg-red-500 rounded-lg hover:bg-white hover:text-red-500 hover:border hover:border-red-500 transition"
-                                  onClick={(e) => handleReject(e, course.id)}
+                                  onClick={() => rejectModalOpen(course.id)}
                                 >
                                   Reject
                                 </button>
@@ -293,7 +336,7 @@ const CourseRequests = () => {
                             </h3>
                             <span
                               className={`text-xs font-semibold px-3 py-1 rounded-full shadow-sm text-white ${
-                                course.level.toLowerCase() === "beginner"
+                                course.level.toLowerCase() === "beginer"
                                   ? "bg-green-500"
                                   : course.level.toLowerCase() ===
                                     "intermediate"
@@ -348,46 +391,9 @@ const CourseRequests = () => {
                           </span>
 
                           <div className="flex items-center space-x-2">
-                            <button className="p-2 text-white bg-blue-500 rounded-lg hover:bg-white hover:text-blue-500 hover:border hover:border-blue-500 transition">
-                              <VisibilityIcon fontSize="small" />
-                            </button>
-
-                            {course.status === "pending" ? (
-                              <>
-                                <button
-                                  className="p-2 text-white bg-green-500 rounded-lg hover:bg-white hover:text-green-500 hover:border hover:border-green-500 transition"
-                                  onClick={(e) => handleAccept(e, course.id)}
-                                >
-                                  Accept
-                                </button>
-                                <button
-                                  className="p-2 text-white bg-red-500 rounded-lg hover:bg-white hover:text-red-500 hover:border hover:border-red-500 transition"
-                                  onClick={(e) => handleReject(e, course.id)}
-                                >
-                                  Reject
-                                </button>
-                              </>
-                            ) : course.status === "accepted" ? (
-                              course.is_active ? (
-                                <button
-                                  className="p-2 text-white bg-red-500 rounded-lg hover:bg-white hover:text-red-500 hover:border hover:border-red-500 transition"
-                                  onClick={(e) => toggle_status(e, course.id)}
-                                >
-                                  <DeleteForeverIcon fontSize="small" />
-                                </button>
-                              ) : (
-                                <button
-                                  className="p-2 text-white bg-green-500 rounded-lg hover:bg-white hover:text-green-500 hover:border hover:border-green-500 transition"
-                                  onClick={(e) => toggle_status(e, course.id)}
-                                >
-                                  <RestoreFromTrashIcon fontSize="small" />
-                                </button>
-                              )
-                            ) : (
                               <span className="p-2 text-white font-semibold bg-red-500 rounded-lg hover:bg-white hover:text-red-500 hover:border hover:border-red-500 transition">
                                 Rejected
                               </span>
-                            )}
                           </div>
                         </div>
                       </div>
@@ -395,6 +401,56 @@ const CourseRequests = () => {
                   ))}
               </div>
             </>
+          )}
+          {showRejectModal && (
+            <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+              <div className="bg-slate-800 rounded-3xl shadow-2xl border border-white/10 max-w-md w-full">
+                <div className="p-6">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-12 h-12 bg-gradient-to-r from-red-500 to-rose-600 rounded-full flex items-center justify-center">
+                      <CancelIcon className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-bold text-white">
+                        Reject Course
+                      </h3>
+                      <p className="text-gray-400 text-sm">
+                        Please provide a reason for rejection
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mb-6">
+                    <span className="block text-sm font-semibold text-gray-400 mb-2">
+                      Rejection Reason
+                    </span>
+                    <textarea
+                      value={rejectionReason}
+                      onChange={(e) => setRejectionReason(e.target.value)}
+                      placeholder="Enter the reason for rejecting this Course..."
+                      className="w-full bg-slate-700/50 border border-white/10 rounded-xl p-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none"
+                      rows="4"
+                    />
+                  </div>
+
+                  <div className="flex gap-3">
+                    <button
+                      onClick={handleRejectCancel}
+                      className="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleReject}
+                      className="flex-1 bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-2"
+                    >
+                      <CloseIcon className="w-5 h-5" />
+                      Reject
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
           )}
         </div>
       </div>

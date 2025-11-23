@@ -1,6 +1,18 @@
 import React, { useEffect, useState } from "react";
 import Layout from "../Layout/Layout";
-import { User, Tag, Calendar, FileClock, FileText, Save, Pencil, Edit3, LineChart } from "lucide-react";
+import {
+  User,
+  Tag,
+  Calendar,
+  FileClock,
+  FileText,
+  Save,
+  Pencil,
+  Edit3,
+  LineChart,
+  FilePen,
+  FileCheck,
+} from "lucide-react";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import RestoreFromTrashIcon from "@mui/icons-material/RestoreFromTrash";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,7 +21,7 @@ import { toast } from "react-toastify";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { setCourseId } from "../../../redux/slices/userSlice";
 import { useNavigate } from "react-router-dom";
-import Tooltip from '@mui/material/Tooltip';
+import Tooltip from "@mui/material/Tooltip";
 
 const Courses = () => {
   const [Courses, setCourses] = useState([]);
@@ -17,6 +29,9 @@ const Courses = () => {
   const [selectedData, setSelectedData] = useState(null);
   const [filteredLessons, setFilteredLessons] = useState([]);
   const [filter, setFilter] = useState("accepted");
+  const [isPending, setIsPending] = useState(0);
+  const [isAccepted, setIsAccepted] = useState(0);
+  const [isRejected, setIsRejected] = useState(0);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -39,22 +54,46 @@ const Courses = () => {
 
   const toggle_status = async (e, course_id) => {
     e.preventDefault();
+
     try {
-      await adminAxios.post(`course_status/${course_id}/`);
-      toast.success("Status Changed Successfully");
+      const response = await adminAxios.post(`course_status/${course_id}/`);
+      toast.success(response.data?.message || "Status Changed Successfully");
+
       fetchCourses();
     } catch (error) {
-      toast.error("Course not Found");
       console.error("Error:", error);
+      toast.error(
+        error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Course not Found"
+      );
+    }
+  };
+
+  const setDraft = async (id) => {
+    try {
+      await adminAxios.post(`set_draft/${id}/`);
+      toast.success("Course set to Draft");
+      fetchCourses();
+    } catch (error) {
+      toast.error(error || "Error While Set Draft");
     }
   };
 
   useEffect(() => {
+    const pending = Courses.filter((c) => c.status === "pending").length;
+    const accepted = Courses.filter((c) => c.status === "accepted").length;
+    const rejected = Courses.filter((c) => c.status === "rejected").length;
+
     const result = Courses.filter((course) => {
       if (filter === "accepted") return course.status === "accepted";
       return course.status === filter;
     });
     setFilteredLessons(result);
+
+    setIsPending(pending);
+    setIsAccepted(accepted);
+    setIsRejected(rejected);
   }, [Courses, filter]);
 
   const handleCourseClick = (id) => {
@@ -64,9 +103,9 @@ const Courses = () => {
   };
 
   const handleCourseAnalytics = (id) => {
-      dispatch(setCourseId(id))
-      navigate("/admin/courses/analytics");
-    }
+    dispatch(setCourseId(id));
+    navigate("/admin/courses/analytics");
+  };
 
   return (
     <Layout page="Courses">
@@ -76,7 +115,7 @@ const Courses = () => {
           <div className="flex mb-12">
             <div className="flex">
               <h2 className="text-5xl font-extrabold text-white">
-                Course Requests
+                Courses
               </h2>
               <div className="absolute -bottom-4 left-0 right-0 h-1 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-full opacity-50 blur-md"></div>
             </div>
@@ -158,7 +197,7 @@ const Courses = () => {
 
                       <div className="flex items-center space-x-2">
                         <Tooltip title="View Analytics" arrow>
-                            <button
+                          <button
                             onClick={() => handleCourseAnalytics(course.id)}
                             className="p-2 text-white bg-blue-500 rounded-lg hover:bg-white hover:text-blue-500 hover:border hover:border-blue-500 transition"
                           >
@@ -166,30 +205,50 @@ const Courses = () => {
                           </button>
                         </Tooltip>
                         <Tooltip title="View Details" arrow>
-                        <button
-                          className="p-2 text-white bg-blue-500 rounded-lg hover:bg-white hover:text-blue-500 hover:border hover:border-blue-500 transition"
-                          onClick={() => handleCourseClick(course.id)}
-                        >
-                          <VisibilityIcon fontSize="small" />
-                        </button>
+                          <button
+                            className="p-2 text-white bg-blue-500 rounded-lg hover:bg-white hover:text-blue-500 hover:border hover:border-blue-500 transition"
+                            onClick={() => handleCourseClick(course.id)}
+                          >
+                            <VisibilityIcon fontSize="small" />
+                          </button>
                         </Tooltip>
+                        {course.is_draft ? (
+                          
+                          <Tooltip title="Published" arrow>
+                            <button
+                              className="p-2 bg-green-600 text-white rounded-lg hover:bg-white hover:text-green-600 hover:border hover:border-green-600 transition"
+                              onClick={() => setDraft(course.id)}
+                            >
+                              <FileCheck fontSize="small" />
+                            </button>
+                          </Tooltip>
+                        ) : (
+                          <Tooltip title="Set as Draft" arrow>
+                            <button
+                              className="p-2 bg-yellow-500 text-white rounded-lg hover:bg-white hover:text-yellow-600 hover:border hover:border-yellow-600 transition"
+                              onClick={() => setDraft(course.id)}
+                            >
+                              <FilePen fontSize="small" />
+                            </button>
+                          </Tooltip>
+                        )}
                         {course.is_active ? (
                           <Tooltip title="Delete" arrow>
-                          <button
-                            className="p-2 text-white bg-red-500 rounded-lg hover:bg-white hover:text-red-500 hover:border hover:border-red-500 transition"
-                            onClick={(e) => toggle_status(e, course.id)}
-                          >
-                            <DeleteForeverIcon fontSize="small" />
-                          </button>
+                            <button
+                              className="p-2 text-white bg-red-500 rounded-lg hover:bg-white hover:text-red-500 hover:border hover:border-red-500 transition"
+                              onClick={(e) => toggle_status(e, course.id)}
+                            >
+                              <DeleteForeverIcon fontSize="small" />
+                            </button>
                           </Tooltip>
                         ) : (
                           <Tooltip title="Restore" arrow>
-                          <button
-                            className="p-2 text-white bg-green-500 rounded-lg hover:bg-white hover:text-green-500 hover:border hover:border-green-500 transition"
-                            onClick={(e) => toggle_status(e, course.id)}
-                          >
-                            <RestoreFromTrashIcon fontSize="small" />
-                          </button>
+                            <button
+                              className="p-2 text-white bg-green-500 rounded-lg hover:bg-white hover:text-green-500 hover:border hover:border-green-500 transition"
+                              onClick={(e) => toggle_status(e, course.id)}
+                            >
+                              <RestoreFromTrashIcon fontSize="small" />
+                            </button>
                           </Tooltip>
                         )}
                       </div>

@@ -47,10 +47,52 @@ const CourseLessonOverview = () => {
     }
   };
 
+  const Course = () => {
+    navigate("/user/courses");
+  };
+
+  const Module = () => {
+    navigate("/user/courses-modules");
+  };
+
+  const Lesson = () => {
+    navigate("/user/courses-lessons")
+  }
+
   return (
     <Layout page="Courses">
       <div className="p-8 min-h-screen relative z-10  text-white">
         <div className="max-w-7xl mx-auto">
+          <div className="mb-2 bg-gradient-to-br from-cyan-900/40 to-purple-800/40 p-6 rounded-3xl shadow-2xl flex items-center space-x-3 text-white text-lg font-semibold">
+            <span
+              className="opacity-70 hover:opacity-100 cursor-pointer transition-all"
+              onClick={Course}
+            >
+              Course
+            </span>
+
+            <span className="opacity-50">{">"}</span>
+
+            <span
+              className="opacity-70 hover:opacity-100 cursor-pointer transition-all"
+              onClick={Module}
+            >
+              Modules
+            </span>
+
+            <span className="opacity-50">{">"}</span>
+
+            <span className="opacity-70 hover:opacity-100 cursor-pointer transition-all"
+            onClick={Lesson}
+            >Lessons
+            </span>
+
+            <span className="opacity-50">{">"}</span>
+
+            <span className="text-white"
+            >Lessons Overview
+            </span>
+          </div>
           {/* Header */}
           {lesson ? (
             <div className="mb-2 bg-gradient-to-br from-cyan-900/40 to-purple-800/40 p-6 rounded-3xl shadow-2xl relative">

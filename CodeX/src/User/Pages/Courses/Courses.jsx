@@ -12,7 +12,7 @@ import cover_photo from "../../../assets/cover.png";
 const Courses = () => {
   const [categories, setCategories] = useState([]);
   const [courses, setCourses] = useState([]);
-  const [allCourses, setAllCourses] = useState([]); // Store all courses
+  const [allCourses, setAllCourses] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -160,7 +160,7 @@ const Courses = () => {
                     <span
                       className={`absolute top-4 right-4 text-xs font-bold px-3 py-1 rounded-full shadow-xl text-white backdrop-blur-md animate-pulse ${(() => {
                         const level = course.level?.trim().toLowerCase();
-                        if (level === "beginner") return "bg-green-500/90";
+                        if (level === "beginer") return "bg-green-500/90";
                         if (level === "intermediate") return "bg-yellow-500/90";
                         if (level === "advanced") return "bg-red-500/90";
                         return "bg-gray-400/90 text-black";
