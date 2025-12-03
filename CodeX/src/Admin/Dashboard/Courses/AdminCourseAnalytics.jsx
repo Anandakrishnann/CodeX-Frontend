@@ -18,6 +18,7 @@ const AdminCourseAnalytics = () => {
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
+        setLoading(true)
         const response = await tutorAxios.get(`course-monthly-trends/${course_id}/`);
         const data = response.data;
         console.log(data);

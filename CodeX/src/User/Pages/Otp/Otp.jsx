@@ -22,6 +22,9 @@ const OTPVerification = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  console.log(email);
+  
+
   const fadeIn = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },

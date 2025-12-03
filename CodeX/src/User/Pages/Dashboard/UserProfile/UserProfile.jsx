@@ -10,6 +10,7 @@ import Layout from "../Layout/Layout";
 import { MdEdit } from "react-icons/md";
 import ProfilePictureModal from "../../../../Component/ProfilePictureModal/ProfilePictureModal";
 import StreakTracker from "../StreakTracker/StreakTracker";
+import Loading from "@/User/Components/Loading/Loading";
 
 const UserProfile = () => {
   const [userData, setUserData] = useState(null);
@@ -21,6 +22,7 @@ const UserProfile = () => {
   const [newImage, setNewImage] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [edited, setEdit] = useState({});
+  const [loading, setLoading] = useState(false)
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -60,6 +62,7 @@ const UserProfile = () => {
   const handleProfilePictureSubmit = async (e) => {
     e.preventDefault();
     try {
+      setLoading(true)
       if (selectedFile) {
         const formData = new FormData();
         formData.append("profilePicture", selectedFile);
@@ -78,6 +81,8 @@ const UserProfile = () => {
       }
     } catch (error) {
       toast.error("Failed to upload image");
+    } finally {
+      setLoading(false)
     }
   };
 
@@ -121,6 +126,7 @@ const UserProfile = () => {
     };
     if (validate(data)) {
       try {
+        setLoading(true)
         const response = await userAxios.put("edit_user/", data);
         setUserData(response.data);
         toast.success("Profile Edited Successfully");
@@ -135,6 +141,8 @@ const UserProfile = () => {
         } else {
           toast.error("Request setup failed.");
         }
+      } finally {
+        setLoading(false)
       }
     }
   };
@@ -142,10 +150,13 @@ const UserProfile = () => {
   useEffect(() => {
     const fetchUserUser = async () => {
       try {
+        setLoading(true)
         const response = await userAxios.get("user_profile/");
         setUserData(response.data);
       } catch (error) {
         console.error("Error fetching user data:", error);
+      } finally {
+        setLoading(false)
       }
     };
 
@@ -154,17 +165,10 @@ const UserProfile = () => {
     }
   }, [picture, user]);
 
-  if (!userData) {
+  if (!userData || loading) {
     return (
       <Layout page={"Profile"}>
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="text-center">
-            <div className="inline-block animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500 mb-4"></div>
-            <div className="text-white text-xl font-semibold">
-              Loading profile...
-            </div>
-          </div>
-        </div>
+        <Loading />
       </Layout>
     );
   }

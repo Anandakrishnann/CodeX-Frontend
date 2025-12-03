@@ -76,6 +76,7 @@ const Overview = () => {
         status: "accepted",
       }));
       toast.success("Application Accepted");
+      fetchUserData();
     } catch (error) {
       toast.error("Something went wrong");
       console.error("Error:", error);
@@ -105,6 +106,7 @@ const Overview = () => {
       setShowRejectModal(false);
       setRejectionReason("");
       fetchReason();
+      fetchUserData();
     } catch (error) {
       toast.error("Something went wrong");
       console.error("Error:", error);
@@ -126,6 +128,7 @@ const Overview = () => {
     setRejectionReason("");
   };
 
+  
   const getStatusConfig = (status) => {
     const configs = {
       pending: {

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { LineChart, BarChart } from "@mui/x-charts";
 import Layout from "./Layout/Layout";
 import { adminAxios } from "../../../axiosConfig";
+import Loading from "@/User/Components/Loading/Loading";
 
 const Dashboard = () => {
   const [analytics, setAnalytics] = useState(null);
@@ -10,6 +11,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
+        setLoading(true)
         const response = await adminAxios.get("admin_dashboard/");
         setAnalytics(response.data);
         console.log(response.data);
@@ -26,12 +28,7 @@ const Dashboard = () => {
   if (loading) {
     return (
       <Layout>
-        <div className="flex items-center justify-center min-h-screen bg-gradient-to-br">
-          <div className="text-center">
-            <div className="inline-block animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500 mb-4"></div>
-            <div className="text-white text-xl font-semibold">Loading dashboard...</div>
-          </div>
-        </div>
+        <Loading />
       </Layout>
     );
   }

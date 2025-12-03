@@ -13,11 +13,14 @@ import StarIcon from "@mui/icons-material/Star";
 import LogoutIcon from "@mui/icons-material/Logout";
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import { Trash2, Flag } from "lucide-react";
+import { useState } from "react";
+import Loading from "@/User/Components/Loading/Loading";
 
 export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
 
   const handleNavigation = (path) => {
     navigate(path);
@@ -25,12 +28,15 @@ export default function Sidebar() {
 
   const logout = async () => {
     try {
+      setLoading(true);
       const response = await userAxios.post("logout/");
       dispatch(logoutUser());
       toast.success("Successfully Logged out");
       navigate("/");
     } catch (error) {
       toast.error("Something went wrong");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -67,7 +73,7 @@ export default function Sidebar() {
     },
     {
       path: "/admin/Reports",
-      icon: <Flag fontSize="medium" className="h-6 w-6"/>,
+      icon: <Flag fontSize="medium" className="h-6 w-6" />,
       label: "Reports",
     },
     {
@@ -82,7 +88,9 @@ export default function Sidebar() {
     },
   ];
 
-  return (
+  return loading ? (
+    <Loading />
+  ) : (
     <aside className="h-screen w-64 fixed left-0 top-0 bg-black p-4 flex flex-col overflow-y-auto">
       {/* Logo or Brand */}
       <div className="mb-8 pt-4">

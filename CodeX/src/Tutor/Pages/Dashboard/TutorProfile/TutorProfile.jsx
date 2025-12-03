@@ -238,6 +238,8 @@ const TutorProfile = () => {
     try {
       const response = await tutorAxios.get("tutor_profile/");
       setUserData(response.data);
+      console.log("tutor profile response data", response.data);
+      
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
@@ -258,7 +260,7 @@ const TutorProfile = () => {
           {/* Header */}
           <div className="mb-8 flex items-center justify-between">
             <div>
-              <h1 className="text-4xl font-bold text-white mb-2 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+              <h1 className="text-4xl font-bold text-white mb-2 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text">
                 My Profile
               </h1>
               <p className="text-gray-400">Manage your profile information</p>

@@ -7,18 +7,23 @@ import Table from "../../Components/Table/Table.jsx";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import Layout from "../Layout/Layout";
 import { useSelector } from "react-redux";
+import Loading from "@/User/Components/Loading/Loading";
 
 const Users = () => {
-  const tutor = useSelector((state) => state.user.role)
+  const tutor = useSelector((state) => state.user.role);
   const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
+        setLoading(true);
         const response = await adminAxios.get("list_users/");
         setUsers(response.data.users || []);
       } catch (error) {
         console.error("Error fetching users:", error.response || error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -29,6 +34,7 @@ const Users = () => {
     e.preventDefault();
 
     try {
+      setLoading(true);
       await adminAxios.post("status/", { id: userId });
       toast.success("Status Changed Successfully");
 
@@ -40,6 +46,8 @@ const Users = () => {
     } catch (error) {
       toast.error("User not Found");
       console.error("Error:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -55,12 +63,16 @@ const Users = () => {
 
   return (
     <Layout>
-      <Table
-        datas={users}
-        fucntions={toggle_status}
-        columns={columns}
-        name={"Users"}
-      />
+      {loading ? (
+        <Loading />
+      ) : (
+          <Table
+            datas={users}
+            fucntions={toggle_status}
+            columns={columns}
+            name={"User's"}
+          />
+      )}
     </Layout>
   );
 };

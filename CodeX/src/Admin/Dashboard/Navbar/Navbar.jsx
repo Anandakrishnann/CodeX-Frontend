@@ -1,28 +1,20 @@
-import { Search, Plus, User } from "lucide-react";
+import { User } from "lucide-react";
+import { useSelector } from "react-redux";
 
 export default function Navbar() {
+  const admin = useSelector((state) => state.user.user);
+
   return (
-    <header className="h-16 fixed top-0 right-0 left-64 bg-black z-10 px-6 flex items-center justify-between">
-      <div className="flex-1 max-w-md">
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="Search"
-            className="w-full bg-white p-2 pl-10 rounded-md text-black focus:outline-none"
-          />
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
-        </div>
-      </div>
+    <header className="h-16 fixed top-0 right-0 left-64 bg-black px-6 flex items-center justify-end shadow-md z-10">
+      {/* Admin Icon + Name */}
+      <div className="flex items-center bg-white rounded-md px-2 py-2 space-x-2 group cursor-pointer select-none">
+        
+        <User className="h-6 w-6  group-hover:text-green-400 transition-colors duration-200" />
 
-      <div className="flex items-center space-x-4">
-        <button className="bg-white p-2 rounded-full hover:bg-gray-200 transition-colors">
-          <Plus className="h-5 w-5 text-black" />
-        </button>
+        <span className=" font-semibold group-hover:text-green-400 transition-colors duration-200">
+          {admin.first_name} {admin.last_name}
+        </span>
 
-        <div className="flex items-center space-x-2 bg-white p-2 rounded-md hover:bg-gray-200 transition-colors cursor-pointer">
-          <User className="h-5 w-5 text-black" />
-          <span className="text-black font-medium">Admin</span>
-        </div>
       </div>
     </header>
   );

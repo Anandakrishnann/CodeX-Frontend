@@ -18,6 +18,7 @@ const CourseDetails = () => {
   const [showFullDesc, setShowFullDesc] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [isEnrolled, setIsEnrolled] = useState(false);
+  const [isTutor, setIsTutor] = useState(false);
 
   // Review states
   const [feedbackList, setFeedbackList] = useState([]);
@@ -59,6 +60,7 @@ const CourseDetails = () => {
     try {
       const response = await userAxios.get(`course_details/${course_id}/`);
       setCourse(response.data);
+      console.log("response data", response.data);
     } catch (error) {
       console.error("Error fetching course details:", error);
     }
@@ -92,6 +94,18 @@ const CourseDetails = () => {
     }
   };
 
+  const checkIsTutor = async () => {
+    try {
+      const response = await userAxios.get(`check-tutor/${course_id}/`);
+      if (response.data.is_tutor) {
+        setIsTutor(true);
+      }
+      console.log("is tutor check function", response.data.is_tutor);
+    } catch (error) {
+      console.error("Enrollment check failed:", error);
+    }
+  };
+
   useEffect(() => {
     if (course_id) {
       fetchCourse();
@@ -100,6 +114,7 @@ const CourseDetails = () => {
 
     if (user && user.email) {
       checkUserEnrollment();
+      checkIsTutor();
     }
   }, [course_id, user]);
 
@@ -271,7 +286,8 @@ const CourseDetails = () => {
                     className="ml-4 p-2 text-white bg-red-600 hover:text-red-500 transition-colors duration-200 hover:bg-red-500/10 rounded-lg flex items-center gap-2"
                     title="Report Course"
                   >
-                    <span>Report</span><Flag size={20} />
+                    <span>Report</span>
+                    <Flag size={20} />
                   </button>
                 </div>
                 <p className="text-gray-300 text-lg">{course.description}</p>
@@ -311,13 +327,22 @@ const CourseDetails = () => {
                     $ {course.price}
                   </p>
                   {user ? (
-                    isEnrolled ? (
-                      <button
-                        onClick={() => navigate("/user-dashboard")}
-                        className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-lg mb-4 cursor-pointer"
-                      >
-                        Go to Dashboard
-                      </button>
+                    isEnrolled || isTutor ? (
+                      isTutor ? (
+                        <button
+                          onClick={() => navigate("/tutor/dashboard")}
+                          className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-lg mb-4 cursor-pointer"
+                        >
+                          Go to Dashboard
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => navigate("/user-dashboard")}
+                          className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-lg mb-4 cursor-pointer"
+                        >
+                          Go to Dashboard
+                        </button>
+                      )
                     ) : (
                       <button
                         className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 rounded-lg mb-4 disabled:opacity-50 cursor-pointer"
@@ -689,7 +714,8 @@ const CourseDetails = () => {
               </div>
 
               <p className="text-gray-400 mb-6">
-                Help us maintain quality by reporting inappropriate content or violations.
+                Help us maintain quality by reporting inappropriate content or
+                violations.
               </p>
 
               <div className="mb-6">

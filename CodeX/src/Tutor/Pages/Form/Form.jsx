@@ -34,6 +34,9 @@ const Form = () => {
   const totalSteps = 6;
   const progressPercentage = (step / totalSteps) * 100;
 
+  console.log("form data", formData);
+  
+
   const sanitizeInput = (value) => {
     return value
       .replace(/<\/?[^>]+(>|$)/g, "")

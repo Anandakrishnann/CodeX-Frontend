@@ -8,10 +8,12 @@ import { Link, useNavigate } from "react-router-dom";
 import EditUserModal from "../../../Component/EditModal/EditUserModal";
 import { useDispatch } from "react-redux";
 import { setTutorId } from "../../../redux/slices/userSlice";
+import { Search } from "lucide-react";
 
 const Table = ({ datas, fucntions, columns, name }) => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("")
   const navigate = useNavigate();
   const dispatch = useDispatch();
   console.log(datas);
@@ -36,12 +38,39 @@ const Table = ({ datas, fucntions, columns, name }) => {
     navigate("/admin/tutor-view/");
   };
 
+  const filteredUsers = datas.filter((item) => {
+    if(searchQuery.trim() === "") return true;
+
+    const lower = searchQuery.toLocaleLowerCase();
+    const phoneString = item.phone ? item.phone.toString() : "";
+
+    return(
+      item.first_name.toLocaleLowerCase().includes(lower) || 
+      item.last_name.toLocaleLowerCase().includes(lower) || 
+      item.email.toLocaleLowerCase().includes(lower) ||
+      phoneString.includes(lower)
+    )
+  })
+
   return (
     <div className="grid">
       <div className="row-span-1 bg-black p-2 rounded-lg">
-        <h2 className="text-4xl font-extrabold mb-6 bg-black w-full mt-0 text-white">
+        <h2 className="text-5xl font-extrabold mb-6 bg-black w-full mt-0 text-white">
           {name}
         </h2>
+
+        <div className="flex-1 max-w-md mb-4 mt-2">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search"
+              className="w-full bg-white p-2 pl-10 rounded-md text-black focus:outline-none"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
+          </div>
+        </div>
         <div className="overflow-x-auto bg-white rounded-lg shadow-lg ">
           <table className="min-w-full border-collapse border border-gray-300">
             {/* Dynamic Table Header */}
@@ -57,8 +86,8 @@ const Table = ({ datas, fucntions, columns, name }) => {
 
             {/* Table Body */}
             <tbody>
-              {datas.length > 0 ? (
-                datas.map((user, index) => (
+              {filteredUsers.length > 0 ? (
+                filteredUsers.map((user, index) => (
                   <tr
                     key={user.id}
                     className={`border-b border-gray-300 ${

@@ -1,168 +1,187 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import TrendingUpIcon from "@mui/icons-material/TrendingUp"
-import Layout from "../Layout/Layout"
-import { toast } from "react-toastify"
-import { adminAxios } from "../../../../axiosConfig"
-import VerifiedIcon from "@mui/icons-material/Verified"
-import DeleteForeverIcon from "@mui/icons-material/DeleteForever"
-import { X, DollarSign, FileText, Tag, Calendar } from "lucide-react"
+import { useEffect, useState } from "react";
+import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+import Layout from "../Layout/Layout";
+import { toast } from "react-toastify";
+import { adminAxios } from "../../../../axiosConfig";
+import VerifiedIcon from "@mui/icons-material/Verified";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import { X, DollarSign, FileText, Tag, Calendar } from "lucide-react";
+import Loading from "@/User/Components/Loading/Loading";
 
 const Plans = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [plan, setPlan] = useState([])
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [plan, setPlan] = useState([]);
   const [formData, setFormData] = useState({
     name: "",
     plan_category: "",
     plan_type: "",
     price: "",
     description: "",
-  })
+  });
+  const [loading, setLoading] = useState(false);
 
-  console.log(formData)
+  console.log(formData);
 
   const handleChange = (e) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-    }))
-  }
+    }));
+  };
 
   const validateForm = (formData) => {
-    const errors = {}
+    const errors = {};
     if (!formData.name.trim()) {
-      errors.name = "Name is required"
-      toast.error("Name is required")
+      errors.name = "Name is required";
+      toast.error("Name is required");
     }
     if (!formData.plan_category) {
-      errors.plan_category = "Category is required"
-      toast.error("Category is required")
+      errors.plan_category = "Category is required";
+      toast.error("Category is required");
     }
     if (!formData.plan_type) {
-      errors.plan_type = "Plan type is required"
-      toast.error("Plan type is required")
+      errors.plan_type = "Plan type is required";
+      toast.error("Plan type is required");
     }
     if (!formData.price) {
-      errors.price = "Price is required"
-      toast.error("Price is required")
+      errors.price = "Price is required";
+      toast.error("Price is required");
     } else if (isNaN(formData.price)) {
-      errors.price = "Price must be a number"
-      toast.error("Price must be a number")
+      errors.price = "Price must be a number";
+      toast.error("Price must be a number");
     } else if (Number(formData.price) <= 0) {
-      errors.price = "Price must be greater than 0"
-      toast.error("Price must be greater than 0")
+      errors.price = "Price must be greater than 0";
+      toast.error("Price must be greater than 0");
     }
     if (!formData.description.trim()) {
-      errors.description = "Description is required"
-      toast.error("Description is required")
+      errors.description = "Description is required";
+      toast.error("Description is required");
     }
-    return Object.keys(errors).length === 0
-  }
+    return Object.keys(errors).length === 0;
+  };
 
   const handleSubmit = async () => {
     try {
       if (validateForm(formData)) {
-        const response = await adminAxios.post("create_plan/", formData)
-        toast.success("Plan Created Successfully")
-        setPlan((prev) => [...prev, response.data])
-        setIsModalOpen(false)
+        setLoading(true);
+        const response = await adminAxios.post("create_plan/", formData);
+        toast.success("Plan Created Successfully");
+        setPlan((prev) => [...prev, response.data]);
+        setIsModalOpen(false);
       }
     } catch (e) {
-      toast.error("Error When Fetching Data")
+      toast.error("Error When Fetching Data");
+    } finally {
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
     const fetchPlans = async () => {
       try {
-        const response = await adminAxios.get("list_plan/")
-        setPlan(response.data)
+        setLoading(true);
+        const response = await adminAxios.get("list_plan/");
+        setPlan(response.data);
       } catch (e) {
-        toast.error("Error When Fetching Data")
+        toast.error("Error When Fetching Data");
+      } finally {
+        setLoading(false);
       }
-    }
-    fetchPlans()
-  }, [])
+    };
+    fetchPlans();
+  }, []);
 
   const handleDelete = async (id) => {
     try {
-      await adminAxios.delete(`delete_plan/${id}/`)
-      toast.success("Plan Deleted Successfully")
-      setPlan(plan.filter((item) => item.id !== id))
+      setLoading(true);
+      await adminAxios.delete(`delete_plan/${id}/`);
+      toast.success("Plan Deleted Successfully");
+      setPlan(plan.filter((item) => item.id !== id));
     } catch (error) {
-      toast.error("Failed to delete plan")
+      toast.error("Failed to delete plan");
+    } finally {
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <Layout>
-      <div className="min-h-screen  from-slate-50 via-gray-100 to-slate-200 p-6">
-        {/* Overview Section */}
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8 gap-4">
-            <h2 className="text-4xl font-bold text-white">Subscription Plans</h2>
-            <button
-              className="px-6 py-3 bg-slate-800 text-white font-medium rounded-lg shadow-lg hover:bg-slate-700 transform hover:scale-105 transition-all duration-200 border border-slate-200"
-              onClick={() => setIsModalOpen(true)}
-            >
-              Create Plan
-            </button>
-          </div>
+      {loading ? (
+        <Loading />
+      ) : (
+        <div className="min-h-screen  from-slate-50 via-gray-100 to-slate-200 p-6">
+          {/* Overview Section */}
+          <div className="max-w-7xl mx-auto">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8 gap-4">
+              <h2 className="text-4xl font-bold text-white">
+                Subscription Plans
+              </h2>
+              <button
+                className="px-6 py-3 bg-slate-800 text-white font-medium rounded-lg shadow-lg hover:bg-slate-700 transform hover:scale-105 transition-all duration-200 border border-slate-200"
+                onClick={() => setIsModalOpen(true)}
+              >
+                Create Plan
+              </button>
+            </div>
 
-          <div className="mb-8">
-            <h1 className="text-2xl font-semibold text-white flex items-center gap-3 mb-6">
-              Active Plans
-              <TrendingUpIcon fontSize="large" className="text-slate-600" />
-            </h1>
-          </div>
+            <div className="mb-8">
+              <h1 className="text-2xl font-semibold text-white flex items-center gap-3 mb-6">
+                Active Plans
+                <TrendingUpIcon fontSize="large" className="text-slate-600" />
+              </h1>
+            </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {plan &&
-              plan.map((data, index) => (
-                <div
-                  key={index}
-                  className="relative bg-white border border-slate-200 shadow-lg rounded-2xl p-6 hover:shadow-xl transition-all duration-300 ease-out flex flex-col justify-between min-h-[380px] group"
-                >
-                  <button
-                    className="absolute top-4 right-4 bg-red-500 text-white font-medium p-2 rounded-lg hover:bg-red-600 transition-all duration-200 shadow-md hover:shadow-lg"
-                    title="Delete Plan"
-                    onClick={() => handleDelete(data.id)}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {plan &&
+                plan.map((data, index) => (
+                  <div
+                    key={index}
+                    className="relative bg-white border border-slate-200 shadow-lg rounded-2xl p-6 hover:shadow-xl transition-all duration-300 ease-out flex flex-col justify-between min-h-[380px] group"
                   >
-                    <DeleteForeverIcon />
-                  </button>
+                    <button
+                      className="absolute top-4 right-4 bg-red-500 text-white font-medium p-2 rounded-lg hover:bg-red-600 transition-all duration-200 shadow-md hover:shadow-lg"
+                      title="Delete Plan"
+                      onClick={() => handleDelete(data.id)}
+                    >
+                      <DeleteForeverIcon />
+                    </button>
 
-                  <div>
-                    <div className="mb-5">
-                      <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2 mb-2">
-                        {data.name}
-                        <VerifiedIcon className="text-slate-600" />
-                      </h2>
-                      <p className="text-xs text-slate-500 uppercase tracking-wider font-medium bg-slate-100 px-3 py-1 rounded-full inline-block">
-                        {data.plan_type}
+                    <div>
+                      <div className="mb-5">
+                        <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2 mb-2">
+                          {data.name}
+                          <VerifiedIcon className="text-slate-600" />
+                        </h2>
+                        <p className="text-xs text-slate-500 uppercase tracking-wider font-medium bg-slate-100 px-3 py-1 rounded-full inline-block">
+                          {data.plan_type}
+                        </p>
+                      </div>
+
+                      <div className="mb-5">
+                        <span className="inline-block px-3 py-1 bg-slate-800 text-white text-xs font-medium rounded-full uppercase tracking-wide shadow-sm">
+                          {data.plan_category}
+                        </span>
+                      </div>
+
+                      <p className="text-slate-600 text-sm leading-relaxed bg-slate-50 p-4 rounded-lg border border-slate-100">
+                        {data.description}
                       </p>
                     </div>
 
-                    <div className="mb-5">
-                      <span className="inline-block px-3 py-1 bg-slate-800 text-white text-xs font-medium rounded-full uppercase tracking-wide shadow-sm">
-                        {data.plan_category}
-                      </span>
+                    <div className="mt-auto pt-4 border-t border-slate-100">
+                      <h2 className="text-3xl font-bold text-slate-800">
+                        ₹{data.price}
+                      </h2>
                     </div>
-
-                    <p className="text-slate-600 text-sm leading-relaxed bg-slate-50 p-4 rounded-lg border border-slate-100">
-                      {data.description}
-                    </p>
                   </div>
-
-                  <div className="mt-auto pt-4 border-t border-slate-100">
-                    <h2 className="text-3xl font-bold text-slate-800">₹{data.price}</h2>
-                  </div>
-                </div>
-              ))}
+                ))}
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -174,7 +193,9 @@ const Plans = () => {
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-sm">
                     <Tag className="w-5 h-5 text-white" />
                   </div>
-                  <h2 className="text-xl font-semibold text-slate-800">Create Plan</h2>
+                  <h2 className="text-xl font-semibold text-slate-800">
+                    Create Plan
+                  </h2>
                 </div>
                 <button
                   onClick={() => setIsModalOpen(false)}
@@ -316,7 +337,7 @@ const Plans = () => {
         </div>
       )}
     </Layout>
-  )
-}
+  );
+};
 
-export default Plans
+export default Plans;

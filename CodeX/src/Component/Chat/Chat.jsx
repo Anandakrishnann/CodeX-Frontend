@@ -12,6 +12,7 @@ import { FiPaperclip, FiMic } from "react-icons/fi";
 import { HiDotsVertical } from "react-icons/hi";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const Chat = ({ roomId: initialRoomId, currentUserId }) => {
   const user = useSelector((state) => state.user.user);
@@ -21,11 +22,14 @@ const Chat = ({ roomId: initialRoomId, currentUserId }) => {
   const [showSidebar, setShowSidebar] = useState(true);
   const [rooms, setRooms] = useState([]);
   const [selectedRoomId, setSelectedRoomId] = useState(initialRoomId);
+  const [searchQuery, setSearchQuery] = useState("");
   const socketRef = useRef(null);
   const reconnectAttempts = useRef(0);
   const maxReconnectAttempts = 10;
   const reconnectInterval = 3000;
   const bottomRef = useRef(null);
+
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (bottomRef.current) {
@@ -253,16 +257,25 @@ const Chat = ({ roomId: initialRoomId, currentUserId }) => {
 
   console.log(rooms);
 
-  const sortedRooms = [...rooms].sort((a, b) => {
-    const getTime = (room) => {
-      if (room.last_message?.timestamp) {
-        return new Date(room.last_message.timestamp).getTime();
-      }
-      return new Date(room.created_at).getTime();
-    };
+  const sortedRooms = [...rooms]
+    .filter((room) => {
+      if (!searchQuery.trim()) return true;
+      const query = searchQuery.toLowerCase();
+      return (
+        room.receiver_name?.toLowerCase().includes(query) ||
+        room.last_message?.content?.toLowerCase().includes(query)
+      );
+    })
+    .sort((a, b) => {
+      const getTime = (room) => {
+        if (room.last_message?.timestamp) {
+          return new Date(room.last_message.timestamp).getTime();
+        }
+        return new Date(room.created_at).getTime();
+      };
 
-    return getTime(a) - getTime(b); // ascending: oldest first
-  });
+      return getTime(b) - getTime(a);
+    });
 
   return (
     <div className="flex h-full text-white rounded-none md:rounded-2xl overflow-hidden shadow-2xl border-0 md:border border-gray-800 relative z-10">
@@ -285,10 +298,13 @@ const Chat = ({ roomId: initialRoomId, currentUserId }) => {
             <input
               type="text"
               placeholder="Search conversations..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 md:pl-12 pr-4 py-2.5 md:py-3 bg-white border border-gray-700 rounded-xl text-black placeholder-black focus:outline-none focus:ring-2 focus:ring-black focus:border-white transition-all text-sm md:text-base"
             />
           </div>
         </div>
+
         <div className="flex-1 overflow-y-auto px-2 md:px-4 py-2 bg-black">
           {sortedRooms.length > 0 ? (
             sortedRooms.map((room) => (
@@ -405,14 +421,10 @@ const Chat = ({ roomId: initialRoomId, currentUserId }) => {
               </div>
             </div>
             <div className="flex items-center space-x-1 md:space-x-2">
-              <button className="p-2 md:p-4 hover:bg-gray-800 rounded-xl transition-all duration-200 group">
-                <FaPhone className="text-black group-hover:text-white text-sm md:text-lg" />
-              </button>
-              <button className="p-2 md:p-4 hover:bg-gray-800 rounded-xl transition-all duration-200 group">
+              <button className="p-2 md:p-4 hover:bg-gray-800 rounded-xl transition-all duration-200 group"
+              onClick={() => navigate("/user/meet")}
+              >
                 <FaVideo className="text-black group-hover:text-white text-sm md:text-lg" />
-              </button>
-              <button className="p-2 md:p-4 hover:bg-gray-800 rounded-xl transition-all duration-200 group">
-                <HiDotsVertical className="text-black group-hover:text-white text-sm md:text-lg" />
               </button>
             </div>
           </div>
@@ -468,9 +480,6 @@ const Chat = ({ roomId: initialRoomId, currentUserId }) => {
         </section>
         <footer className="flex-shrink-0 p-4 md:p-6 border-t border-gray-800 bg-white">
           <div className="flex items-center space-x-2 md:space-x-4">
-            <button className="p-2 md:p-3 hover:bg-gray-800 rounded-xl transition-all duration-200 group">
-              <FiPaperclip className="text-black group-hover:text-white text-sm md:text-lg" />
-            </button>
             <div className="flex-1 relative">
               <input
                 type="text"
@@ -485,9 +494,6 @@ const Chat = ({ roomId: initialRoomId, currentUserId }) => {
                 }}
               />
             </div>
-            <button className="p-2 md:p-3 hover:bg-black rounded-xl transition-all duration-200 group">
-              <FiMic className="text-black group-hover:text-white text-sm md:text-lg" />
-            </button>
             <button
               className="p-3 md:p-4 bg-black hover:bg-white hover:text-black text-black rounded-2xl"
               onClick={sendMessage}

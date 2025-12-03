@@ -7,6 +7,7 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import { toast } from "react-toastify";
 import { adminAxios } from "../../../../axiosConfig";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
+import { Search } from "lucide-react";
 
 const Category = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -21,6 +22,8 @@ const Category = () => {
     description: "",
   });
   const [selectedData, setSelectedData] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(false)
   console.log(selectedData);
 
   console.log(category);
@@ -61,10 +64,13 @@ const Category = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
+        setLoading(true)
         const response = await adminAxios.get("list_category/");
         setCategory(response.data);
       } catch (e) {
         toast.error("Error While Fetching Data");
+      } finally {
+        setLoading(false)
       }
     };
 
@@ -90,6 +96,7 @@ const Category = () => {
   const handleSubmit = async () => {
     try {
       if (validateForm(formData)) {
+        setLoading(true)
         const response = await adminAxios.post("create_category/", formData);
         toast.success("Category Created Successfully");
         console.log(response.data);
@@ -105,12 +112,15 @@ const Category = () => {
 
       toast.error(errorMessage);
       console.error("Error creating category:", error);
+    } finally {
+      setLoading(false)
     }
   };
 
   const toggle_status = async (e, category_id) => {
     e.preventDefault();
     try {
+      setLoading(true)
       const response = await adminAxios.post("category_status/", {
         id: category_id,
       });
@@ -129,12 +139,15 @@ const Category = () => {
 
       toast.error(`Error: ${errorMessage}`);
       console.error("Backend Error:", error);
+    } finally {
+      setLoading(false)
     }
   };
 
   const handleEditSubmit = async () => {
     try {
       if (validateForm(editFormData)) {
+        setLoading(true)
         const data = {
           name: editFormData.name || category.name,
           description: editFormData.description || category.description,
@@ -159,10 +172,23 @@ const Category = () => {
 
       toast.error(`Error: ${errorMessage}`);
       console.error("Backend Error:", error);
+    } finally {
+      setLoading(false)
     }
   };
 
   const columns = ["ID", "Name", "Description", "Status", "Action"];
+
+  const filteredCategories = category.filter((item) => {
+    if (searchQuery.trim() === "") return true;
+
+    const lower = searchQuery.toLowerCase();
+
+    return (
+      item.name.toLowerCase().includes(lower) ||
+      item.description.toLowerCase().includes(lower)
+    );
+  });
 
   return (
     <Layout>
@@ -180,6 +206,18 @@ const Category = () => {
               Create
             </button>
           </div>
+          <div className="flex-1 max-w-md mb-6 ">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search"
+                className="w-full bg-white p-2 pl-10 rounded-md text-black focus:outline-none"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
+            </div>
+          </div>
           <div className="overflow-x-auto bg-white rounded-lg shadow-lg">
             <table className="min-w-full border-collapse border border-gray-300">
               {/* Table Header */}
@@ -195,8 +233,8 @@ const Category = () => {
 
               {/* Table Body */}
               <tbody>
-                {category.length > 0 ? (
-                  category.map((item, index) => (
+                {filteredCategories.length > 0 ? (
+                  filteredCategories.map((item, index) => (
                     <tr
                       key={item.id}
                       className={`border-b border-gray-300 ${

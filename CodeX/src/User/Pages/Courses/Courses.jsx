@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import Navbar from "../Navbar/Navbar";
 import Footer from "../Footer/Footer";
 import { userAxios } from "../../../../axiosConfig";
 import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setCourseId } from "../../../redux/slices/userSlice";
 import { motion } from "framer-motion";
@@ -11,9 +11,10 @@ import cover_photo from "../../../assets/cover.png";
 
 const Courses = () => {
   const [categories, setCategories] = useState([]);
-  const [courses, setCourses] = useState([]);
   const [allCourses, setAllCourses] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [searchParams] = useSearchParams();
+  const searchQuery = searchParams.get('search');
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -24,11 +25,6 @@ const Courses = () => {
   const handleClick = (id) => {
     dispatch(setCourseId(id));
     navigate("/courses/details");
-  };
-
-  const fadeIn = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
   };
 
   useEffect(() => {
@@ -44,8 +40,7 @@ const Courses = () => {
     const fetchCourses = async () => {
       try {
         const response = await userAxios.get("courses/");
-        setCourses(response.data);
-        setAllCourses(response.data); // Store all courses
+        setAllCourses(response.data);
       } catch {
         toast.error("Error While Loading Courses");
       }
@@ -55,33 +50,60 @@ const Courses = () => {
     fetchCourses();
   }, []);
 
-  // Filter courses when category is selected
-  useEffect(() => {
-    if (selectedCategory === null) {
-      // Show all courses when no category is selected
-      setCourses(allCourses);
-    } else {
-      // Filter courses by selected category
-      const filtered = allCourses.filter(
-        (course) => course.category_id === selectedCategory || course.category === categories.find(cat => cat.id === selectedCategory)?.name
+  // Create a category lookup map for O(1) access
+  const categoryMap = useMemo(() => {
+    const map = new Map();
+    categories.forEach(cat => {
+      map.set(cat.id, cat.name);
+    });
+    return map;
+  }, [categories]);
+
+  // Optimized filtering with useMemo
+  const filteredCourses = useMemo(() => {
+    let filtered = allCourses;
+
+    // Apply category filter first (more specific)
+    if (selectedCategory !== null) {
+      const categoryName = categoryMap.get(selectedCategory);
+      filtered = filtered.filter(
+        (course) => course.category_id === selectedCategory || 
+                   course.category === categoryName
       );
-      setCourses(filtered);
     }
-  }, [selectedCategory, allCourses, categories]);
+
+    // Apply search filter
+    if (searchQuery && searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      filtered = filtered.filter((course) => {
+        return (
+          course.title?.toLowerCase().includes(query) ||
+          course.description?.toLowerCase().includes(query) ||
+          course.category?.toLowerCase().includes(query) ||
+          course.created_by?.toLowerCase().includes(query) ||
+          course.level?.toLowerCase().includes(query)
+        );
+      });
+    }
+
+    return filtered;
+  }, [allCourses, selectedCategory, searchQuery, categoryMap]);
 
   const handleCategoryClick = (categoryId) => {
     if (selectedCategory === categoryId) {
-      // If clicking the same category, deselect it (show all)
       setSelectedCategory(null);
     } else {
       setSelectedCategory(categoryId);
     }
   };
 
+  const clearSearch = () => {
+    navigate('/courses');
+  };
+
   return (
     <div className="min-h-screen relative overflow-hidden font-poppins bg-black">
       <Navbar />
-      {/* Page Layout */}
       <div className="flex pt-24">
         {/* Sidebar */}
         <div className="fixed top-24 left-0 h-[calc(100vh-6rem)] w-64 p-6 overflow-y-auto z-10 border-r border-gray-800 ml-2">
@@ -127,23 +149,47 @@ const Courses = () => {
             />
           </div>
 
+          {/* Search Info Banner */}
+          {searchQuery && (
+            <div className="bg-gradient-to-r from-green-500/10 to-emerald-600/10 border border-green-500/30 rounded-xl p-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <div>
+                  <p className="text-gray-300">
+                    Showing results for: <span className="text-green-400 font-semibold">"{searchQuery}"</span>
+                  </p>
+                </div>
+              </div>
+              <button 
+                onClick={clearSearch}
+                className="text-sm bg-gray-800/50 hover:bg-gray-700 px-4 py-2 rounded-lg transition-all duration-300"
+              >
+                Clear Search
+              </button>
+            </div>
+          )}
+
           {/* Section Title with Filter Info */}
           <div className="flex items-center justify-between">
             <h3 className="text-5xl font-bold font-serif">
-              {selectedCategory 
-                ? `${categories.find(cat => cat.id === selectedCategory)?.name} Courses`
-                : "Popular Classes"
+              {searchQuery 
+                ? "Search Results"
+                : selectedCategory 
+                  ? `${categoryMap.get(selectedCategory)} Courses`
+                  : "Popular Classes"
               }
             </h3>
             <div className="text-gray-400 text-lg">
-              {courses.length} {courses.length === 1 ? 'Course' : 'Courses'}
+              {filteredCourses.length} {filteredCourses.length === 1 ? 'Course' : 'Courses'}
             </div>
           </div>
 
           {/* Advanced Cards */}
-          {courses.length > 0 ? (
+          {filteredCourses.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {courses.map((course) => (
+              {filteredCourses.map((course) => (
                 <motion.div
                   key={course.id}
                   initial={{ opacity: 0, y: 40 }}
@@ -226,12 +272,22 @@ const Courses = () => {
             <div className="flex flex-col items-center justify-center py-20">
               <div className="text-gray-400 text-6xl mb-4">📚</div>
               <h3 className="text-2xl font-bold text-white mb-2">No Courses Found</h3>
-              <p className="text-gray-400">
-                {selectedCategory 
-                  ? `No courses available in ${categories.find(cat => cat.id === selectedCategory)?.name} category`
-                  : "No courses available at the moment"
+              <p className="text-gray-400 text-center">
+                {searchQuery 
+                  ? `No courses found matching "${searchQuery}"`
+                  : selectedCategory 
+                    ? `No courses available in ${categoryMap.get(selectedCategory)} category`
+                    : "No courses available at the moment"
                 }
               </p>
+              {searchQuery && (
+                <button 
+                  onClick={clearSearch}
+                  className="mt-4 bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-all duration-300"
+                >
+                  Clear Search
+                </button>
+              )}
             </div>
           )}
         </div>

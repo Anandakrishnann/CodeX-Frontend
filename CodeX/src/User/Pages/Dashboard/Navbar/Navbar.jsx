@@ -3,15 +3,21 @@ import { Menu, Search } from "lucide-react";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import { useNotifications } from "../../../../context/NotificationContext";
+import { useSelector } from "react-redux";
 
 const Navbar = ({ setSidebarOpen }) => {
+  const user = useSelector((state) => state.user.user)
   const [showNotifications, setShowNotifications] = useState(false);
   const notificationRef = useRef(null);
-  const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
+  const { notifications, unreadCount, markAsRead, markAllAsRead } =
+    useNotifications();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (notificationRef.current && !notificationRef.current.contains(event.target)) {
+      if (
+        notificationRef.current &&
+        !notificationRef.current.contains(event.target)
+      ) {
         setShowNotifications(false);
       }
     };
@@ -36,12 +42,13 @@ const Navbar = ({ setSidebarOpen }) => {
     const date = new Date(dateString);
     const now = new Date();
     const diffInMinutes = Math.floor((now - date) / (1000 * 60));
-    
+
     if (diffInMinutes < 1) return "Just now";
     if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
     if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h ago`;
-    if (diffInMinutes < 10080) return `${Math.floor(diffInMinutes / 1440)}d ago`;
-    
+    if (diffInMinutes < 10080)
+      return `${Math.floor(diffInMinutes / 1440)}d ago`;
+
     return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
   };
 
@@ -61,20 +68,16 @@ const Navbar = ({ setSidebarOpen }) => {
         className="flex items-center space-x-4"
         style={{ marginBottom: "20px" }}
       >
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="Search..."
-            className="w-64 pl-10 pr-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-1 focus:ring-black"
-          />
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-        </div>
+        <div className="relative"></div>
         <div className="relative" ref={notificationRef}>
           <button
             className="relative p-1"
             onClick={() => setShowNotifications(!showNotifications)}
           >
-            <NotificationsIcon fontSize="large" className="w-5 h-5 text-white" />
+            <NotificationsIcon
+              fontSize="large"
+              className="w-5 h-5 text-white"
+            />
             {unreadCount > 0 && (
               <span className="absolute top-0 right-0 h-4 w-4 rounded-full bg-red-500 text-white text-xs flex items-center justify-center">
                 {unreadCount > 9 ? "9+" : unreadCount}
@@ -111,9 +114,15 @@ const Navbar = ({ setSidebarOpen }) => {
                     >
                       <div className="flex justify-between items-start">
                         <div className="flex-1">
-                          <p className="text-sm text-gray-900">{notification.message || notification.title || "Notification"}</p>
+                          <p className="text-sm text-gray-900">
+                            {notification.message ||
+                              notification.title ||
+                              "Notification"}
+                          </p>
                           <p className="text-xs text-gray-500 mt-1">
-                            {formatDate(notification.created_at || notification.timestamp)}
+                            {formatDate(
+                              notification.created_at || notification.timestamp
+                            )}
                           </p>
                         </div>
                         {!notification.is_read && (
@@ -127,8 +136,21 @@ const Navbar = ({ setSidebarOpen }) => {
             </div>
           )}
         </div>
-        <button className="relative p-1">
+        <button className="relative group p-1">
           <AccountCircleIcon fontSize="large" className="w-5 h-5 text-white" />
+
+          {/* Hover Label */}
+          <span
+            className="
+    absolute left-1/2 -translate-x-1/2 top-8
+    bg-black text-white text-xs font-semibold
+    py-1 px-2 rounded-md whitespace-nowrap
+    opacity-0 group-hover:opacity-100
+    transition-all duration-200
+  "
+          >
+            {user.email}
+          </span>
         </button>
       </div>
     </header>

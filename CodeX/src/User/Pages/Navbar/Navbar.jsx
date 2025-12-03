@@ -9,12 +9,11 @@ import { toast } from "react-toastify";
 const Navbar = () => {
   const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
   const user = useSelector((state) => state.user.user);
-  console.log(isAuthenticated);
-  console.log(user);
 
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -33,7 +32,7 @@ const Navbar = () => {
 
   const logout = async () => {
     try {
-      await userAxios.post("logout/"); // Ensure this is imported and correct
+      await userAxios.post("logout/");
       dispatch(logoutUser());
       toast.success("Logged out successfully");
       navigate("/login");
@@ -53,6 +52,25 @@ const Navbar = () => {
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/courses?search=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery("");
+      setMobileMenuOpen(false);
+    }
+  };
+
+  const handleSearchInputChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleSearchKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch(e);
+    }
   };
 
   return (
@@ -86,10 +104,16 @@ const Navbar = () => {
             <div className="relative">
               <input
                 type="text"
+                value={searchQuery}
+                onChange={handleSearchInputChange}
+                onKeyPress={handleSearchKeyPress}
                 className="px-4 py-2 text-white bg-gray-900/70 border border-gray-700 rounded-lg w-64 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all"
                 placeholder="Search courses..."
               />
-              <button className="absolute right-0 top-0 h-full px-3 flex items-center justify-center text-green-500 hover:bg-green-500 hover:text-white hover:rounded-full transition-all">
+              <button 
+                onClick={handleSearch}
+                className="absolute right-0 top-0 h-full px-3 flex items-center justify-center text-green-500 hover:bg-green-500 hover:text-white hover:rounded-full transition-all"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-5 w-5"
@@ -189,10 +213,16 @@ const Navbar = () => {
             <div className="relative mx-2 my-2">
               <input
                 type="text"
+                value={searchQuery}
+                onChange={handleSearchInputChange}
+                onKeyPress={handleSearchKeyPress}
                 className="w-full px-4 py-2 text-white bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all"
                 placeholder="Search courses..."
               />
-              <button className="absolute right-0 top-0 h-full px-3 flex items-center justify-center text-green-500 hover:text-white transition-all">
+              <button 
+                onClick={handleSearch}
+                className="absolute right-0 top-0 h-full px-3 flex items-center justify-center text-green-500 hover:text-white transition-all"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-5 w-5"

@@ -31,6 +31,7 @@ const TutorDetails = () => {
 
   const tutor_id = useSelector((state) => state.user.tutorId);
   const user = useSelector((state) => state.user.user);
+  const role = useSelector((state) => state.user.role);
   const user_id = user?.id;
 
   const dispatch = useDispatch();
@@ -110,7 +111,7 @@ const TutorDetails = () => {
     }
   };
 
-  const handleDeleteReview = async (feedbackId) => {
+  const handleDeleteReview = async () => {
     try {
       await userAxios.delete(`tutor/${tutorId}/feedback/`);
       toast.success("Review deleted successfully!");
@@ -236,7 +237,8 @@ const TutorDetails = () => {
                     className="ml-4 p-2 text-white bg-red-600 hover:text-red-500 transition-colors duration-200 hover:bg-red-500/10 rounded-lg flex items-center gap-2"
                     title="Report Tutor"
                   >
-                    <span>Report</span><Flag size={20} />
+                    <span>Report</span>
+                    <Flag size={20} />
                   </button>
                 </div>
                 <p className="text-gray-300 text-lg">{tutor.about}</p>
@@ -320,7 +322,7 @@ const TutorDetails = () => {
                       <span className="text-xl font-bold text-white">
                         Email:
                       </span>
-                      <span className="text-xl font-bold text-green-500 ml-3 bg-black/30 px-3 py-1 rounded-lg">
+                      <span className="text-xl font-bold text-green-500  bg-black/30 px-1 py-1 rounded-lg">
                         {tutor.email}
                       </span>
                     </div>
@@ -375,79 +377,86 @@ const TutorDetails = () => {
               </div>
 
               {/* Add Review Form */}
-              <div className="bg-gradient-to-br from-black to-gray-900 rounded-2xl p-8 border border-green-500/20 shadow-xl mb-8 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-green-500/5 rounded-full blur-3xl"></div>
-                <div className="absolute bottom-0 left-0 w-48 h-48 bg-green-500/5 rounded-full blur-3xl"></div>
+              {role === "user" && (
+                <div className="bg-gradient-to-br from-black to-gray-900 rounded-2xl p-8 border border-green-500/20 shadow-xl mb-8 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-green-500/5 rounded-full blur-3xl"></div>
+                  <div className="absolute bottom-0 left-0 w-48 h-48 bg-green-500/5 rounded-full blur-3xl"></div>
 
-                <h3 className="text-3xl font-bold mb-6 text-green-400 relative z-10">
-                  Share Your Experience
-                </h3>
+                  <h3 className="text-3xl font-bold mb-6 text-green-400 relative z-10">
+                    Share Your Experience
+                  </h3>
 
-                <div className="relative z-10">
-                  <div className="mb-6">
-                    <label className="block text-gray-300 mb-3 text-lg font-semibold">
-                      Your Rating
-                    </label>
-                    {renderStars(
-                      userRating,
-                      "text-4xl",
-                      true,
-                      setUserRating,
-                      setHoverRating
-                    )}
-                    {userRating > 0 && (
-                      <p className="text-green-400 mt-2 text-sm">
-                        You rated: {userRating} star{userRating > 1 ? "s" : ""}
-                      </p>
-                    )}
-                  </div>
+                  <div className="relative z-10">
+                    <div className="mb-6">
+                      <label className="block text-gray-300 mb-3 text-lg font-semibold">
+                        Your Rating
+                      </label>
+                      {renderStars(
+                        userRating,
+                        "text-4xl",
+                        true,
+                        setUserRating,
+                        setHoverRating
+                      )}
+                      {userRating > 0 && (
+                        <p className="text-green-400 mt-2 text-sm">
+                          You rated: {userRating} star
+                          {userRating > 1 ? "s" : ""}
+                        </p>
+                      )}
+                    </div>
 
-                  <div className="mb-6">
-                    <label className="block text-gray-300 mb-3 text-lg font-semibold">
-                      Your Review
-                    </label>
-                    <textarea
-                      value={reviewText}
-                      onChange={(e) => setReviewText(e.target.value)}
-                      placeholder="Share your thoughts about this tutor..."
-                      className="w-full bg-gray-900/50 border border-green-500/30 rounded-xl p-4 text-white placeholder-gray-500 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all duration-300 min-h-[120px]"
-                      rows="4"
-                    />
-                  </div>
+                    <div className="mb-6">
+                      <label className="block text-gray-300 mb-3 text-lg font-semibold">
+                        Your Review
+                      </label>
+                      <textarea
+                        value={reviewText}
+                        onChange={(e) => setReviewText(e.target.value)}
+                        placeholder="Share your thoughts about this tutor..."
+                        className="w-full bg-gray-900/50 border border-green-500/30 rounded-xl p-4 text-white placeholder-gray-500 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all duration-300 min-h-[120px]"
+                        rows="4"
+                      />
+                    </div>
 
-                  <button
-                    onClick={handleSubmitReview}
-                    disabled={
-                      isSubmitting ||
-                      userRating === 0 ||
-                      reviewText.trim() === ""
-                    }
-                    className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-xl transition-all duration-300 hover:shadow-xl hover:shadow-green-500/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
-                        Submitting...
-                      </>
+                    {role !== "tutor" ? (
+                      <button
+                        onClick={handleSubmitReview}
+                        disabled={
+                          isSubmitting ||
+                          userRating === 0 ||
+                          reviewText.trim() === ""
+                        }
+                        className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-xl transition-all duration-300 hover:shadow-xl hover:shadow-green-500/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                            Submitting...
+                          </>
+                        ) : (
+                          <>
+                            <IoStar className="text-xl" />
+                            Submit Review
+                          </>
+                        )}
+                      </button>
                     ) : (
-                      <>
-                        <IoStar className="text-xl" />
-                        Submit Review
-                      </>
+                      <span></span>
                     )}
-                  </button>
-                </div>
+                  </div>
 
-                <div className="absolute inset-0 opacity-5 pointer-events-none">
-                  <div
-                    className="absolute inset-0"
-                    style={{
-                      backgroundImage: `linear-gradient(rgba(74, 222, 128, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(74, 222, 128, 0.1) 1px, transparent 1px)`,
-                      backgroundSize: "20px 20px",
-                    }}
-                  ></div>
+                  <div className="absolute inset-0 opacity-5 pointer-events-none">
+                    <div
+                      className="absolute inset-0"
+                      style={{
+                        backgroundImage: `linear-gradient(rgba(74, 222, 128, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(74, 222, 128, 0.1) 1px, transparent 1px)`,
+                        backgroundSize: "20px 20px",
+                      }}
+                    ></div>
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Reviews List */}
               <div className="space-y-4">
@@ -547,7 +556,7 @@ const TutorDetails = () => {
                     <span
                       className={`absolute top-4 right-4 text-xs font-bold px-3 py-1 rounded-full shadow-xl text-white backdrop-blur-md animate-pulse ${(() => {
                         const level = course.level?.trim().toLowerCase();
-                        if (level === "beginner") return "bg-green-500/90";
+                        if (level === "beginer") return "bg-green-500/90";
                         if (level === "intermediate") return "bg-yellow-500/90";
                         if (level === "advanced") return "bg-red-500/90";
                         return "bg-gray-400/90 text-black";
@@ -646,7 +655,8 @@ const TutorDetails = () => {
               </div>
 
               <p className="text-gray-400 mb-6">
-                Help us maintain quality by reporting inappropriate content or violations.
+                Help us maintain quality by reporting inappropriate content or
+                violations.
               </p>
 
               <div className="mb-6">
