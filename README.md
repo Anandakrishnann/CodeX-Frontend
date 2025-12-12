@@ -57,27 +57,21 @@ It provides intuitive course navigation, secure payments, real-time meetings, an
 git clone https://github.com/your-username/codexlearning-frontend.git
 cd codexlearning-frontend
 2️⃣ Install Dependencies
-bash
-Copy code
 npm install
+
 3️⃣ Create Environment File
 Create a .env file in your root folder:
 
-ini
-Copy code
 REACT_APP_API_URL=http://127.0.0.1:8000/api/
 REACT_APP_STRIPE_PUBLIC_KEY=your_stripe_public_key
 REACT_APP_ZEGO_APP_ID=your_zegocloud_app_id
 REACT_APP_ZEGO_SERVER_SECRET=your_zegocloud_secret
+
 4️⃣ Start Development Server
-bash
-Copy code
 npm run dev
 App runs on 👉 http://localhost:5173
 
 📁 Folder Structure
-pgsql
-Copy code
 Frontend/
 └── CodeX/
     ├── src/
