@@ -120,6 +120,10 @@ const CourseModules = () => {
     navigate("/user/courses");
   };
 
+  const Chat = () => {
+    navigate("/user/chat")
+  }
+
   return (
     <Layout page="Courses">
       <div className="p-8 min-h-screen relative z-10  text-white">
@@ -170,7 +174,7 @@ const CourseModules = () => {
           {/* Filter Buttons */}
           <button
             className={`text-xl font-bold px-5 py-2 ml-6 mt-2 bg-white text-black rounded-lg border-2 border-white hover:bg-black hover:text-white transition-all duration-300`}
-            onClick={() => navigate("/user/chat")}
+            onClick={() => Chat()}
           >
             Chat With Tutor
           </button>

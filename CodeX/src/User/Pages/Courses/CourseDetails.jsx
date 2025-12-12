@@ -656,9 +656,13 @@ const CourseDetails = () => {
                 return actions.order.create({
                   purchase_units: [
                     {
+                      reference_id: `COURSE_${course.id}`,
+                      description: course.title,
                       amount: {
                         value: course.price.toString(),
+                        currency_code: "USD",
                       },
+                      custom_id: course.id.toString(),
                     },
                   ],
                 });
@@ -668,17 +672,17 @@ const CourseDetails = () => {
                 const orderID = data.orderID;
 
                 try {
-                  const successRes = await userAxios.post("paypal_success/", {
+                  await userAxios.post("paypal_success/", {
                     user_email: user?.email,
                     course_id: course.id,
                     orderID,
                   });
+
                   toast.success("Payment Successful 🎉 Go to Dashboard");
                   navigate("/user/order-success");
                   handleClose();
                 } catch (error) {
                   toast.error("Payment Verification Failed");
-                  console.error(error);
                 }
               }}
             />

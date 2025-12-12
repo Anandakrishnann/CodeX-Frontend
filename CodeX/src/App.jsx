@@ -68,6 +68,9 @@ import Review from "./User/Review";
 import CourseAnalytics from "./Tutor/Pages/Dashboard/Course/Course/CourseAnalytics";
 import AdminCourseAnalytics from "./Admin/Dashboard/Courses/AdminCourseAnalytics";
 import Report from "./Admin/Dashboard/Reports/Report";
+import TutorWallet from "./Tutor/Pages/Dashboard/Wallet/Wallet";
+import PayoutRequests from "./Admin/Dashboard/PayoutRequests/PayoutRequests";
+import PayoutRequestDetails from "./Admin/Dashboard/PayoutRequests/PayoutRequestDetails";
 
 
 const queryClient = new QueryClient();  // ✅ Fix QueryClient initialization
@@ -144,6 +147,7 @@ function App() {
                   <Route path="/tutor/course" element={<Course />} />
                   <Route path="/tutor/chat" element={<TutorChat />} />
                   <Route path="/tutor/meet" element={<TutorMeeting />} />
+                  <Route path="/tutor/wallet" element={<TutorWallet />} />
                   <Route path="tutor/course/analytics" element={<CourseAnalytics/> } />
                   <Route path="/tutor/course/modules" element={<Modules />} />
                   <Route path="/tutor/course/lessons" element={<Lessons />} />
@@ -162,6 +166,8 @@ function App() {
                   <Route path="/admin/courses/lessons/overview" element={<AdminLessonOverview />} />
                   <Route path="/admin/applications" element={<Applications />} />
                   <Route path="/admin/course-requests" element={<CourseRequests />} />
+                  <Route path="/admin/payout-requests" element={<PayoutRequests />} />
+                  <Route path="/admin/payout-requests-details" element={<PayoutRequestDetails />} />
                   <Route path="/admin/reports" element={<Report />} />
                   <Route path="/admin/plans" element={<Plans />} /> 
                   <Route path="/admin/category" element={<Category />} />

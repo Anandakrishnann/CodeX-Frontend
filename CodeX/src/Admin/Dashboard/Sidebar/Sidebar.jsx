@@ -12,6 +12,7 @@ import ViewListIcon from "@mui/icons-material/ViewList";
 import StarIcon from "@mui/icons-material/Star";
 import LogoutIcon from "@mui/icons-material/Logout";
 import PostAddIcon from "@mui/icons-material/PostAdd";
+import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import { Trash2, Flag } from "lucide-react";
 import { useState } from "react";
 import Loading from "@/User/Components/Loading/Loading";
@@ -70,6 +71,11 @@ export default function Sidebar() {
       path: "/admin/course-requests",
       icon: <PostAddIcon fontSize="medium" className="h-6 w-6" />,
       label: "Coures Requests",
+    },
+    {
+      path: "/admin/payout-requests",
+      icon: <AccountBalanceWalletIcon fontSize="medium" className="h-6 w-6" />,
+      label: "Payout Requests",
     },
     {
       path: "/admin/Reports",

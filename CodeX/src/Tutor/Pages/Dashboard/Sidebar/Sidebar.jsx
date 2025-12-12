@@ -7,7 +7,8 @@ import SchoolIcon from "@mui/icons-material/School";
 import QuestionAnswerIcon from "@mui/icons-material/QuestionAnswer";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
-import CastIcon from '@mui/icons-material/Cast';
+import CastIcon from "@mui/icons-material/Cast";
+import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import { useDispatch } from "react-redux";
 import { userAxios } from "../../../../../axiosConfig";
 import { toast } from "react-toastify";
@@ -16,9 +17,9 @@ import { logoutUser } from "@/redux/slices/userSlice";
 const Sidebar = ({ activeItem, setActiveItem }) => {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
-   const logout = async () => {
+  const logout = async () => {
     try {
       const response = await userAxios.post("logout/");
       dispatch(logoutUser()); // ✅ Update redux state
@@ -110,6 +111,17 @@ const Sidebar = ({ activeItem, setActiveItem }) => {
                 setOpen(false);
               }}
             />
+            <SidebarItem
+              icon={<AccountBalanceWalletIcon />}
+              label="Wallet"
+              activeItem={activeItem}
+              setActiveItem={setActiveItem}
+              onClick={() => {
+                navigate("/tutor/wallet");
+                setOpen(false);
+              }}
+            />
+
             <SidebarItem
               icon={<KeyboardReturnIcon />}
               label="Home"

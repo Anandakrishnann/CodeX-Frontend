@@ -17,11 +17,12 @@ import {
 import Layout from "./Layout/Layout";
 import { tutorAxios } from "../../../../axiosConfig";
 import { useSelector } from "react-redux";
+import Loading from "@/User/Components/Loading/Loading";
 
 const TutorDashboard = () => {
   const [timeOfDay, setTimeOfDay] = useState("");
   const [data, setData] = useState(null);
-  const tutor = useSelector((state) => state.user.user)
+  const tutor = useSelector((state) => state.user.user);
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -41,7 +42,9 @@ const TutorDashboard = () => {
     }
   };
 
-  if (!data) return <div className="text-white p-6">Loading...</div>;
+  if (!data) {
+    return <Loading />;
+  }
 
   const summary = data.summary;
 
@@ -87,10 +90,26 @@ const TutorDashboard = () => {
 
             {/* Quick Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-              <QuickStat icon={<BookOpen className="text-cyan-300" />} value={summary.total_courses} label="Total Courses" />
-              <QuickStat icon={<Users className="text-green-300" />} value={summary.total_students} label="Total Students" />
-              <QuickStat icon={<DollarSign className="text-yellow-300" />} value={`$${summary.total_revenue}`} label="Total Revenue" />
-              <QuickStat icon={<Clock className="text-pink-300" />} value={`${summary.avg_progress}%`} label="Avg Course Progress" />
+              <QuickStat
+                icon={<BookOpen className="text-cyan-300" />}
+                value={summary.total_courses}
+                label="Total Courses"
+              />
+              <QuickStat
+                icon={<Users className="text-green-300" />}
+                value={summary.total_students}
+                label="Total Students"
+              />
+              <QuickStat
+                icon={<DollarSign className="text-yellow-300" />}
+                value={`$${summary.total_revenue}`}
+                label="Total Revenue"
+              />
+              <QuickStat
+                icon={<Clock className="text-pink-300" />}
+                value={`${summary.avg_progress}%`}
+                label="Avg Course Progress"
+              />
             </div>
           </motion.div>
 
@@ -128,19 +147,19 @@ const TutorDashboard = () => {
                   className="flex justify-between items-center bg-white/10 rounded-xl p-4 border border-white/5"
                 >
                   <div>
-                    <p className="text-white font-medium">
-                      {enroll.user}
-                    </p>
+                    <p className="text-white font-medium">{enroll.user}</p>
                     <p className="text-indigo-200 text-sm">{enroll.course}</p>
                   </div>
                   <div className="text-sm text-gray-300">{enroll.date}</div>
-                  <span className={`px-3 py-1.5 text-xs rounded-full ${
-                    enroll.status === "completed"
-                      ? "bg-green-500/20 text-green-300"
-                      : enroll.status === "progress"
-                      ? "bg-blue-500/20 text-blue-300"
-                      : "bg-yellow-500/20 text-yellow-300"
-                  }`}>
+                  <span
+                    className={`px-3 py-1.5 text-xs rounded-full ${
+                      enroll.status === "completed"
+                        ? "bg-green-500/20 text-green-300"
+                        : enroll.status === "progress"
+                        ? "bg-blue-500/20 text-blue-300"
+                        : "bg-yellow-500/20 text-yellow-300"
+                    }`}
+                  >
                     {enroll.status}
                   </span>
                 </div>
