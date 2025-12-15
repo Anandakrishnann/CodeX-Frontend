@@ -14,6 +14,7 @@ import SchoolIcon from "@mui/icons-material/School";
 import WorkIcon from "@mui/icons-material/Work";
 import EmojiObjectsIcon from "@mui/icons-material/EmojiObjects";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+import { TiStarOutline } from "react-icons/ti";
 import { toast } from "react-toastify";
 import Layout from "../Layout/Layout";
 import { RotateCcw } from "lucide-react";
@@ -232,6 +233,66 @@ const TutorView = () => {
                           Experience
                         </p>
                         <p className="text-white">{userData.experience}</p>
+                      </div>
+                      <div className="bg-gradient-to-br from-slate-700/50 to-slate-800/50 p-4 rounded-2xl border border-white/10 shadow-xl">
+                        <div className="flex items-center justify-center gap-2 mb-3">
+                          <TiStarOutline className="text-yellow-400 text-2xl" />
+                          <h3 className="text-lg font-bold text-white">
+                            Subscription
+                          </h3>
+                        </div>
+
+                        <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl p-4 mb-3">
+                          <p className="text-white font-bold text-xl">
+                            {userData.plan_name}
+                          </p>
+                          <p className="text-white/90 text-sm">
+                            {userData.plan_category}
+                          </p>
+                        </div>
+
+                        <div className="space-y-2 text-left">
+                          <div className="flex justify-between text-sm">
+                            <span className="text-gray-400">Plan Type:</span>
+                            <span className="text-white font-semibold">
+                              {userData.plan_type}
+                            </span>
+                          </div>
+                          <div className="flex justify-between text-sm">
+                            <span className="text-gray-400">Price:</span>
+                            <span className="text-emerald-400 font-bold">
+                              ₹{userData.plan_price}
+                            </span>
+                          </div>
+                          <div className="flex justify-between text-sm">
+                            <span className="text-gray-400">Subscribed On:</span>
+                            <span className="text-orange-400 font-semibold">
+                              {new Date(
+                                userData.paln_subscribed
+                              ).toLocaleDateString("en-US", {
+                                day: "2-digit",
+                                month: "long",
+                                year: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}
+                            </span>
+                          </div>
+                          <div className="flex justify-between text-sm">
+                            <span className="text-gray-400">Expires:</span>
+                            <span className="text-orange-400 font-semibold">
+                              {new Date(
+                                userData.plan_expires
+                              ).toLocaleDateString("en-US", {
+                                day: "2-digit",
+                                month: "long",
+                                year: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}
+                            </span>
+                          </div>
+                        </div>
                       </div>
                     </div>
 

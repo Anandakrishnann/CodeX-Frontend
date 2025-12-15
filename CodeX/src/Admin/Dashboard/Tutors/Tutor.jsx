@@ -16,18 +16,20 @@ const Tutors = () => {
   const [tutors, setTutors] = useState([]);
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState("active");
-  const [activeCount, setActiveCount] = useState(0);
-  const [inactiveCount, setInactiveCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const activeCount = tutors.filter((t) => t.status === false).length;
+  const inactiveCount = tutors.filter((t) => t.status === true).length;
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         setLoading(true);
         const response = await adminAxios.get("list_tutors/");
+
         setTutors(response.data.users || []);
       } catch (error) {
         console.error("Error fetching users:", error.response || error);
@@ -57,27 +59,6 @@ const Tutors = () => {
   });
 
   console.log(tutors);
-
-  const toggle_status = async (e, userId) => {
-    e.preventDefault();
-
-    try {
-      setLoading(true);
-      await adminAxios.post("tutor-status/", { id: userId });
-      toast.success("Status Changed Successfully");
-
-      setTutors((prevUsers) =>
-        prevUsers.map((tutors) =>
-          tutors.id === userId ? { ...tutors, status: !tutors.status } : tutors
-        )
-      );
-    } catch (error) {
-      toast.error("User not Found");
-      console.error("Error:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleNavigate = (id) => {
     dispatch(setTutorId(id));

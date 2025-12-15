@@ -13,7 +13,7 @@ import StarIcon from "@mui/icons-material/Star";
 import LogoutIcon from "@mui/icons-material/Logout";
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
-import { Trash2, Flag } from "lucide-react";
+import { Trash2, Flag, HandCoins  } from "lucide-react";
 import { useState } from "react";
 import Loading from "@/User/Components/Loading/Loading";
 
@@ -73,8 +73,13 @@ export default function Sidebar() {
       label: "Coures Requests",
     },
     {
-      path: "/admin/payout-requests",
+      path: "/admin/wallet",
       icon: <AccountBalanceWalletIcon fontSize="medium" className="h-6 w-6" />,
+      label: "Wallet",
+    },
+    {
+      path: "/admin/payout-requests",
+      icon: <HandCoins fontSize="medium" className="h-6 w-6" />,
       label: "Payout Requests",
     },
     {

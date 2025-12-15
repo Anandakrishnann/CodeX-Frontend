@@ -71,6 +71,7 @@ import Report from "./Admin/Dashboard/Reports/Report";
 import TutorWallet from "./Tutor/Pages/Dashboard/Wallet/Wallet";
 import PayoutRequests from "./Admin/Dashboard/PayoutRequests/PayoutRequests";
 import PayoutRequestDetails from "./Admin/Dashboard/PayoutRequests/PayoutRequestDetails";
+import PlatformWallet from "./Admin/Dashboard/PlatformWallet/PlatformWallet";
 
 
 const queryClient = new QueryClient();  // ✅ Fix QueryClient initialization
@@ -166,6 +167,7 @@ function App() {
                   <Route path="/admin/courses/lessons/overview" element={<AdminLessonOverview />} />
                   <Route path="/admin/applications" element={<Applications />} />
                   <Route path="/admin/course-requests" element={<CourseRequests />} />
+                  <Route path="/admin/wallet" element={<PlatformWallet />} />
                   <Route path="/admin/payout-requests" element={<PayoutRequests />} />
                   <Route path="/admin/payout-requests-details" element={<PayoutRequestDetails />} />
                   <Route path="/admin/reports" element={<Report />} />

@@ -214,7 +214,7 @@ const Dashboard = () => {
 const StatCard = ({ title, value, gradient, icon }) => (
   <div className={`relative overflow-hidden bg-gradient-to-br ${gradient} p-6 rounded-2xl shadow-2xl transform hover:scale-105 transition-all duration-300 group`}>
     <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
-    <div className="relative z-10">
+    <div className="relative">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-medium text-white/90 uppercase tracking-wider">{title}</h3>
         <span className="text-3xl opacity-80">{icon}</span>
