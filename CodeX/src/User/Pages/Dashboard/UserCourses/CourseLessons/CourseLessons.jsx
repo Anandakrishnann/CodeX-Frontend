@@ -12,6 +12,7 @@ import { LuActivity } from "react-icons/lu";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import { MdOutlinePendingActions } from "react-icons/md";
 import { userAxios } from "../../../../../../axiosConfig";
+import Loading from "@/User/Components/Loading/Loading";
 
 const CourseLessons = () => {
   const [lessons, setLessons] = useState([]);
@@ -22,6 +23,7 @@ const CourseLessons = () => {
   const [isPending, setIsPending] = useState(0);
   const [isInProgress, setIsInProgress] = useState(0);
   const [isCompleted, setIsCompleted] = useState(0);
+  const [loading, setLoading] = useState(true);
   const user = useSelector((state) => state.user.user);
   const module_id = useSelector((state) => state.user.moduleId);
 
@@ -59,8 +61,18 @@ const CourseLessons = () => {
   };
 
   useEffect(() => {
-    fetchModule();
-    fetchLessons();
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        await Promise.all([
+          fetchModule(),
+          fetchLessons()
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
   }, []);
 
   useEffect(() => {
@@ -111,6 +123,14 @@ const CourseLessons = () => {
   const Module = () => {
     navigate("/user/courses-modules");
   };
+
+  if (loading) {
+    return (
+      <Layout page="Courses">
+        <Loading />
+      </Layout>
+    );
+  }
 
   return (
     <Layout page="Courses">

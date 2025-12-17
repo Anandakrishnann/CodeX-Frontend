@@ -6,12 +6,14 @@ import { Navigate, useNavigate } from "react-router-dom";
 import { setLessonId } from "../../../../../redux/slices/userSlice";
 import { userAxios } from "../../../../../../axiosConfig";
 import { Flag } from "lucide-react";
+import Loading from "@/User/Components/Loading/Loading";
 
 const CourseLessonOverview = () => {
   const [lesson, setLesson] = useState(null);
   const lesson_id = useSelector((state) => state.user.lessonId);
   const [showVideo, setShowVideo] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -21,12 +23,15 @@ const CourseLessonOverview = () => {
 
   const fetchLesson = async () => {
     try {
+      setLoading(true);
       const response = await userAxios.get(`started_lesson/${lesson_id}/`);
       console.log("requestes data", response.data);
 
       setLesson(response.data);
     } catch (error) {
       toast.error("Error While Loading module");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -57,6 +62,14 @@ const CourseLessonOverview = () => {
 
   const Lesson = () => {
     navigate("/user/courses-lessons")
+  }
+
+  if (loading) {
+    return (
+      <Layout page="Courses">
+        <Loading />
+      </Layout>
+    );
   }
 
   return (

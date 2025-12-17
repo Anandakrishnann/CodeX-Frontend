@@ -20,6 +20,7 @@ import {
 import { userAxios } from "../../../../axiosConfig";
 import { useNavigate } from "react-router-dom";
 import { couch } from "globals";
+import Loading from "@/User/Components/Loading/Loading";
 
 const UserDashboard = () => {
   const user = useSelector((state) => state.user.user);
@@ -55,9 +56,7 @@ const UserDashboard = () => {
   if (!dashboardData) {
     return (
       <Layout page={"Home"}>
-        <div className="flex items-center justify-center h-screen text-white">
-          Loading dashboard...
-        </div>
+        <Loading />
       </Layout>
     );
   }

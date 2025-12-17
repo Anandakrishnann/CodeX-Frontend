@@ -8,11 +8,13 @@ import { useDispatch } from "react-redux";
 import { setCourseId } from "../../../redux/slices/userSlice";
 import { motion } from "framer-motion";
 import cover_photo from "../../../assets/cover.png";
+import Loading from "@/User/Components/Loading/Loading";
 
 const Courses = () => {
   const [categories, setCategories] = useState([]);
   const [allCourses, setAllCourses] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [searchParams] = useSearchParams();
   const searchQuery = searchParams.get('search');
   const navigate = useNavigate();
@@ -28,26 +30,23 @@ const Courses = () => {
   };
 
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchData = async () => {
       try {
-        const response = await userAxios.get("categories/");
-        setCategories(response.data);
+        setLoading(true);
+        const [categoriesRes, coursesRes] = await Promise.all([
+          userAxios.get("categories/"),
+          userAxios.get("courses/")
+        ]);
+        setCategories(categoriesRes.data);
+        setAllCourses(coursesRes.data);
       } catch {
-        toast.error("Error While Loading Categories");
+        toast.error("Error While Loading Data");
+      } finally {
+        setLoading(false);
       }
     };
 
-    const fetchCourses = async () => {
-      try {
-        const response = await userAxios.get("courses/");
-        setAllCourses(response.data);
-      } catch {
-        toast.error("Error While Loading Courses");
-      }
-    };
-
-    fetchCategories();
-    fetchCourses();
+    fetchData();
   }, []);
 
   // Create a category lookup map for O(1) access
@@ -100,6 +99,15 @@ const Courses = () => {
   const clearSearch = () => {
     navigate('/courses');
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen relative overflow-hidden font-poppins bg-black">
+        <Navbar />
+        <Loading />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen relative overflow-hidden font-poppins bg-black">

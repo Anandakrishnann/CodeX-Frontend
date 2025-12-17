@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { userAxios } from "../../../../../../axiosConfig";
+import Loading from "@/User/Components/Loading/Loading";
 
 const Certificate = () => {
   const courseId = useSelector((state) => state.user.courseId);
@@ -64,9 +65,7 @@ const Certificate = () => {
           Your Certificate
         </h2> */}
 
-        {loading && (
-          <div className="text-center text-xl">Loading certificate...</div>
-        )}
+        {loading && <Loading />}
 
         {error && (
           <div className="text-center text-xl text-red-500">{error}</div>

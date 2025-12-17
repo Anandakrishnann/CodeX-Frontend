@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { setCourseId } from "../../../redux/slices/userSlice";
 import { toast } from "react-toastify";
 import { Trash2, Flag } from "lucide-react";
+import Loading from "@/User/Components/Loading/Loading";
 
 const TutorDetails = () => {
   const [tutor, setTutor] = useState(null);
@@ -28,6 +29,7 @@ const TutorDetails = () => {
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportReason, setReportReason] = useState("");
   const [isSubmittingReport, setIsSubmittingReport] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const tutor_id = useSelector((state) => state.user.tutorId);
   const user = useSelector((state) => state.user.user);
@@ -69,9 +71,17 @@ const TutorDetails = () => {
   };
 
   useEffect(() => {
-    if (tutor_id) {
-      fetchCourse();
-    }
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        if (tutor_id) {
+          await fetchCourse();
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
   }, [tutor_id]);
 
   useEffect(() => {
@@ -206,6 +216,15 @@ const TutorDetails = () => {
     dispatch(setCourseId(courseId));
     navigate("/courses/details");
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black text-white font-poppins">
+        <Navbar />
+        <Loading />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-black text-white font-poppins">

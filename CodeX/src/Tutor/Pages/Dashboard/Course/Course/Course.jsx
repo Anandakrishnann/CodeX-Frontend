@@ -25,6 +25,7 @@ import "../Course/Course.css";
 import PendingActionsIcon from "@mui/icons-material/PendingActions";
 import { useNavigate } from "react-router-dom";
 import { setCourseId } from "../../../../../redux/slices/userSlice";
+import Loading from "@/User/Components/Loading/Loading";
 
 const Course = () => {
   const [courses, setCourses] = useState([]);
@@ -47,6 +48,7 @@ const Course = () => {
   const [isPending, setIsPending] = useState(0);
   const [isAccepted, setIsAccepted] = useState(0);
   const [isRejected, setIsRejected] = useState(0);
+  const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -90,8 +92,18 @@ const Course = () => {
   }, []);
 
   useEffect(() => {
-    fetchCourses();
-    fetchCoursesRejections()
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        await Promise.all([
+          fetchCourses(),
+          fetchCoursesRejections()
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
   }, [formData, editFormData]);
 
   const fetchCourses = async () => {
@@ -387,6 +399,14 @@ const Course = () => {
     setIsAccepted(accepted);
     setIsRejected(rejected);
   }, [courses, filter]);
+
+  if (loading) {
+    return (
+      <Layout page="Courses">
+        <Loading />
+      </Layout>
+    );
+  }
 
   return (
     <Layout page="Courses">

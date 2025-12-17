@@ -1,19 +1,31 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Calendar, Clock, Users, X, Edit, Trash2 } from "lucide-react";
+import {
+  GraduationCap,
+  Calendar,
+  Clock,
+  Users,
+  X,
+  Edit,
+  Trash2,
+} from "lucide-react";
 import { useSelector } from "react-redux";
 import { tutorAxios, userAxios } from "../../../axiosConfig";
 import { toast } from "react-toastify";
 import { XCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import Loading from "@/User/Components/Loading/Loading";
 
 export default function TutorMeeting() {
   const [activeTab, setActiveTab] = useState("your-meetings");
+  const [activeCourses, setactiveCourses] = useState([]);
+  const [selectedCourse, setSelectedCourse] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
   const [limit, setLimit] = useState("");
+  const [editCourse, setEditCourse] = useState("");
   const [editDate, setEditDate] = useState("");
   const [editTime, setEditTime] = useState("");
   const [editLimit, setEditLimit] = useState("");
@@ -25,6 +37,7 @@ export default function TutorMeeting() {
   const [userBookedMeetings, setUserBookedMeetings] = useState([]);
   const [recentMeetings, setRecentMeetings] = useState([]);
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const role = useSelector((state) => state.user.role);
   const user = useSelector((state) => state.user.user);
@@ -33,15 +46,28 @@ export default function TutorMeeting() {
   const location = window.location.href;
 
   useEffect(() => {
-    if (role === "tutor") {
-      tutorSheduledMeetings();
-      tutorRecentMeetings();
-      tutorSubscribed();
-    } else if (role === "user") {
-      userAvailableMeetings();
-      userBookedMeetingFetch();
-      userRecentMeetings();
-    }
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        if (role === "tutor") {
+          await Promise.all([
+            tutorSheduledMeetings(),
+            tutorRecentMeetings(),
+            tutorSubscribed(),
+            fetchActiveCourses()
+          ]);
+        } else if (role === "user") {
+          await Promise.all([
+            userAvailableMeetings(),
+            userBookedMeetingFetch(),
+            userRecentMeetings()
+          ]);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
   }, [role]);
 
   const tutorSubscribed = async () => {
@@ -62,6 +88,19 @@ export default function TutorMeeting() {
       const response = await userAxios.get("available-meetings/");
       setAvailableMeetings(response.data);
     } catch (error) {}
+  };
+
+  const fetchActiveCourses = async () => {
+    try {
+      const response = await tutorAxios.get("active-courses/");
+      console.log(response.data);
+
+      setactiveCourses(response.data);
+    } catch (error) {
+      toast.error(
+        error.data.error || "something went wrong while fetching active courses"
+      );
+    }
   };
 
   const userBookedMeetingFetch = async () => {
@@ -116,10 +155,12 @@ export default function TutorMeeting() {
       await tutorAxios.post("shedule-meeting/", {
         date: selectedDate,
         time: selectedTime,
+        course: selectedCourse,
         limit: parseInt(limit),
       });
       toast.success("Meeting created successfully!");
       setSelectedDate("");
+      setSelectedCourse("");
       setSelectedTime("");
       setLimit("");
       tutorSheduledMeetings();
@@ -156,7 +197,11 @@ export default function TutorMeeting() {
       userAvailableMeetings();
       userBookedMeetingFetch();
       handleCloseModal();
-    } catch (error) {}
+    } catch (error) {
+      toast.error(
+        error.data.error || "Something went wrong while booking meeting"
+      );
+    }
   };
 
   const handleEditChange = async (meeting_id) => {
@@ -164,10 +209,12 @@ export default function TutorMeeting() {
       await tutorAxios.post("edit-meeting/", {
         meeting_id: meeting_id,
         date: editDate,
+        course: editCourse,
         time: editTime,
         limit: parseInt(editLimit),
       });
       toast.success("Meeting Edited successfully!");
+      setEditCourse("");
       setEditDate("");
       setEditTime("");
       setEditLimit("");
@@ -210,6 +257,24 @@ export default function TutorMeeting() {
   const handleJoinMeeting = (meetId) => {
     navigate(`/room/${meetId}/${user.id}/${user.first_name}`);
   };
+
+  const handleCancelMeeting = async (meetId) => {
+    try {
+      await userAxios.post("cancel-meeting/", { meeting_id: meetId });
+      toast.success("Meeting Cancelled Successfully");
+      userAvailableMeetings();
+      userBookedMeetingFetch();
+      handleCloseModal();
+    } catch (error) {
+      toast.error(
+        error.data.error || "Something went wrong while cancel meeting"
+      );
+    }
+  };
+
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <div className="min-h-screen p-6 relative z-10">
@@ -262,7 +327,7 @@ export default function TutorMeeting() {
                     >
                       <div className="p-6 border-b border-gray-100">
                         <h3 className="text-lg font-bold text-gray-900 mb-1">
-                          {meeting.tutor_name || meeting.name || "Tutor"}
+                          {meeting.course_name}
                         </h3>
                         <span
                           className={`px-3 py-1 text-xs font-semibold rounded-full ${
@@ -271,13 +336,17 @@ export default function TutorMeeting() {
                               : "bg-blue-100 text-blue-800"
                           }`}
                         >
-                          {meeting.left === meeting.limit
-                            ? "Full"
-                            : `${meeting.left} spots left`}
+                          Spot left : {meeting.left}
                         </span>
                       </div>
 
                       <div className="p-6 space-y-4">
+                        <div className="flex items-center text-gray-600">
+                          <GraduationCap className="w-4 h-4 mr-3 text-blue-600" />
+                          <span className="text-sm">
+                            {`Tutor: ${meeting.tutor_name}`}
+                          </span>
+                        </div>
                         <div className="flex items-center text-gray-600">
                           <Calendar className="w-4 h-4 mr-3 text-blue-600" />
                           <span className="text-sm">
@@ -323,6 +392,7 @@ export default function TutorMeeting() {
                                     <button
                                       onClick={() => {
                                         setEditDate(meeting.date);
+                                        setEditCourse(meeting.course);
                                         setEditTime(meeting.time);
                                         setEditLimit(meeting.limit);
                                         setModalData(meeting);
@@ -379,23 +449,50 @@ export default function TutorMeeting() {
                                   `${meeting.date}T${meeting.time}`
                                 );
                                 const currentTime = new Date();
+
+                                // Join condition
                                 const userCanJoin =
                                   currentTime >= meetingDateTime;
 
+                                // Cancel condition (only before 15 minutes)
+                                const cancelDeadline = new Date(
+                                  meetingDateTime.getTime() - 15 * 60 * 1000
+                                );
+                                const userCanCancel =
+                                  currentTime < cancelDeadline;
+
                                 return (
-                                  <button
-                                    className={`w-full py-3 px-4 rounded-lg font-medium transition ${
-                                      userCanJoin
-                                        ? "bg-green-600 hover:bg-green-700 text-white"
-                                        : "bg-gray-300 text-gray-600"
-                                    }`}
-                                    disabled={!userCanJoin}
-                                    onClick={() =>
-                                      handleJoinMeeting(meeting.id)
-                                    }
-                                  >
-                                    Join Meeting
-                                  </button>
+                                  <>
+                                    {/* Join Button */}
+                                    <button
+                                      className={`w-full py-3 px-4 mb-2 rounded-lg font-medium transition ${
+                                        userCanJoin
+                                          ? "bg-green-600 hover:bg-green-700 text-white"
+                                          : "bg-gray-300 text-gray-600"
+                                      }`}
+                                      disabled={!userCanJoin}
+                                      onClick={() =>
+                                        handleJoinMeeting(meeting.id)
+                                      }
+                                    >
+                                      Join Meeting
+                                    </button>
+
+                                    {/* Cancel Button */}
+                                    <button
+                                      className={`w-full py-3 px-4 rounded-lg font-medium transition ${
+                                        userCanCancel
+                                          ? "bg-red-600 hover:bg-red-700 text-white"
+                                          : "bg-gray-300 text-gray-600"
+                                      }`}
+                                      disabled={!userCanCancel}
+                                      onClick={() =>
+                                        handleCancelMeeting(meeting.id)
+                                      }
+                                    >
+                                      Cancel Meeting
+                                    </button>
+                                  </>
                                 );
                               })()}
                           </>
@@ -419,6 +516,27 @@ export default function TutorMeeting() {
                   Create New Meeting
                 </h2>
                 <div className="space-y-6">
+                  <div>
+                    <label className="block mb-1 font-semibold text-sm">
+                      Meeting Course
+                    </label>
+
+                    <select
+                      value={selectedCourse}
+                      onChange={(e) => setSelectedCourse(e.target.value)}
+                      className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-600 bg-white"
+                    >
+                      <option value="" disabled>
+                        Select a course
+                      </option>
+
+                      {activeCourses.map((course) => (
+                        <option key={course.id} value={course.id}>
+                          {course.title}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                   <div>
                     <label className="block mb-1 font-semibold text-sm">
                       Meeting Date
@@ -496,6 +614,12 @@ export default function TutorMeeting() {
 
               <div className="p-6 space-y-3">
                 <div className="flex justify-between text-sm">
+                  <span className="text-md">Course:</span>
+                  <span className="text-black font-bold">
+                    {modalData.course_name}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
                   <span className="font-semibold text-gray-500">Tutor:</span>
                   <span>{modalData.tutor_name}</span>
                 </div>
@@ -551,6 +675,27 @@ export default function TutorMeeting() {
               </div>
 
               <div className="p-6 space-y-4">
+                <div>
+                  <label className="block mb-1 font-semibold text-sm">
+                    Meeting Course
+                  </label>
+
+                  <select
+                    value={editCourse}
+                    onChange={(e) => setEditCourse(e.target.value)}
+                    className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-600 bg-white"
+                  >
+                    <option value="" disabled>
+                      Select a course
+                    </option>
+
+                    {activeCourses.map((course) => (
+                      <option key={course.id} value={course.id}>
+                        {course.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
                 <div>
                   <label className="block text-sm font-medium">Date</label>
                   <input

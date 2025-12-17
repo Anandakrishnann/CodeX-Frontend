@@ -11,6 +11,7 @@ import { IoStar } from "react-icons/io5";
 import { motion } from "framer-motion";
 import { IoMdStarOutline } from "react-icons/io";
 import { Trash2, Flag } from "lucide-react";
+import Loading from "@/User/Components/Loading/Loading";
 
 const CourseDetails = () => {
   const [openSection, setOpenSection] = useState(null);
@@ -33,6 +34,7 @@ const CourseDetails = () => {
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportReason, setReportReason] = useState("");
   const [isSubmittingReport, setIsSubmittingReport] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const course_id = useSelector((state) => state.user.courseId);
   const user = useSelector((state) => state.user.user);
@@ -107,15 +109,27 @@ const CourseDetails = () => {
   };
 
   useEffect(() => {
-    if (course_id) {
-      fetchCourse();
-      fetchFeedback();
-    }
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        if (course_id) {
+          await Promise.all([
+            fetchCourse(),
+            fetchFeedback()
+          ]);
+        }
 
-    if (user && user.email) {
-      checkUserEnrollment();
-      checkIsTutor();
-    }
+        if (user && user.email) {
+          await Promise.all([
+            checkUserEnrollment(),
+            checkIsTutor()
+          ]);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
   }, [course_id, user]);
 
   const handleSubmitReview = async () => {
@@ -247,6 +261,15 @@ const CourseDetails = () => {
   };
 
   const handleClose = () => setShowModal(false);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black text-white font-poppins">
+        <Navbar />
+        <Loading />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-black text-white font-poppins">

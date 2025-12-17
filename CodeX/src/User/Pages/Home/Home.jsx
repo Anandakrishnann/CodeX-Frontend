@@ -9,11 +9,13 @@ import Footer from "../Footer/Footer";
 import { userAxios } from "../../../../axiosConfig";
 import { useDispatch } from "react-redux";
 import { setCourseId } from "../../../redux/slices/userSlice";
+import Loading from "@/User/Components/Loading/Loading";
 
 const Home = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -37,11 +39,14 @@ const Home = () => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
+        setLoading(true);
         const response = await userAxios.get("courses/");
         setCourses(response.data);
         console.log(response.data);
       } catch (error) {
         console.error(error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -52,6 +57,16 @@ const Home = () => {
     dispatch(setCourseId(courseId));
     navigate("/courses/details");
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen relative overflow-hidden font-poppins">
+        <BackgroundAnimation />
+        <Navbar />
+        <Loading />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen relative overflow-hidden font-poppins">

@@ -3,6 +3,7 @@ import Chat from "../../../../Component/Chat/Chat";
 import Layout from "../Layout/Layout";
 import { useSelector } from "react-redux";
 import { chatAxios } from "../../../../../axiosConfig";
+import Loading from "@/User/Components/Loading/Loading";
 
 const UserChat = () => {
   const user = useSelector((state) => state.user.user);
@@ -41,7 +42,7 @@ const UserChat = () => {
       {roomCheckComplete ? (
         <Chat roomId={roomId} currentUserId={user?.id} />
       ) : (
-        <p>Loading chat...</p>
+        <Loading />
       )}
     </Layout>
   );

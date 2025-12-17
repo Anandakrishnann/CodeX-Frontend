@@ -8,6 +8,7 @@ import { LuActivity } from "react-icons/lu";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import { MdOutlinePendingActions } from "react-icons/md";
 import { userAxios } from "../../../../../axiosConfig";
+import Loading from "@/User/Components/Loading/Loading";
 
 const UserCourses = () => {
   const [courses, setCourses] = useState([]);
@@ -16,16 +17,20 @@ const UserCourses = () => {
   const [isPending, setIsPending] = useState(0);
   const [isInProgress, setIsInProgress] = useState(0);
   const [isCompleted, setIsCompleted] = useState(0);
+  const [loading, setLoading] = useState(true);
   const user = useSelector((state) => state.user.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const fetchCourses = async () => {
     try {
+      setLoading(true);
       const response = await userAxios.get("enrolled_courses/");
       setCourses(response.data);
     } catch (error) {
       console.log(error || "Error While Loading Courses");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -69,6 +74,14 @@ const UserCourses = () => {
     dispatch(setCourseId(id));
     navigate("/user/course-certificate");
   };
+
+  if (loading) {
+    return (
+      <Layout page="Courses">
+        <Loading />
+      </Layout>
+    );
+  }
 
   return (
     <Layout page="Courses">
