@@ -11,6 +11,7 @@ import {
   ArrowUpRight,
   ArrowDownRight,
 } from "lucide-react";
+import Swal from "sweetalert2";
 import Tooltip from "@mui/material/Tooltip";
 import { useDispatch, useSelector } from "react-redux";
 import { adminAxios, tutorAxios } from "../../../../../axiosConfig";
@@ -143,6 +144,43 @@ const TutorWallet = () => {
       const errorMessage =
         error.response?.data?.error || "Error while Requesting Payout";
       toast.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const confirmPayoutCancel = (payoutId) => {
+    Swal.fire({
+      title: "Cancel Payout Request?",
+      text: "Are you sure you want to cancel this payout request? This action cannot be undone.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#dc2626",
+      cancelButtonColor: "#9ca3af",
+      confirmButtonText: "Yes, Cancel",
+      cancelButtonText: "No, Keep It",
+      reverseButtons: true,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        handlePayoutCancel(payoutId);
+      }
+    });
+  };
+
+  const handlePayoutCancel = async (id) => {
+    try {
+      setLoading(true);
+
+      await tutorAxios.post("cancel_payout/", { request_id: id });
+
+      toast.success("Payout request cancelled successfully");
+
+      fetchPayoutRequests();
+    } catch (error) {
+      toast.error(
+        error.response?.data?.error ||
+          "Something went wrong while cancelling the payout"
+      );
     } finally {
       setLoading(false);
     }
@@ -406,15 +444,15 @@ const TutorWallet = () => {
                   >
                     <div
                       className={`h-2 w-full transition-all duration-300 group-hover:h-3 ${
-                        payout.status === "Pending"
+                        payout.status === "PENDING"
                           ? "bg-yellow-400"
-                          : payout.status === "Paid"
+                          : payout.status === "PAID"
                           ? "bg-green-500"
                           : "bg-red-500"
                       }`}
                     ></div>
 
-                    <div className="p-6 flex flex-col justify-between h-full">
+                    <div className="p-4 flex flex-col justify-between h-full">
                       <div>
                         <div className="flex justify-between items-start mb-4">
                           <h3 className="text-xl font-bold text-gray-900">
@@ -422,9 +460,9 @@ const TutorWallet = () => {
                           </h3>
                           <span
                             className={`text-xs font-semibold px-3 py-1 rounded-full shadow-sm ${
-                              payout.status === "Pending"
+                              payout.status === "PENDING"
                                 ? "bg-yellow-100 text-yellow-800"
-                                : payout.status === "Paid"
+                                : payout.status === "PAID"
                                 ? "bg-green-100 text-green-800"
                                 : "bg-red-100 text-red-800"
                             }`}
@@ -484,6 +522,17 @@ const TutorWallet = () => {
                                 }
                               )}
                             </span>
+                          </div>
+                          <div className="flex items-end mt-6">
+                            {payout.status === "PENDING" && (
+                              <button
+                                onClick={() => confirmPayoutCancel(payout.id)}
+                                className="flex-1 bg-red-500 text-white py-3 rounded-xl font-bold hover:bg-red-600 transition-all duration-300 shadow-lg hover:shadow-red-500/50"
+                              >
+                                <X className="inline mr-2" size={18} />
+                                Cancel
+                              </button>
+                            )}
                           </div>
                         </div>
                       </div>

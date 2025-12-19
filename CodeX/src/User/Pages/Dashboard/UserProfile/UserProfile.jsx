@@ -5,7 +5,9 @@ import EditNoteIcon from "@mui/icons-material/EditNote";
 import EmailIcon from "@mui/icons-material/Email";
 import PhoneIcon from "@mui/icons-material/Phone";
 import PersonIcon from "@mui/icons-material/Person";
-import { toast } from "sonner";
+import { KeyRound } from "lucide-react";  
+// import { toast } from "sonner";
+import { toast } from "react-toastify";
 import Layout from "../Layout/Layout";
 import { MdEdit } from "react-icons/md";
 import ProfilePictureModal from "../../../../Component/ProfilePictureModal/ProfilePictureModal";
@@ -22,7 +24,13 @@ const UserProfile = () => {
   const [newImage, setNewImage] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [edited, setEdit] = useState({});
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [passwordData, setPasswordData] = useState({
+    oldPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -62,7 +70,7 @@ const UserProfile = () => {
   const handleProfilePictureSubmit = async (e) => {
     e.preventDefault();
     try {
-      setLoading(true)
+      setLoading(true);
       if (selectedFile) {
         const formData = new FormData();
         formData.append("profilePicture", selectedFile);
@@ -82,7 +90,7 @@ const UserProfile = () => {
     } catch (error) {
       toast.error("Failed to upload image");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   };
 
@@ -126,7 +134,7 @@ const UserProfile = () => {
     };
     if (validate(data)) {
       try {
-        setLoading(true)
+        setLoading(true);
         const response = await userAxios.put("edit_user/", data);
         setUserData(response.data);
         toast.success("Profile Edited Successfully");
@@ -142,7 +150,7 @@ const UserProfile = () => {
           toast.error("Request setup failed.");
         }
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     }
   };
@@ -150,13 +158,13 @@ const UserProfile = () => {
   useEffect(() => {
     const fetchUserUser = async () => {
       try {
-        setLoading(true)
+        setLoading(true);
         const response = await userAxios.get("user_profile/");
         setUserData(response.data);
       } catch (error) {
         console.error("Error fetching user data:", error);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     };
 
@@ -173,6 +181,79 @@ const UserProfile = () => {
     );
   }
 
+  const handlePasswordChange = (e) => {
+    const { name, value } = e.target;
+    setPasswordData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmitPassword = async () => {
+    try {
+      setLoading(true);
+      const oldPassword = passwordData.oldPassword.trim();
+      const newPassword = passwordData.newPassword.trim();
+      const confirmPassword = passwordData.confirmPassword.trim();
+
+      console.log(
+        `oldPassword ${oldPassword}`,
+        `newPassword ${newPassword}`,
+        `confirmPassword ${confirmPassword}`
+      );
+
+      if (!oldPassword || !newPassword || !confirmPassword) {
+        toast.error("All fields are required");
+        return;
+      }
+
+      if (newPassword.length < 8) {
+        toast.error("Password must be at least 8 characters");
+        return;
+      }
+
+      if (
+        !/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/.test(
+          newPassword
+        )
+      ) {
+        toast.error(
+          "Password must contain uppercase, lowercase, digit, and special character"
+        );
+        return;
+      }
+
+      if (newPassword !== confirmPassword) {
+        toast.error("Passwords do not match");
+        return;
+      }
+
+      await userAxios.post("change_password/", {
+        old_password: oldPassword,
+        new_password: newPassword,
+        confirm_password: confirmPassword,
+      });
+      console.log(
+        `oldPassword ${oldPassword}`,
+        `newPassword ${newPassword}`,
+        `confirmPassword ${confirmPassword}`
+      );
+
+      setPasswordData({
+        oldPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+
+      toast.success("Password updated successfully");
+      setIsPasswordModalOpen(false);
+    } catch (error) {
+      toast.error(
+        error?.response?.data?.error ||
+          "Something went wrong while updating password"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Layout page={"Profile"}>
       <div className="min-h-screen py-8 px-4">
@@ -185,13 +266,27 @@ const UserProfile = () => {
               </h1>
               <p className="text-gray-400">Manage your personal information</p>
             </div>
-            <button
-              onClick={handleOpenModal}
-              className="bg-gradient-to-r from-green-600 via-green-500 to-green-400 hover:via-green-500 hover:to-green-400 text-white font-bold px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-2 transform hover:scale-105 transition-all duration-300"
-            >
-              <EditNoteIcon />
-              Edit Profile
-            </button>
+            <div className="flex">
+              <button
+                onClick={() => handleOpenModal(userData)}
+                className="bg-gradient-to-r from-green-600 to-emerald-600 
+             hover:from-green-700 hover:to-emerald-700 text-white font-bold px-6 py-3 mr-2 rounded-2xl shadow-2xl flex items-center gap-2 transform hover:scale-105 transition-all duration-300"
+              >
+                <EditNoteIcon />
+                Edit Profile
+              </button>
+              <button
+                onClick={() => setIsPasswordModalOpen(true)}
+                className="bg-gradient-to-r from-green-600 to-emerald-600 
+             hover:from-green-700 hover:to-emerald-700 
+             text-white font-bold px-6 py-3 rounded-2xl 
+             shadow-2xl flex items-center gap-2 
+             transform hover:scale-105 transition-all duration-300"
+              >
+                <KeyRound size={20} />
+                Change Password
+              </button>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -330,6 +425,96 @@ const UserProfile = () => {
                   Save Changes
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {isPasswordModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+          <div className="bg-gradient-to-br from-gray-900 to-black w-full max-w-md rounded-2xl shadow-2xl border-2 border-green-500 overflow-hidden">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-green-500 to-emerald-600 px-6 py-4 flex justify-between items-center">
+              <h2 className="text-white text-2xl font-extrabold">
+                Change Password
+              </h2>
+              <button
+                onClick={() => setIsPasswordModalOpen(false)}
+                className="text-white hover:text-black bg-white/20 hover:bg-white rounded-full p-2 transition-all duration-200"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="p-6 space-y-5">
+              <div>
+                <span className="block text-white text-sm font-semibold mb-2 uppercase tracking-wide">
+                  Old Password
+                </span>
+                <input
+                  type="password"
+                  name="oldPassword"
+                  value={passwordData.oldPassword}
+                  onChange={handlePasswordChange}
+                  placeholder="Enter your old password"
+                  className="w-full px-4 py-3 bg-white/10 border-2 border-white/20 rounded-lg text-white placeholder-gray-400 focus:border-green-500 focus:outline-none transition-all duration-200"
+                />
+              </div>
+
+              <div>
+                <span className="block text-white text-sm font-semibold mb-2 uppercase tracking-wide">
+                  New Password
+                </span>
+                <input
+                  type="password"
+                  name="newPassword"
+                  value={passwordData.newPassword}
+                  onChange={handlePasswordChange}
+                  placeholder="Enter your new password"
+                  className="w-full px-4 py-3 bg-white/10 border-2 border-white/20 rounded-lg text-white placeholder-gray-400 focus:border-green-500 focus:outline-none transition-all duration-200"
+                />
+              </div>
+
+              <div>
+                <span className="block text-white text-sm font-semibold mb-2 uppercase tracking-wide">
+                  Confirm Password
+                </span>
+                <input
+                  type="password"
+                  name="confirmPassword"
+                  value={passwordData.confirmPassword}
+                  onChange={handlePasswordChange}
+                  placeholder="Confirm your new password"
+                  className="w-full px-4 py-3 bg-white/10 border-2 border-white/20 rounded-lg text-white placeholder-gray-400 focus:border-green-500 focus:outline-none transition-all duration-200"
+                />
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="flex justify-end gap-3 px-6 py-4 bg-black/50 border-t-2 border-white/10">
+              <button
+                onClick={() => setIsPasswordModalOpen(false)}
+                className="px-6 py-3 rounded-lg bg-white/10 text-white font-bold border-2 border-white/20 hover:bg-red-600 hover:text-white transition-all duration-300"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSubmitPassword}
+                className="px-6 py-3 rounded-lg bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold hover:from-green-600 hover:to-emerald-700 transition-all duration-300 shadow-lg hover:shadow-green-500/50"
+              >
+                Update Password
+              </button>
             </div>
           </div>
         </div>
