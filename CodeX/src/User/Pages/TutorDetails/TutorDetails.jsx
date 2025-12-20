@@ -50,7 +50,7 @@ const TutorDetails = () => {
 
   const fetchCourse = async () => {
     try {
-      const response = await userAxios.get(`tutor_details/${tutor_id}/`);
+      const response = await userAxios.get(`tutor-details/${tutor_id}/`);
       setTutor(response.data.tutor);
       setCourses(response.data.courses);
       setTutorId(response.data.tutor.id);

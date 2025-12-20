@@ -135,7 +135,7 @@ const UserProfile = () => {
     if (validate(data)) {
       try {
         setLoading(true);
-        const response = await userAxios.put("edit_user/", data);
+        const response = await userAxios.put("edit-user/", data);
         setUserData(response.data);
         toast.success("Profile Edited Successfully");
         setIsModalOpen(false);
@@ -159,7 +159,7 @@ const UserProfile = () => {
     const fetchUserUser = async () => {
       try {
         setLoading(true);
-        const response = await userAxios.get("user_profile/");
+        const response = await userAxios.get("user-profile/");
         setUserData(response.data);
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -193,11 +193,6 @@ const UserProfile = () => {
       const newPassword = passwordData.newPassword.trim();
       const confirmPassword = passwordData.confirmPassword.trim();
 
-      console.log(
-        `oldPassword ${oldPassword}`,
-        `newPassword ${newPassword}`,
-        `confirmPassword ${confirmPassword}`
-      );
 
       if (!oldPassword || !newPassword || !confirmPassword) {
         toast.error("All fields are required");
@@ -225,16 +220,11 @@ const UserProfile = () => {
         return;
       }
 
-      await userAxios.post("change_password/", {
+      await userAxios.post("change-password/", {
         old_password: oldPassword,
         new_password: newPassword,
         confirm_password: confirmPassword,
       });
-      console.log(
-        `oldPassword ${oldPassword}`,
-        `newPassword ${newPassword}`,
-        `confirmPassword ${confirmPassword}`
-      );
 
       setPasswordData({
         oldPassword: "",
@@ -300,7 +290,7 @@ const UserProfile = () => {
                     <div className="relative">
                       <img
                         src={
-                          userData.profile_picture ||
+                          userData.profile-picture ||
                           "https://i.pinimg.com/736x/de/0a/47/de0a470a4617bb6272ad32dea7c497ce.jpg"
                         }
                         alt={userData.first_name}

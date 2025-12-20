@@ -15,7 +15,6 @@ const Login = () => {
     try {
       const response = await userAxios.post("login/", { email, password });
 
-      console.log("Login successful:", response.data);
       if (response.status === 200) {
         dispatch(loginUser(response.data.user));
         toast.success("Login Successful!");
@@ -25,7 +24,6 @@ const Login = () => {
         navigate("/");
       }
     } catch (error) {
-      console.error("Login failed:", error.response?.data || error.message);
       toast.error("Invalid email or password. Please try again.");
     }
   };

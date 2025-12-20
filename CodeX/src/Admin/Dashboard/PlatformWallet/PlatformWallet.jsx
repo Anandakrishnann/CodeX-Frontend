@@ -32,7 +32,6 @@ const PlatformWallet = () => {
     try {
       setLoading(true);
       const response = await adminAxios.get("platform-wallet/");
-      console.log(response.data);
 
       setWalletData(response.data.wallet);
       setTransactions(response.data.transactions);

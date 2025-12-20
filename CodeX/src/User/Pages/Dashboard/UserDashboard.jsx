@@ -38,7 +38,7 @@ const UserDashboard = () => {
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
-        const response = await userAxios.get("user_dashboard/");
+        const response = await userAxios.get("user-dashboard/");
         setDashboardData(response.data);
         console.log(response.data);
         

@@ -17,7 +17,6 @@ export const NotificationProvider = ({ children, userType = "user" }) => {
       setLoading(true);
       // GET /notifications/
       const response = await notificationAxios.get("");
-      console.log("[Notifications] GET response:", response.status, response.data);
       const data = Array.isArray(response.data) ? response.data : response.data?.results || [];
       setNotifications(data);
       
@@ -25,7 +24,6 @@ export const NotificationProvider = ({ children, userType = "user" }) => {
       const unread = data.filter((n) => !n.is_read).length;
       setUnreadCount(unread);
     } catch (error) {
-      console.error("Error fetching notifications:", error);
       setNotifications([]);
       setUnreadCount(0);
     } finally {
@@ -37,7 +35,6 @@ export const NotificationProvider = ({ children, userType = "user" }) => {
     try {
       // PATCH /notifications/{id}/read/
       const res = await notificationAxios.patch(`${notificationId}/read/`);
-      console.log(`(Notifications) PATCH ${notificationId}/read/ ->`, res.status, res.data);
       setNotifications((prev) =>
         prev.map((n) =>
           n.id === notificationId ? { ...n, is_read: true } : n
@@ -45,19 +42,18 @@ export const NotificationProvider = ({ children, userType = "user" }) => {
       );
       setUnreadCount((prev) => Math.max(0, prev - 1));
     } catch (error) {
-      console.error("Error marking notification as read:", error);
+      // Error marking notification as read
     }
   }, []);
 
   const markAllAsRead = useCallback(async () => {
     try {
       // POST /notifications/mark-all-read/
-      const res = await notificationAxios.post("mark-all-read/");
-      console.log("[Notifications] POST mark-all-read/ ->", res.status, res.data);
+      await notificationAxios.post("mark-all-read/");
       setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
       setUnreadCount(0);
     } catch (error) {
-      console.error("Error marking all notifications as read:", error);
+      // Error marking all notifications as read
     }
   }, []);
 

@@ -41,14 +41,12 @@ const Courses = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  console.log(tutor.email);
 
   const fetchCourses = async () => {
     try {
       setLoading(true);
-      const response = await adminAxios.get("list_courses/");
+      const response = await adminAxios.get("list-courses/");
       setCourses(response.data);
-      console.log(response.data);
     } catch (error) {
       toast.error("Error While Fetching Data");
       console.error(error);
@@ -66,7 +64,7 @@ const Courses = () => {
 
     try {
       setLoading(true);
-      const response = await adminAxios.post(`course_status/${course_id}/`);
+      const response = await adminAxios.post(`course-status/${course_id}/`);
       toast.success(response.data?.message || "Status Changed Successfully");
 
       fetchCourses();
@@ -85,7 +83,7 @@ const Courses = () => {
   const setDraft = async (id) => {
     try {
       setLoading(true);
-      await adminAxios.post(`set_draft/${id}/`);
+      await adminAxios.post(`set-draft/${id}/`);
       toast.success("Course set to Draft");
       fetchCourses();
     } catch (error) {

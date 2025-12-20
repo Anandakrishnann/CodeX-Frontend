@@ -21,7 +21,6 @@ const AdminCourseAnalytics = () => {
         setLoading(true)
         const response = await tutorAxios.get(`course-monthly-trends/${course_id}/`);
         const data = response.data;
-        console.log(data);
 
         setAnalyticsData({
           totalUsers: data.total_users,

@@ -37,7 +37,6 @@ const Chat = ({ roomId: initialRoomId, currentUserId }) => {
     }
   }, [messages]);
 
-  console.log("user details from sender:", user);
 
   const connectWebSocket = () => {
     if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
@@ -105,7 +104,6 @@ const Chat = ({ roomId: initialRoomId, currentUserId }) => {
     if (!selectedRoomId) return;
     try {
       const data = await chatAxios.get(`messages/${selectedRoomId}/`);
-      console.log("Messages:", data.data);
       setMessages(Array.isArray(data.data) ? data.data : []);
     } catch (error) {
       console.error("Error while fetching messages:", error);
@@ -115,16 +113,12 @@ const Chat = ({ roomId: initialRoomId, currentUserId }) => {
   const fetchRooms = async () => {
     try {
       const response = await chatAxios.get("rooms/");
-      console.log("Rooms response:", JSON.stringify(response.data, null, 2));
       const roomsData = Array.isArray(response.data) ? response.data : [];
 
       const enrichedRooms = await Promise.all(
         roomsData.map(async (room) => {
           if (!room.receiver_name) {
-            console.warn(
-              `Room ${room.id} has undefined receiver_name:`,
-              JSON.stringify(room, null, 2)
-            );
+            // Room missing receiver_name
           }
           const summary = await fetchRoomSummary(room.id);
           return {
@@ -161,7 +155,6 @@ const Chat = ({ roomId: initialRoomId, currentUserId }) => {
   const fetchRoomSummary = async (roomId) => {
     try {
       const response = await chatAxios.get(`room_summary/${roomId}/`);
-      console.log(`Room summary response for room ${roomId}:`, response.data);
       return response.data;
     } catch (error) {
       console.error(`Error fetching room summary for room ${roomId}:`, error);
@@ -228,7 +221,6 @@ const Chat = ({ roomId: initialRoomId, currentUserId }) => {
       }, 1000);
     } else {
       const payload = { message, sender_id: currentUserId };
-      console.log("Sending message:", payload);
       socketRef.current.send(JSON.stringify(payload));
       setMessage("");
     }
@@ -255,7 +247,6 @@ const Chat = ({ roomId: initialRoomId, currentUserId }) => {
     ? `${user.first_name} ${user.last_name}`.trim()
     : "You";
 
-  console.log(rooms);
 
   const sortedRooms = [...rooms]
     .filter((room) => {

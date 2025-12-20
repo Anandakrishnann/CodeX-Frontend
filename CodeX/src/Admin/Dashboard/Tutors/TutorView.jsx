@@ -25,12 +25,11 @@ const TutorView = () => {
   const tutorId = useSelector((state) => state.user.tutorId);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(false);
-  console.log(userData);
 
   const fetchUserData = async () => {
     try {
       setLoading(true);
-      const response = await adminAxios.get(`tutor_view/${tutorId}/`);
+      const response = await adminAxios.get(`tutor-view/${tutorId}/`);
       setUserData(response.data);
     } catch (error) {
       console.error("Error fetching user data:", error);

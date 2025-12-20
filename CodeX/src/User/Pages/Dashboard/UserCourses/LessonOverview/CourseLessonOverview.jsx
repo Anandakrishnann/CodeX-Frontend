@@ -24,7 +24,7 @@ const CourseLessonOverview = () => {
   const fetchLesson = async () => {
     try {
       setLoading(true);
-      const response = await userAxios.get(`started_lesson/${lesson_id}/`);
+      const response = await userAxios.get(`started-lesson/${lesson_id}/`);
       console.log("requestes data", response.data);
 
       setLesson(response.data);
@@ -41,7 +41,7 @@ const CourseLessonOverview = () => {
 
   const handleCompleteLesson = async (lesson_id) => {
     try {
-      const response = await userAxios.post("complete_lesson/", {
+      const response = await userAxios.post("complete-lesson/", {
         lesson_id,
       });
       dispatch(setLessonId(lesson_id));

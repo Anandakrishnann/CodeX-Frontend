@@ -16,7 +16,6 @@ const Table = ({ datas, fucntions, columns, name }) => {
   const [searchQuery, setSearchQuery] = useState("")
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  console.log(datas);
 
   const handleEditClick = (user) => {
     setSelectedUser(user);

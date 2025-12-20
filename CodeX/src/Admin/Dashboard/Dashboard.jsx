@@ -12,9 +12,8 @@ const Dashboard = () => {
     const fetchAnalytics = async () => {
       try {
         setLoading(true)
-        const response = await adminAxios.get("admin_dashboard/");
+        const response = await adminAxios.get("admin-dashboard/");
         setAnalytics(response.data);
-        console.log(response.data);
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
       } finally {

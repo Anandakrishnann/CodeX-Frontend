@@ -65,7 +65,7 @@ const Course = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await adminAxios.get("list_category/");
+        const response = await adminAxios.get("list-category/");
         setCategories(response.data);
       } catch (error) {
         toast.error("Error While Fetching Category");
@@ -108,7 +108,7 @@ const Course = () => {
 
   const fetchCourses = async () => {
     try {
-      const response = await tutorAxios.get("list_course/");
+      const response = await tutorAxios.get("list-course/");
       setCourses(response.data);
     } catch (error) {
       toast.error("Error While Fetching Data");
@@ -117,7 +117,7 @@ const Course = () => {
 
   const fetchCoursesRejections = async () => {
     try {
-      const response = await tutorAxios.get("course_rejections/");
+      const response = await tutorAxios.get("course-rejections/");
       setCoursesRejections(response.data);
     } catch (error) {
       toast.error("Error While Fetching Data");
@@ -294,7 +294,7 @@ const Course = () => {
           };
           console.log("data  ", data);
 
-          const response = await tutorAxios.post("create_course/", data);
+          const response = await tutorAxios.post("create-course/", data);
 
           toast.success("Course Added Successfully");
           toast.success("Wait for the Admin Approval");
@@ -331,7 +331,7 @@ const Course = () => {
           price: parseFloat(editFormData.price).toFixed(2), // Ensure price is formatted
         };
         console.log("Sending edit data:", data); // Debugging
-        await tutorAxios.put(`edit_course/${selectedData}/`, data);
+        await tutorAxios.put(`edit-course/${selectedData}/`, data);
         toast.success("Course Updated Successfully");
         fetchCourses();
         setEditStep(1);
@@ -360,7 +360,7 @@ const Course = () => {
 
   const setDraft = async (id) => {
     try {
-      await tutorAxios.post(`set_draft/${id}/`);
+      await tutorAxios.post(`set-draft/${id}/`);
       toast.success("Course set to Draft");
       fetchCourses();
     } catch (error) {
@@ -371,7 +371,7 @@ const Course = () => {
   const toggle_status = async (e, course_id) => {
     e.preventDefault();
     try {
-      await tutorAxios.post(`course_status/${course_id}/`);
+      await tutorAxios.post(`course-status/${course_id}/`);
       toast.success("Status Changed Successfully");
       fetchCourses();
     } catch (error) {

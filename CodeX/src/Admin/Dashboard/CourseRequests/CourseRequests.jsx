@@ -33,16 +33,11 @@ const CourseRequests = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  console.log(tutor.email);
-  console.log("selected data", selectedData);
-  console.log("rejection Reason", rejectionReason);
-  console.log("pending data", pendingCourseRequests);
-  console.log("rejected data", rejectedCourseRequests);
 
   const fetchCourseRequests = async () => {
     try {
       setLoading(true);
-      const response = await adminAxios.get("list_course_request/");
+      const response = await adminAxios.get("list-course-request/");
       const data = response.data;
 
       const pending = data.filter((course) => course.status === "pending");
@@ -60,8 +55,6 @@ const CourseRequests = () => {
 
       setIsPendingRequests(pendingRequests);
       setIsRejectedRequests(rejectedRequests);
-
-      console.log(response.data);
     } catch (error) {
       toast.error("Error While Fetching Data");
       console.error(error);
@@ -118,7 +111,7 @@ const CourseRequests = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      await adminAxios.post(`accept_course_request/${courseId}/`);
+      await adminAxios.post(`accept-course-request/${courseId}/`);
       toast.success("Course Accepted Successfully");
       fetchCourseRequests();
     } catch (error) {
@@ -138,7 +131,7 @@ const CourseRequests = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      await adminAxios.post(`reject_course_request/${selectedData}/`, {
+      await adminAxios.post(`reject-course-request/${selectedData}/`, {
         reason: rejectionReason,
       });
       toast.success("Course Rejected Successfully");

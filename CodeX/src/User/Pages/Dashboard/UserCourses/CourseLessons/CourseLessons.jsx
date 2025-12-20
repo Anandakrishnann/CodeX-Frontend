@@ -39,7 +39,7 @@ const CourseLessons = () => {
 
   const fetchModule = async () => {
     try {
-      const response = await userAxios.get(`started_module/${module_id}/`);
+      const response = await userAxios.get(`started-module/${module_id}/`);
       console.log("requestes data", response.data);
 
       setModule(response.data);
@@ -50,7 +50,7 @@ const CourseLessons = () => {
 
   const fetchLessons = async () => {
     try {
-      const response = await userAxios.get("started_module_lessons/", {
+      const response = await userAxios.get("started-module-lessons/", {
         params: { module_id },
       });
       console.log("requested data", response.data);
@@ -96,7 +96,7 @@ const CourseLessons = () => {
 
   const handleStartLesson = async (lesson_id) => {
     try {
-      const response = await userAxios.post(`start_lesson/`, { lesson_id });
+      const response = await userAxios.post(`start-lesson/`, { lesson_id });
 
       dispatch(setLessonId(lesson_id));
       setSelectedData(lesson_id);

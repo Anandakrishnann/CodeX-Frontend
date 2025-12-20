@@ -47,7 +47,7 @@ const Login = () => {
     try {
       setLoading(true);
 
-      const verified = await userAxios.get(`google_verified/${email}/`);
+      const verified = await userAxios.get(`google-verified/${email}/`);
 
       if (verified.status === 201) {
         toast.error(
@@ -78,7 +78,6 @@ const Login = () => {
         }
       }
     } catch (error) {
-      console.error("Login error:", error);
       toast.error("❌ Invalid email or password. Please try again.");
     } finally {
       setLoading(false);
@@ -93,10 +92,6 @@ const Login = () => {
     const token = credentialResponse?.credential;
 
     if (!token || typeof token !== "string") {
-      console.error(
-        "Frontend Debug: ❌ Invalid token received from Google OAuth:",
-        token
-      );
       return;
     }
 
@@ -117,10 +112,6 @@ const Login = () => {
         navigate("/");
       }
     } catch (error) {
-      console.error(
-        "Frontend Debug: Google login error from backend:",
-        error.response?.data || error.message || error
-      );
       toast.error(
         error.response?.data?.error || "Google login failed. Please try again."
       );
@@ -128,9 +119,7 @@ const Login = () => {
   };
 
   const handleError = () => {
-    console.error(
-      "Frontend Debug: Google Login Failed: onError callback fired."
-    );
+    // Google login error handled silently
   };
 
   return (

@@ -22,7 +22,6 @@ const Plans = () => {
   });
   const [loading, setLoading] = useState(false);
 
-  console.log(formData);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -67,7 +66,7 @@ const Plans = () => {
     try {
       if (validateForm(formData)) {
         setLoading(true);
-        const response = await adminAxios.post("create_plan/", formData);
+        const response = await adminAxios.post("create-plan/", formData);
         toast.success("Plan Created Successfully");
         setPlan((prev) => [...prev, response.data]);
         setIsModalOpen(false);
@@ -83,7 +82,7 @@ const Plans = () => {
     const fetchPlans = async () => {
       try {
         setLoading(true);
-        const response = await adminAxios.get("list_plan/");
+        const response = await adminAxios.get("list-plan/");
         setPlan(response.data);
       } catch (e) {
         toast.error("Error When Fetching Data");

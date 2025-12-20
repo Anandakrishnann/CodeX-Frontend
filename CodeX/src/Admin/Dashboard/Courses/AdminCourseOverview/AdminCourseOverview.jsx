@@ -28,11 +28,6 @@ const AdminCourseOverview = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  console.log("id", id);
-  console.log("selected data", selectedData);
-  console.log("rejection Reason", rejectionReason);
-  console.log(modules);
-  console.log("course data", course);
 
   useEffect(() => {
     const pending = modules.filter((c) => c.status === "pending").length;
@@ -54,7 +49,7 @@ const AdminCourseOverview = () => {
     const fetchCourseDetails = async () => {
       try {
         setLoading(true)
-        const response = await adminAxios.get(`view_course/${id}/`);
+        const response = await adminAxios.get(`view-course/${id}/`);
         setCourse(response.data);
       } catch (error) {
         toast.error("Error while fetching course details");
@@ -71,8 +66,7 @@ const AdminCourseOverview = () => {
   const fetchModules = async () => {
     try {
       setLoading(true);
-      const response = await adminAxios.get(`course_modules/${id}/`);
-      console.log(response.data);
+      const response = await adminAxios.get(`course-modules/${id}/`);
       setModules(response.data);
     } catch (error) {
       toast.error("Error while fetching Modules details");
@@ -90,7 +84,7 @@ const AdminCourseOverview = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      await adminAxios.post(`accept_module/${id}/`);
+      await adminAxios.post(`accept-module/${id}/`);
       toast.success("Module Accepted Successfully");
       fetchModules();
     } catch (error) {
@@ -110,7 +104,7 @@ const AdminCourseOverview = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      await adminAxios.post(`reject_module/${selectedData}/`, {
+      await adminAxios.post(`reject-module/${selectedData}/`, {
         reason: rejectionReason,
       });
       toast.success("Module Rejected Successfully");
@@ -135,7 +129,7 @@ const AdminCourseOverview = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      await adminAxios.post(`module_status/${id}/`);
+      await adminAxios.post(`module-status/${id}/`);
       toast.success("Status Updated Successfully");
       fetchModules();
     } catch (error) {

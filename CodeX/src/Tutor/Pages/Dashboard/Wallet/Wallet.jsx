@@ -132,7 +132,7 @@ const TutorWallet = () => {
         amount: amount,
       };
 
-      await tutorAxios.post("request_payout/", data);
+      await tutorAxios.post("request-payout/", data);
       toast.success("Payout Request Submitted Successfully");
 
       setPayoutFormData({ upiId: "", bankName: "", amount: "" });
@@ -171,7 +171,7 @@ const TutorWallet = () => {
     try {
       setLoading(true);
 
-      await tutorAxios.post("cancel_payout/", { request_id: id });
+      await tutorAxios.post("cancel-payout/", { request_id: id });
 
       toast.success("Payout request cancelled successfully");
 

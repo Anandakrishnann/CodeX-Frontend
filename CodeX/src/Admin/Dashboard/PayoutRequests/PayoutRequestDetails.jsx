@@ -27,7 +27,6 @@ const PayoutRequestDetails = () => {
   const [tutorData, setTutorData] = useState(null);
 
   const requestId = useSelector((state) => state.user.payoutRequestId);
-  console.log("requested id", requestId.id);
 
   const navigate = useNavigate();
 
@@ -40,7 +39,6 @@ const PayoutRequestDetails = () => {
       const response = await adminAxios.get(
         `payout-request-details/${requestId.id}`
       );
-      console.log("response", response.data);
 
       setTutorData(response.data.tutor_data);
       setTransactions(response.data.transactions);

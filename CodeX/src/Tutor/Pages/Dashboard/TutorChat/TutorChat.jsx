@@ -8,7 +8,6 @@ const TutorChat = () => {
   const user = useSelector((state) => state.user.user);
   const role = useSelector((state) => state.user.role)
   const tutor = useSelector((state) => state.user.tutorId)
-  console.log(tutor)
   const [roomId, setRoomId] = useState(null);
 
   return (

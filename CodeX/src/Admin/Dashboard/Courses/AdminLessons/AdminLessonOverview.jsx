@@ -22,8 +22,7 @@ const AdminLessonOverview = () => {
   const fetchLessons = async () => {
     try {
       setLoading(true);
-      const response = await adminAxios.get(`lesson_overview/${id}/`);
-      console.log(response.data);
+      const response = await adminAxios.get(`lesson-overview/${id}/`);
       setLesson(response.data);
     } catch (error) {
       toast.error("Error while fetching Lessons details");

@@ -37,7 +37,7 @@ const CourseModules = () => {
 
   const fetchCourse = async () => {
     try {
-      const response = await userAxios.get(`started_course/${course_id}/`);
+      const response = await userAxios.get(`started-course/${course_id}/`);
       console.log("requestes data", response.data);
 
       setCourse(response.data);
@@ -48,7 +48,7 @@ const CourseModules = () => {
 
   const fetchTutor = async () => {
     try {
-      const response = await userAxios.get(`course_tutor/${course_id}/`);
+      const response = await userAxios.get(`course-tutor/${course_id}/`);
       console.log("requestes data of tutor", response.data);
 
       setTutor(response.data);
@@ -60,7 +60,7 @@ const CourseModules = () => {
 
   const fetchModules = async () => {
     try {
-      const response = await userAxios.get("course_modules/", {
+      const response = await userAxios.get("course-modules/", {
         params: { course_id },
       });
       console.log("requested data", response.data);
@@ -118,7 +118,7 @@ const CourseModules = () => {
     }
 
     try {
-      const response = await userAxios.post("start_module/", { module_id });
+      const response = await userAxios.post("start-module/", { module_id });
       dispatch(setModuleId(module_id));
       fetchModules();
       navigate("/user/courses-lessons");

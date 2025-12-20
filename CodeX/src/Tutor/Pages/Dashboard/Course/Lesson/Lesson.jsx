@@ -41,7 +41,7 @@ const Lessons = () => {
     const fetchModuleDetails = async () => {
       try {
         setLoading(true);
-        const response = await tutorAxios.get(`view_module/${id}/`);
+        const response = await tutorAxios.get(`view-module/${id}/`);
         setModule(response.data);
       } catch (error) {
         toast.error("Error while fetching Module details");
@@ -58,7 +58,7 @@ const Lessons = () => {
   const fetchLessons = async () => {
     try {
       setLoading(true);
-      const response = await tutorAxios.get(`course_lessons/${id}/`);
+      const response = await tutorAxios.get(`course-lessons/${id}/`);
       setLessons(response.data);
     } catch (error) {
       toast.error("Error while fetching Lessons details");
@@ -182,7 +182,7 @@ const Lessons = () => {
       console.log("Form Payload:", formPayload, "Module ID:", id);
       toast.info("Uploading lesson...");
 
-      const response = await tutorAxios.post("create_lesson/", formPayload, {
+      const response = await tutorAxios.post("create-lesson/", formPayload, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
@@ -220,7 +220,7 @@ const Lessons = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      await tutorAxios.post(`lesson_status/${id}/`);
+      await tutorAxios.post(`lesson-status/${id}/`);
       toast.success("Status Updated Successfully");
       fetchLessons();
     } catch (error) {
@@ -284,7 +284,7 @@ const Lessons = () => {
 
       toast.info("Updating lesson...");
 
-      await tutorAxios.put(`edit_lesson/${selectedData}/`, formPayload);
+      await tutorAxios.put(`edit-lesson/${selectedData}/`, formPayload);
 
       toast.success("Lesson Edited Successfully");
       fetchLessons();

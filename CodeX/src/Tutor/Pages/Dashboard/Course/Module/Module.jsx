@@ -40,7 +40,7 @@ const Modules = () => {
     const fetchCourseDetails = async () => {
       try {
         setLoading(true);
-        const response = await tutorAxios.get(`view_course/${id}/`);
+        const response = await tutorAxios.get(`view-course/${id}/`);
         setCourse(response.data);
       } catch (error) {
         toast.error("Error while fetching course details");
@@ -57,7 +57,7 @@ const Modules = () => {
   const fetchModules = async () => {
     try {
       setLoading(true);
-      const response = await tutorAxios.get(`course_modules/${id}/`);
+      const response = await tutorAxios.get(`course-modules/${id}/`);
       console.log(response.data);
       setModules(response.data);
     } catch (error) {
@@ -111,7 +111,7 @@ const Modules = () => {
 
         setLoading(true);
 
-        const response = await tutorAxios.post("create_module/", data);
+        const response = await tutorAxios.post("create-module/", data);
         toast.success("Module Added Successfully Create Lessons");
         toast.success("Wait for the Admin Approval");
         setModules((prevModules) => [...prevModules, response.data]);
@@ -137,7 +137,7 @@ const Modules = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      await tutorAxios.post(`module_status/${id}/`);
+      await tutorAxios.post(`module-status/${id}/`);
       toast.success("Status Updated Successfully");
       fetchModules();
     } catch (error) {
@@ -168,7 +168,7 @@ const Modules = () => {
     try {
       if (validateForm(editFormData)) {
         setLoading(true);
-        await tutorAxios.put(`edit_module/${selectedData}/`, editFormData);
+        await tutorAxios.put(`edit-module/${selectedData}/`, editFormData);
         toast.success("Module Edited Successfully");
         fetchModules();
         setIsEditModalOpen(false);

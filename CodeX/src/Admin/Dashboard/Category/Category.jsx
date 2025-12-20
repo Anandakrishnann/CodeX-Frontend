@@ -24,9 +24,6 @@ const Category = () => {
   const [selectedData, setSelectedData] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false)
-  console.log(selectedData);
-
-  console.log(category);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -65,7 +62,7 @@ const Category = () => {
     const fetchCategories = async () => {
       try {
         setLoading(true)
-        const response = await adminAxios.get("list_category/");
+        const response = await adminAxios.get("list-category/");
         setCategory(response.data);
       } catch (e) {
         toast.error("Error While Fetching Data");
@@ -97,9 +94,8 @@ const Category = () => {
     try {
       if (validateForm(formData)) {
         setLoading(true)
-        const response = await adminAxios.post("create_category/", formData);
+        const response = await adminAxios.post("create-category/", formData);
         toast.success("Category Created Successfully");
-        console.log(response.data);
 
         setCategory((prev) => [...prev, response.data]);
         setIsModalOpen(false);
@@ -121,7 +117,7 @@ const Category = () => {
     e.preventDefault();
     try {
       setLoading(true)
-      const response = await adminAxios.post("category_status/", {
+      const response = await adminAxios.post("category-status/", {
         id: category_id,
       });
       toast.success("Status Updated Successfully");
@@ -154,7 +150,7 @@ const Category = () => {
         };
 
         const response = await adminAxios.put(
-          `edit_category/${selectedData}/`,
+          `edit-category/${selectedData}/`,
           data
         );
 

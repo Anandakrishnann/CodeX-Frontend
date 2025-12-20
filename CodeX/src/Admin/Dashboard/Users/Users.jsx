@@ -18,7 +18,7 @@ const Users = () => {
     const fetchUsers = async () => {
       try {
         setLoading(true);
-        const response = await adminAxios.get("list_users/");
+        const response = await adminAxios.get("list-users/");
         setUsers(response.data.users || []);
       } catch (error) {
         console.error("Error fetching users:", error.response || error);

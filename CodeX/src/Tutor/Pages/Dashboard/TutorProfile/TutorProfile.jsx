@@ -75,7 +75,7 @@ const TutorProfile = () => {
         const formData = new FormData();
         formData.append("profilePicture", selectedFile);
 
-        const response = await tutorAxios.post("profile_picture/", formData, {
+        const response = await tutorAxios.post("profile-picture/", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
@@ -199,7 +199,7 @@ const TutorProfile = () => {
 
     if (validate({ ...userPayload, ...tutor })) {
       try {
-        const response = await tutorAxios.put("edit_tutor/", data);
+        const response = await tutorAxios.put("edit-tutor/", data);
         setUserData(response.data);
         toast.success("Profile updated successfully");
         setIsModalOpen(false);
@@ -244,9 +244,8 @@ const TutorProfile = () => {
 
   const fetchTutorData = async () => {
     try {
-      const response = await tutorAxios.get("tutor_profile/");
+      const response = await tutorAxios.get("tutor-profile/");
       setUserData(response.data);
-      console.log("tutor profile response data", response.data);
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
@@ -272,11 +271,6 @@ const TutorProfile = () => {
       const newPassword = passwordData.newPassword.trim();
       const confirmPassword = passwordData.confirmPassword.trim();
 
-      console.log(
-        `oldPassword ${oldPassword}`,
-        `newPassword ${newPassword}`,
-        `confirmPassword ${confirmPassword}`
-      );
 
       if (!oldPassword || !newPassword || !confirmPassword) {
         toast.error("All fields are required");
@@ -309,11 +303,6 @@ const TutorProfile = () => {
         new_password: newPassword,
         confirm_password: confirmPassword,
       });
-      console.log(
-        `oldPassword ${oldPassword}`,
-        `newPassword ${newPassword}`,
-        `confirmPassword ${confirmPassword}`
-      );
 
       setPasswordData({
         oldPassword: "",

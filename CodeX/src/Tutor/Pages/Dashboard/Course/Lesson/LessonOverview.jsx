@@ -19,7 +19,7 @@ const LessonOverview = () => {
 
   const fetchLessons = async () => {
     try {
-      const response = await adminAxios.get(`lesson_overview/${id}/`);
+      const response = await adminAxios.get(`lesson-overview/${id}/`);
       console.log(response.data);
       setLesson(response.data);
     } catch (error) {
@@ -31,7 +31,7 @@ const LessonOverview = () => {
   const toggle_status = async (e, lessonId) => {
     e.preventDefault();
     try {
-      await adminAxios.post(`lesson_status/${lessonId}/`);
+      await adminAxios.post(`lesson-status/${lessonId}/`);
       toast.success("Status Updated Successfully");
       fetchLessons();
     } catch (error) {

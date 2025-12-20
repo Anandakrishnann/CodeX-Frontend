@@ -28,7 +28,7 @@ const Tutors = () => {
     const fetchUsers = async () => {
       try {
         setLoading(true);
-        const response = await adminAxios.get("list_tutors/");
+        const response = await adminAxios.get("list-tutors/");
 
         setTutors(response.data.users || []);
       } catch (error) {
@@ -58,7 +58,6 @@ const Tutors = () => {
     return true;
   });
 
-  console.log(tutors);
 
   const handleNavigate = (id) => {
     dispatch(setTutorId(id));

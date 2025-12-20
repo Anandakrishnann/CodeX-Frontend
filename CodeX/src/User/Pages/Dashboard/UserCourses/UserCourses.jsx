@@ -25,7 +25,7 @@ const UserCourses = () => {
   const fetchCourses = async () => {
     try {
       setLoading(true);
-      const response = await userAxios.get("enrolled_courses/");
+      const response = await userAxios.get("enrolled-courses/");
       setCourses(response.data);
     } catch (error) {
       console.log(error || "Error While Loading Courses");
@@ -56,7 +56,7 @@ const UserCourses = () => {
 
   const handleStartCourse = async (id) => {
     try {
-      await userAxios.post(`start_course/${id}/`);
+      await userAxios.post(`start-course/${id}/`);
       dispatch(setCourseId(id));
       fetchCourses();
       toast.success("Course Started Check Progress");

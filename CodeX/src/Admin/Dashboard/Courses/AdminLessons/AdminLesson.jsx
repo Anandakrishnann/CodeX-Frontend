@@ -28,14 +28,12 @@ const AdminLessons = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  console.log("selected data", selectedData);
-  console.log("rejection Reason", rejectionReason);
 
   useEffect(() => {
     const fetchModuleDetails = async () => {
       try {
         setLoading(true)
-        const response = await adminAxios.get(`view_module/${id}/`);
+        const response = await adminAxios.get(`view-module/${id}/`);
         setModule(response.data);
       } catch (error) {
         toast.error("Error while fetching Module details");
@@ -52,8 +50,7 @@ const AdminLessons = () => {
   const fetchLessons = async () => {
     try {
       setLoading(true);
-      const response = await adminAxios.get(`course_lessons/${id}/`);
-      console.log(response.data);
+      const response = await adminAxios.get(`course-lessons/${id}/`);
       setLessons(response.data);
     } catch (error) {
       toast.error("Error while fetching Lessons details");
@@ -67,7 +64,7 @@ const AdminLessons = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      await adminAxios.post(`lesson_status/${lessonId}/`);
+      await adminAxios.post(`lesson-status/${lessonId}/`);
       toast.success("Status Updated Successfully");
       fetchLessons();
     } catch (error) {
@@ -82,7 +79,7 @@ const AdminLessons = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      await adminAxios.post(`accept_lesson/${lessonId}/`);
+      await adminAxios.post(`accept-lesson/${lessonId}/`);
       fetchLessons();
       toast.success("Lesson Accepted");
     } catch (error) {
@@ -101,7 +98,7 @@ const AdminLessons = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      await adminAxios.post(`reject_lesson/${selectedData}/`, {
+      await adminAxios.post(`reject-lesson/${selectedData}/`, {
         reason: rejectionReason,
       });
       toast.success("Lesson Rejected Successfully");

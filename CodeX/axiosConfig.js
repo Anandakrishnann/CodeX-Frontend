@@ -34,19 +34,13 @@ const notificationAxios = axios.create({
     axiosInstance.interceptors.response.use(
       (response) => response,
       async (error) => {
-        console.log(`Error status: ${error.response?.status}`);
-
         if (error.response && error.response.status === 401) {
-          console.log("401 error occurred, trying to refresh token...");
-
           try {
             const refreshResponse = await axios.post(
               `${API_BASE_URL}api/token/refresh/`,
               { refresh: "dummy" },
               { withCredentials: true } // Ensure cookies are sent
             );
-
-            console.log("Token refreshed successfully!");
 
             const newAccessToken = refreshResponse.data.access;
 
@@ -56,14 +50,12 @@ const notificationAxios = axios.create({
             // ✅ Retry the original request
             return axiosInstance(error.config);
           } catch (refreshError) {
-            console.error("Refresh token expired, logging out...");
             window.location.href = "/login"; // Redirect user to login page
             return Promise.reject(refreshError);
           }
         }
 
         if (error.response && error.response.status === 403) {
-          console.log("403 Forbidden — logging out user");
 
           store.dispatch(logoutUser());
 

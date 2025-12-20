@@ -47,12 +47,10 @@ const NotificationSocket = ({ onMessage }) => {
       socket.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
-          console.log("[Notifications] WS message:", data);
           
           // Prevent duplicate processing - check if we've already processed this notification ID
           const notificationId = data.id;
           if (notificationId && processedIdsRef.current.has(notificationId)) {
-            console.log("[Notifications] Duplicate notification ignored:", notificationId);
             return;
           }
           
@@ -64,16 +62,15 @@ const NotificationSocket = ({ onMessage }) => {
           onMessageRef.current?.(data);
           toast.info("New notification");
         } catch (err) {
-          console.error("Error parsing WS message:", err);
+          // Error parsing WebSocket message
         }
       };
 
       socket.onerror = (err) => {
-        console.error("❌ WS error:", err);
+        // WebSocket error occurred
       };
 
       socket.onclose = (event) => {
-        console.log("⚠️ WS closed:", event.code, event.reason);
         if (event.code !== 1000 && reconnectAttempts.current < maxReconnectAttempts) {
           reconnectAttempts.current++;
           const jitter = Math.random() * 500;
@@ -86,13 +83,12 @@ const NotificationSocket = ({ onMessage }) => {
 
       socketRef.current = socket;
     } catch (err) {
-      console.error("Error creating WebSocket:", err);
+      // Error creating WebSocket
     }
   };
 
   useEffect(() => {
     const url = buildWebSocketUrl();
-    console.log("[Notifications] Connecting to WebSocket:", url);
 
     // Add 500ms delay to prevent initial Channels handshake failure
     const timeout = setTimeout(() => {

@@ -44,7 +44,6 @@ const PayoutRequests = () => {
       setLoading(true);
       const response = await adminAxios.get("payout-requests/");
       setPayoutRequests(response.data.payout_requests);
-      console.log(response.data);
     } catch (error) {
       toast.error(error.error || "Something went wrong");
     } finally {

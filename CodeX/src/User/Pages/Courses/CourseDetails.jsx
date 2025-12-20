@@ -60,7 +60,7 @@ const CourseDetails = () => {
 
   const fetchCourse = async () => {
     try {
-      const response = await userAxios.get(`course_details/${course_id}/`);
+      const response = await userAxios.get(`course-details/${course_id}/`);
       setCourse(response.data);
       console.log("response data", response.data);
     } catch (error) {
@@ -81,7 +81,7 @@ const CourseDetails = () => {
 
   const checkUserEnrollment = async () => {
     try {
-      const res = await userAxios.get("/check_enrollment/", {
+      const res = await userAxios.get("/check-enrollment/", {
         params: {
           user_email: user?.email,
           course_id: course_id,

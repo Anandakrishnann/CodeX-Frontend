@@ -22,7 +22,6 @@ const OTPVerification = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  console.log(email);
   
 
   const fadeIn = {
@@ -77,14 +76,13 @@ const OTPVerification = () => {
     try {
       setLoading(true)
 
-      const response = await userAxios.post("resend_otp/", { email });
+      const response = await userAxios.post("resend-otp/", { email });
       toast.success(response.data.message || "OTP has been resent!");
       const expireAt = Date.now() + 120 * 1000;
       localStorage.setItem("otpExpireTime", expireAt.toString());
       dispatch(setOtpTime());
       setExpired(false);
     } catch (error) {
-      console.error("Error:", error);
       toast.error("Failed to resend OTP.");
     } finally {
       setLoading(false)
@@ -97,7 +95,7 @@ const OTPVerification = () => {
     try {
       setLoading(true)
       
-      await userAxios.post("verify_otp/", { otp, email });
+      await userAxios.post("verify-otp/", { otp, email });
       toast.success("Your Account Activated Successfully. Please Login!");
       dispatch(otpTime(0));
       localStorage.removeItem("otpExpireTime");
@@ -106,7 +104,6 @@ const OTPVerification = () => {
       dispatch(setOtpTime());
       navigate("/login");
     } catch (error) {
-      console.error("Error:", error);
       toast.error("Invalid OTP.");
     } finally {
       setLoading(false)

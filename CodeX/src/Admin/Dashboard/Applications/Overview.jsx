@@ -37,7 +37,7 @@ const Overview = () => {
   const fetchUserData = async () => {
     try {
       setLoading(true);
-      const response = await adminAxios.get(`application_view/${id}/`);
+      const response = await adminAxios.get(`application-view/${id}/`);
       setUserData(response.data);
     } catch (error) {
       console.error("Error fetching user data:", error);
@@ -49,9 +49,8 @@ const Overview = () => {
   const fetchReason = async () => {
     try {
       setLoading(true);
-      const response = await adminAxios.get(`rejected_reason/${id}`);
+      const response = await adminAxios.get(`rejected-reason/${id}`);
       setReason(response.data);
-      console.log(response.data);
     } catch (error) {
       console.log("Error fetching reason:", error);
     } finally {
@@ -68,7 +67,7 @@ const Overview = () => {
 
     try {
       setLoading(true);
-      await adminAxios.post(`/accept_application/${applicationId}/`);
+      await adminAxios.post(`/accept-application/${applicationId}/`);
       console.log("Application accepted");
 
       setUserData((prevData) => ({
@@ -93,7 +92,7 @@ const Overview = () => {
 
     try {
       setLoading(true);
-      await adminAxios.post(`/reject_application/${userData.id}/`, {
+      await adminAxios.post(`/reject-application/${userData.id}/`, {
         reason: rejectionReason,
       });
 

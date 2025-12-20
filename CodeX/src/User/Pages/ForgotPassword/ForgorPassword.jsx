@@ -18,11 +18,10 @@ const ForgotPassword = () => {
         return;
       }
       setLoading(true);
-      await userAxios.post(`forgot_password/${email}/`);
+      await userAxios.post(`forgot-password/${email}/`);
       toast.success("📧 Password reset email sent successfully!");
       setIsModalOpen(true);
     } catch (error) {
-      console.error("Forgot password error:", error);
       toast.error("❌ Failed to send password reset email. Please try again.");
     } finally {
       setLoading(false);

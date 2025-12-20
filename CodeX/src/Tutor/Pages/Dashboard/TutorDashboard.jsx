@@ -35,7 +35,7 @@ const TutorDashboard = () => {
 
   const fetchDashboardData = async () => {
     try {
-      const res = await tutorAxios.get("tutor_dashboard/");
+      const res = await tutorAxios.get("tutor-dashboard/");
       setData(res.data);
     } catch (err) {
       console.error("Error fetching tutor dashboard:", err);

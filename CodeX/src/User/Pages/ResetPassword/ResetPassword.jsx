@@ -29,7 +29,7 @@ const ResetPassword = () => {
         return;
       }
       setLoading(true);
-      await userAxios.post(`reset_password/${uid}/${token}/`, { password });
+      await userAxios.post(`reset-password/${uid}/${token}/`, { password });
       toast.success("Password reset successful");
       navigate("/login");
     } catch (error) {

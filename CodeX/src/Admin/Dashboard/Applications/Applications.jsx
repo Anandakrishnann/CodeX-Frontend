@@ -26,7 +26,7 @@ const Applications = () => {
     const fetchApplications = async () => {
       try {
         setLoading(true);
-        const response = await adminAxios.get("list_applicaions/");
+        const response = await adminAxios.get("list-applicaions/");
         setApplications(response.data || []);
       } catch (error) {
         console.error("Error fetching applications:", error.response || error);

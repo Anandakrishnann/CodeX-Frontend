@@ -42,7 +42,7 @@ const TutorHome = () => {
 
   const fetchTutor = async () => {
     try {
-      const response = await userAxios.get("tutor_home/");
+      const response = await userAxios.get("tutor-home/");
 
       if (response.status === 200 && response.data.user) {
         dispatch(loginUser(response.data.user));
@@ -58,7 +58,7 @@ const TutorHome = () => {
 
   const tutorSubscribed = async () => {
     try {
-      const response = await tutorAxios.get("tutor_subscribed/");
+      const response = await tutorAxios.get("tutor-subscribed/");
       console.log(response.data);
       if (response.data.subscribed) {
         setIsSubscribed(true);
@@ -74,7 +74,7 @@ const TutorHome = () => {
 
   const tutorapplication = async () => {
     try {
-      const response = await tutorAxios.get("tutor_application/");
+      const response = await tutorAxios.get("tutor-application/");
       console.log(response.data);
       if (response.data.application) {
         setIsApplication(true);
