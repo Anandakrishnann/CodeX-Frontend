@@ -21,7 +21,7 @@ const Subscription = () => {
   useEffect(() => {
     const fetchPlans = async () => {
       try {
-        const response = await adminAxios.get("list_plan/");
+        const response = await adminAxios.get("list-plan/");
         setPlan(response.data);
       } catch (e) {
         toast.error("Error When Fetching Data");

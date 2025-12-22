@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { tutorAxios, userAxios } from "../../../../../axiosConfig";
 import EditNoteIcon from "@mui/icons-material/EditNote";
-import { KeyRound } from "lucide-react";  
+import { KeyRound, X } from "lucide-react";
 import FileOpenIcon from "@mui/icons-material/FileOpen";
 import { TiStarOutline } from "react-icons/ti";
 import Layout from "../Layout/Layout";
@@ -20,9 +20,11 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ProfilePictureModal from "../../../../Component/ProfilePictureModal/ProfilePictureModal";
 import { toast } from "react-toastify";
 import Loading from "@/User/Components/Loading/Loading";
+import Swal from "sweetalert2";
 
 const TutorProfile = () => {
   const [userData, setUserData] = useState(null);
+  const [subscriptionHistory, setSubscriptionHistory] = useState([]);
   const user = useSelector((state) => state.user.user);
   const plan = useSelector((state) => state.user.plan_details);
   const [currentStep, setCurrentStep] = useState(1);
@@ -52,6 +54,7 @@ const TutorProfile = () => {
     confirmPassword: "",
   });
   const [loading, setLoading] = useState(false);
+  const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
 
   const subscribedOn = user?.plan_details?.subscribed_on
     ? new Date(user.plan_details.subscribed_on)
@@ -239,6 +242,7 @@ const TutorProfile = () => {
       return;
     }
 
+    fetchSubscriptionHistory();
     fetchTutorData();
   }, []);
 
@@ -246,6 +250,17 @@ const TutorProfile = () => {
     try {
       const response = await tutorAxios.get("tutor-profile/");
       setUserData(response.data);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
+
+  const fetchSubscriptionHistory = async () => {
+    try {
+      const response = await tutorAxios.get("subscription-history/");
+      console.log("subscripton history is ", response.data.subscriptions);
+
+      setSubscriptionHistory(response.data.subscriptions);
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
@@ -270,7 +285,6 @@ const TutorProfile = () => {
       const oldPassword = passwordData.oldPassword.trim();
       const newPassword = passwordData.newPassword.trim();
       const confirmPassword = passwordData.confirmPassword.trim();
-
 
       if (!oldPassword || !newPassword || !confirmPassword) {
         toast.error("All fields are required");
@@ -316,6 +330,40 @@ const TutorProfile = () => {
       toast.error(
         error?.response?.data?.error ||
           "Something went wrong while updating password"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const subscriptionCancel = async () => {
+    const result = await Swal.fire({
+      title: "Cancel Subscription?",
+      text: "Your subscription will remain active until the end of the billing period.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, cancel it",
+      cancelButtonText: "Keep subscription",
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      setLoading(true);
+
+      await userAxios.post("subscription-cancel/");
+
+      toast.success(
+        "Subscription will be canceled at the end of the billing period"
+      );
+      fetchTutorData();
+      fetchSubscriptionHistory();
+    } catch (error) {
+      toast.error(
+        error?.response?.data?.detail ||
+          "Something went wrong while canceling subscription"
       );
     } finally {
       setLoading(false);
@@ -459,6 +507,147 @@ const TutorProfile = () => {
                             {expiresOn?.toLocaleDateString()}
                           </span>
                         </div>
+                        <div className="flex justify-between">
+                          {userData.subscribed ? (
+                            <button className="flex-1 bg-red-500 text-white py-3 rounded-xl font-bold hover:bg-red-600 transition-all duration-300 shadow-lg hover:shadow-red-500/50">
+                              <X className="inline mr-2" size={18} />
+                              Subscription Cancelled
+                            </button>
+                          ) : (
+                            <button
+                              className="flex-1 bg-red-500 text-white py-3 rounded-xl font-bold hover:bg-red-600 transition-all duration-300 shadow-lg hover:shadow-red-500/50"
+                              onClick={subscriptionCancel}
+                              disabled={loading}
+                            >
+                              <X className="inline mr-2" size={18} />
+                              Cancel Subscription
+                            </button>
+                          )}
+                        </div>
+                        <div className="flex justify-between">
+                          <button
+                            className="text-sm text-green-500 font-blod hover:underline"
+                            onClick={() => setIsSubscriptionModalOpen(true)}
+                          >
+                            View Subscription History
+                          </button>
+                        </div>
+                        {isSubscriptionModalOpen && (
+                          <div
+                            role="dialog"
+                            aria-modal="true"
+                            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+                          >
+                            {/* Backdrop */}
+                            <div
+                              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+                              onClick={() => setIsSubscriptionModalOpen(false)}
+                            />
+
+                            {/* Modal Container */}
+                            <div className="relative z-50 w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-2xl bg-gray-950 border border-gray-800 p-6">
+                              {/* Header */}
+                              <div className="flex justify-between items-center mb-4">
+                                <h2 className="text-lg font-bold text-white">
+                                  Subscription History
+                                </h2>
+                                <button
+                                  onClick={() =>
+                                    setIsSubscriptionModalOpen(false)
+                                  }
+                                  className="text-gray-400 hover:text-white text-xl"
+                                >
+                                  ×
+                                </button>
+                              </div>
+
+                              {/* Content */}
+                              <div className="flex flex-col gap-4">
+                                {subscriptionHistory.length > 0 ? (
+                                  subscriptionHistory.map((sub) => {
+                                    const expiresOn = new Date(sub.expires_on);
+
+                                    return (
+                                      <div
+                                        key={sub.id}
+                                        className="rounded-xl border border-gray-800 bg-gray-900 p-4"
+                                      >
+                                        {/* Gradient Header */}
+                                        <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl p-4 mb-4">
+                                          <p className="text-white font-bold text-xl">
+                                            {sub.plan.name}
+                                          </p>
+                                          <p className="text-white/90 text-sm">
+                                            {sub.plan.plan_category}
+                                          </p>
+                                        </div>
+
+                                        {/* Plan Details */}
+                                        <div className="space-y-2 text-left">
+                                          <div className="flex justify-between text-sm">
+                                            <span className="text-gray-400">
+                                              Plan Type:
+                                            </span>
+                                            <span className="text-white font-semibold">
+                                              {sub.plan.plan_type}
+                                            </span>
+                                          </div>
+
+                                          <div className="flex justify-between text-sm">
+                                            <span className="text-gray-400">
+                                              Price:
+                                            </span>
+                                            <span className="text-emerald-400 font-bold">
+                                              ₹{sub.plan.price}
+                                            </span>
+                                          </div>
+
+                                          <div className="flex justify-between text-sm">
+                                            <span className="text-gray-400">
+                                              Subscribed On:
+                                            </span>
+                                            <span className="text-white">
+                                              {new Date(
+                                                sub.subscribed_on
+                                              ).toLocaleDateString()}
+                                            </span>
+                                          </div>
+
+                                          <div className="flex justify-between text-sm">
+                                            <span className="text-gray-400">
+                                              Expires:
+                                            </span>
+                                            <span className="text-orange-400 font-semibold">
+                                              {expiresOn.toLocaleDateString()}
+                                            </span>
+                                          </div>
+                                        </div>
+
+                                        {/* Status */}
+                                        <div className="flex justify-end mt-4">
+                                          {sub.is_active ? (
+                                            <span className="text-orange-400 text-sm font-semibold">
+                                              Active until{" "}
+                                              {expiresOn.toLocaleDateString()}
+                                            </span>
+                                          ) : (
+                                            <span className="text-gray-500 text-sm font-semibold">
+                                              Expired
+                                            </span>
+                                          )}
+                                        </div>
+                                      </div>
+                                    );
+                                  })
+                                ) : (
+                                  <p className="text-gray-500 text-sm">
+                                    No subscription history
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
