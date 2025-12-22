@@ -12,6 +12,8 @@ import { Search } from "lucide-react";
 const Category = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModal] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 6;
   const [category, setCategory] = useState([]);
   const [formData, setFormData] = useState({
     name: "",
@@ -23,7 +25,7 @@ const Category = () => {
   });
   const [selectedData, setSelectedData] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -61,13 +63,13 @@ const Category = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        setLoading(true)
+        setLoading(true);
         const response = await adminAxios.get("list-category/");
         setCategory(response.data);
       } catch (e) {
         toast.error("Error While Fetching Data");
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     };
 
@@ -93,7 +95,7 @@ const Category = () => {
   const handleSubmit = async () => {
     try {
       if (validateForm(formData)) {
-        setLoading(true)
+        setLoading(true);
         const response = await adminAxios.post("create-category/", formData);
         toast.success("Category Created Successfully");
 
@@ -109,14 +111,14 @@ const Category = () => {
       toast.error(errorMessage);
       console.error("Error creating category:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   };
 
   const toggle_status = async (e, category_id) => {
     e.preventDefault();
     try {
-      setLoading(true)
+      setLoading(true);
       const response = await adminAxios.post("category-status/", {
         id: category_id,
       });
@@ -136,14 +138,14 @@ const Category = () => {
       toast.error(`Error: ${errorMessage}`);
       console.error("Backend Error:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   };
 
   const handleEditSubmit = async () => {
     try {
       if (validateForm(editFormData)) {
-        setLoading(true)
+        setLoading(true);
         const data = {
           name: editFormData.name || category.name,
           description: editFormData.description || category.description,
@@ -169,7 +171,7 @@ const Category = () => {
       toast.error(`Error: ${errorMessage}`);
       console.error("Backend Error:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   };
 
@@ -185,6 +187,17 @@ const Category = () => {
       item.description.toLowerCase().includes(lower)
     );
   });
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
+  const totalPages = Math.ceil(filteredCategories.length / ITEMS_PER_PAGE);
+
+  const paginatedApps = filteredCategories.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
   return (
     <Layout>
@@ -229,8 +242,8 @@ const Category = () => {
 
               {/* Table Body */}
               <tbody>
-                {filteredCategories.length > 0 ? (
-                  filteredCategories.map((item, index) => (
+                {paginatedApps.length > 0 ? (
+                  paginatedApps.map((item, index) => (
                     <tr
                       key={item.id}
                       className={`border-b border-gray-300 ${
@@ -295,6 +308,42 @@ const Category = () => {
               </tbody>
             </table>
           </div>
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-2 mt-10">
+              <button
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage((p) => p - 1)}
+                className="px-4 py-2 rounded-lg bg-white text-black disabled:opacity-40"
+              >
+                Prev
+              </button>
+
+              {[...Array(totalPages)].map((_, i) => {
+                const page = i + 1;
+                return (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`px-4 py-2 rounded-lg font-bold ${
+                      currentPage === page
+                        ? "bg-blue-600 text-white"
+                        : "bg-white text-black"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                );
+              })}
+
+              <button
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage((p) => p + 1)}
+                className="px-4 py-2 rounded-lg bg-white text-black disabled:opacity-40"
+              >
+                Next
+              </button>
+            </div>
+          )}
         </div>
       </div>
 

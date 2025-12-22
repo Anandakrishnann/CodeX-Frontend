@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import TaskAltIcon from "@mui/icons-material/TaskAlt";
 import CancelIcon from "@mui/icons-material/Cancel";
@@ -13,7 +13,9 @@ import { Search } from "lucide-react";
 const Table = ({ datas, fucntions, columns, name }) => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("")
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 6;
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -38,18 +40,29 @@ const Table = ({ datas, fucntions, columns, name }) => {
   };
 
   const filteredUsers = datas.filter((item) => {
-    if(searchQuery.trim() === "") return true;
+    if (searchQuery.trim() === "") return true;
 
     const lower = searchQuery.toLocaleLowerCase();
     const phoneString = item.phone ? item.phone.toString() : "";
 
-    return(
-      item.first_name.toLocaleLowerCase().includes(lower) || 
-      item.last_name.toLocaleLowerCase().includes(lower) || 
+    return (
+      item.first_name.toLocaleLowerCase().includes(lower) ||
+      item.last_name.toLocaleLowerCase().includes(lower) ||
       item.email.toLocaleLowerCase().includes(lower) ||
       phoneString.includes(lower)
-    )
-  })
+    );
+  });
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
+  const totalPages = Math.ceil(filteredUsers.length / ITEMS_PER_PAGE);
+
+  const paginatedApps = filteredUsers.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
   return (
     <div className="grid">
@@ -85,8 +98,8 @@ const Table = ({ datas, fucntions, columns, name }) => {
 
             {/* Table Body */}
             <tbody>
-              {filteredUsers.length > 0 ? (
-                filteredUsers.map((user, index) => (
+              {paginatedApps.length > 0 ? (
+                paginatedApps.map((user, index) => (
                   <tr
                     key={user.id}
                     className={`border-b border-gray-300 ${
@@ -167,6 +180,42 @@ const Table = ({ datas, fucntions, columns, name }) => {
             </tbody>
           </table>
         </div>
+        {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-2 mt-10">
+              <button
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage((p) => p - 1)}
+                className="px-4 py-2 rounded-lg bg-white text-black disabled:opacity-40"
+              >
+                Prev
+              </button>
+
+              {[...Array(totalPages)].map((_, i) => {
+                const page = i + 1;
+                return (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`px-4 py-2 rounded-lg font-bold ${
+                      currentPage === page
+                        ? "bg-blue-600 text-white"
+                        : "bg-white text-black"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                );
+              })}
+
+              <button
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage((p) => p + 1)}
+                className="px-4 py-2 rounded-lg bg-white text-black disabled:opacity-40"
+              >
+                Next
+              </button>
+            </div>
+          )}
       </div>
       {isModalOpen && selectedUser && (
         <EditUserModal

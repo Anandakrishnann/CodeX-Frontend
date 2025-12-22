@@ -17,6 +17,8 @@ const Tutors = () => {
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState("active");
   const [searchQuery, setSearchQuery] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 6;
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -57,6 +59,17 @@ const Tutors = () => {
 
     return true;
   });
+
+    useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
+  const totalPages = Math.ceil(filteredTutors.length / ITEMS_PER_PAGE);
+
+  const paginatedApps = filteredTutors.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
 
   const handleNavigate = (id) => {
@@ -130,8 +143,8 @@ const Tutors = () => {
 
             {/* Card Grid with Stagger Animation */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredTutors.length > 0 ? (
-                filteredTutors.map((tutor, index) => (
+              {paginatedApps.length > 0 ? (
+                paginatedApps.map((tutor, index) => (
                   <div
                     key={tutor.id}
                     className="group relative bg-white/95 backdrop-blur-xl p-6 rounded-3xl shadow-2xl transition-all duration-500 transform "
@@ -202,6 +215,42 @@ const Tutors = () => {
                 </div>
               )}
             </div>
+            {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-2 mt-10">
+              <button
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage((p) => p - 1)}
+                className="px-4 py-2 rounded-lg bg-white text-black disabled:opacity-40"
+              >
+                Prev
+              </button>
+
+              {[...Array(totalPages)].map((_, i) => {
+                const page = i + 1;
+                return (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`px-4 py-2 rounded-lg font-bold ${
+                      currentPage === page
+                        ? "bg-blue-600 text-white"
+                        : "bg-white text-black"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                );
+              })}
+
+              <button
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage((p) => p + 1)}
+                className="px-4 py-2 rounded-lg bg-white text-black disabled:opacity-40"
+              >
+                Next
+              </button>
+            </div>
+          )}
           </div>
         </div>
       )}

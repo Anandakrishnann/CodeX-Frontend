@@ -22,6 +22,8 @@ const PlatformWallet = () => {
   const [coursePurchaseCount, setCoursePurchaseCount] = useState(0);
   const [subscriptionCount, setSubscriptionCount] = useState(0);
   const [loading, setLoading] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 6;
 
 
   useEffect(() => {
@@ -84,6 +86,17 @@ const PlatformWallet = () => {
         return "Other";
     }
   };
+
+    useEffect(() => {
+    setCurrentPage(1);
+  }, []);
+
+  const totalPages = Math.ceil(filteredTransactions.length / ITEMS_PER_PAGE);
+
+  const paginatedApps = filteredTransactions.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
   return (
     <Layout>
@@ -218,8 +231,8 @@ const PlatformWallet = () => {
                 Recent Transactions
               </h2>
               <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                {filteredTransactions && filteredTransactions.length > 0 ? (
-                  filteredTransactions.map((transaction) => (
+                {paginatedApps && paginatedApps.length > 0 ? (
+                  paginatedApps.map((transaction) => (
                     <div
                       key={transaction.id}
                       className="group bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 border border-gray-200/50 transform hover:-translate-y-1 hover:scale-[1.02]"
@@ -315,6 +328,42 @@ const PlatformWallet = () => {
                   </div>
                 )}
               </div>
+              {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-2 mt-10">
+              <button
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage((p) => p - 1)}
+                className="px-4 py-2 rounded-lg bg-white text-black disabled:opacity-40"
+              >
+                Prev
+              </button>
+
+              {[...Array(totalPages)].map((_, i) => {
+                const page = i + 1;
+                return (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`px-4 py-2 rounded-lg font-bold ${
+                      currentPage === page
+                        ? "bg-blue-600 text-white"
+                        : "bg-white text-black"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                );
+              })}
+
+              <button
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage((p) => p + 1)}
+                className="px-4 py-2 rounded-lg bg-white text-black disabled:opacity-40"
+              >
+                Next
+              </button>
+            </div>
+          )}
             </div>
           </div>
         </div>

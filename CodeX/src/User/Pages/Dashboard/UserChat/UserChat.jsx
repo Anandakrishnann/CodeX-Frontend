@@ -1,49 +1,24 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Chat from "../../../../Component/Chat/Chat";
 import Layout from "../Layout/Layout";
 import { useSelector } from "react-redux";
-import { chatAxios } from "../../../../../axiosConfig";
 import Loading from "@/User/Components/Loading/Loading";
 
 const UserChat = () => {
   const user = useSelector((state) => state.user.user);
-  const tutor = useSelector((state) => state.user.tutorId);
-  const [roomId, setRoomId] = useState(null);
-  const [roomCheckComplete, setRoomCheckComplete] = useState(false);
+  const tutorId = useSelector((state) => state.user.tutorId);
 
-  useEffect(() => {
-    const getRoomId = async () => {
-      if (user?.id && tutor) {
-        try {
-          const response = await chatAxios.post("get-or-create-room/", {
-            user2_id: tutor,
-          });
-          setRoomId(response.data.room_id);
-        } catch (error) {
-          if (error.response?.status === 403) {
-            console.warn("User is not allowed to chat with this tutor.");
-            setRoomId(null); 
-          } else {
-            console.error("Error getting room ID:", error);
-          }
-        } finally {
-          setRoomCheckComplete(true);
-        }
-      } else {
-        setRoomCheckComplete(true);
-      }
-    };
-
-    getRoomId();
-  }, [user?.id, tutor]);
+  if (!user || !tutorId) {
+    return (
+      <Layout page="Chat's">
+        <Loading />
+      </Layout>
+    );
+  }
 
   return (
     <Layout page="Chat's">
-      {roomCheckComplete ? (
-        <Chat roomId={roomId} currentUserId={user?.id} />
-      ) : (
-        <Loading />
-      )}
+      <Chat currentUserId={user.id} tutorId={tutorId} />
     </Layout>
   );
 };

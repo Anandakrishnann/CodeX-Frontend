@@ -38,6 +38,8 @@ const Courses = () => {
   const [draftCount, setDraftCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 6;
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -131,6 +133,17 @@ const Courses = () => {
     setDraftCount(draftCourses);
   }, [Courses, filter, searchQuery]);
 
+    useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
+  const totalPages = Math.ceil(filteredLessons.length / ITEMS_PER_PAGE);
+
+  const paginatedApps = filteredLessons.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
   const handleCourseClick = (id) => {
     console.log("course navigated");
     dispatch(setCourseId(id));
@@ -208,8 +221,8 @@ const Courses = () => {
 
             {/* Course Cards Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 ">
-              {filteredLessons && filteredLessons.length > 0 ? (
-                filteredLessons.map((course, index) => (
+              {paginatedApps && paginatedApps.length > 0 ? (
+                paginatedApps.map((course, index) => (
                   <div
                     key={index}
                     className="group bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 border border-gray-200/50 flex flex-col h-full transform hover:-translate-y-1 hover:scale-[1.02]"
@@ -359,6 +372,42 @@ const Courses = () => {
                 </div>
               )}
             </div>
+            {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-2 mt-10">
+              <button
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage((p) => p - 1)}
+                className="px-4 py-2 rounded-lg bg-white text-black disabled:opacity-40"
+              >
+                Prev
+              </button>
+
+              {[...Array(totalPages)].map((_, i) => {
+                const page = i + 1;
+                return (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`px-4 py-2 rounded-lg font-bold ${
+                      currentPage === page
+                        ? "bg-blue-600 text-white"
+                        : "bg-white text-black"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                );
+              })}
+
+              <button
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage((p) => p + 1)}
+                className="px-4 py-2 rounded-lg bg-white text-black disabled:opacity-40"
+              >
+                Next
+              </button>
+            </div>
+          )}
           </div>
         </div>
       )}

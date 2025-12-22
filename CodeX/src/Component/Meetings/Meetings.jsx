@@ -72,7 +72,7 @@ export default function TutorMeeting() {
 
   const tutorSubscribed = async () => {
     try {
-      const response = await tutorAxios.get("tutor_subscribed/");
+      const response = await tutorAxios.get("tutor-subscribed/");
       if (response.data.subscribed) {
         setIsSubscribed(true);
       } else {

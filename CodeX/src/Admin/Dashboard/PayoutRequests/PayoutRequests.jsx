@@ -32,6 +32,8 @@ const PayoutRequests = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [adminNote, setAdminNote] = useState("");
   const [loading, setLoading] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 6;
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -117,6 +119,17 @@ const PayoutRequests = () => {
       setLoading(false);
     }
   };
+
+    useEffect(() => {
+    setCurrentPage(1);
+  }, []);
+
+  const totalPages = Math.ceil(filteredRequests.length / ITEMS_PER_PAGE);
+
+  const paginatedApps = filteredRequests.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
   const handleNavigate = (id) => {
     dispatch(setPayoutRequestId(id));
@@ -244,8 +257,8 @@ const PayoutRequests = () => {
 
             {/* Requests Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {filteredRequests && filteredRequests.length > 0 ? (
-                filteredRequests.map((request) => (
+              {paginatedApps && paginatedApps.length > 0 ? (
+                paginatedApps.map((request) => (
                   <div
                     key={request.id}
                     className="bg-white rounded-2xl overflow-hidden shadow-2xl hover:shadow-green-500/20 transition-all duration-500 transform hover:-translate-y-2"
@@ -399,6 +412,42 @@ const PayoutRequests = () => {
                 </div>
               )}
             </div>
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-2 mt-10">
+              <button
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage((p) => p - 1)}
+                className="px-4 py-2 rounded-lg bg-white text-black disabled:opacity-40"
+              >
+                Prev
+              </button>
+
+              {[...Array(totalPages)].map((_, i) => {
+                const page = i + 1;
+                return (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`px-4 py-2 rounded-lg font-bold ${
+                      currentPage === page
+                        ? "bg-blue-600 text-white"
+                        : "bg-white text-black"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                );
+              })}
+
+              <button
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage((p) => p + 1)}
+                className="px-4 py-2 rounded-lg bg-white text-black disabled:opacity-40"
+              >
+                Next
+              </button>
+            </div>
+          )}
           </div>
 
           {/* Details Modal */}
