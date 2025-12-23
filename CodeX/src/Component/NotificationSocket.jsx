@@ -9,7 +9,7 @@ function buildWebSocketUrl() {
     return `${wsBase}/ws/notifications/`;
   }
   
-  return "wss://codexlearning.online/ws/notifications/";
+  return "wss://api.codexlearning.online/ws/notifications/";
 }
 
 const NotificationSocket = ({ onMessage }) => {
