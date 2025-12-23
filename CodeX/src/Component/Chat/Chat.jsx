@@ -71,7 +71,7 @@ const Chat = ({ currentUserId, tutorId }) => {
     if (!roomId || socketRef.current) return;
 
     socketRef.current = new WebSocket(
-      `ws://127.0.0.1:8000/ws/chatroom/${roomId}/`
+      `wss://codexlearning.online/ws/chatroom/${roomId}/`
     );
 
     socketRef.current.onmessage = () => {
