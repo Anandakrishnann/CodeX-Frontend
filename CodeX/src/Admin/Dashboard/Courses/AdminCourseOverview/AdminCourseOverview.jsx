@@ -11,6 +11,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import { setModuleId } from "../../../../redux/slices/userSlice";
 import { useNavigate } from "react-router-dom";
 import Loading from "@/User/Components/Loading/Loading";
+import Swal from "sweetalert2";
 
 const AdminCourseOverview = () => {
   const [modules, setModules] = useState([]);
@@ -82,6 +83,20 @@ const AdminCourseOverview = () => {
 
   const handleAccept = async (e, id) => {
     e.preventDefault();
+    
+    const result = await Swal.fire({
+      title: "Accept Module?",
+      text: "Are you sure you want to accept this module?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#16a34a",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Accept",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
       setLoading(true);
       await adminAxios.post(`accept-module/${id}/`);
@@ -102,6 +117,25 @@ const AdminCourseOverview = () => {
 
   const handleReject = async (e) => {
     e.preventDefault();
+    
+    if (!rejectionReason.trim()) {
+      toast.error("Please provide a reason for rejection");
+      return;
+    }
+
+    const result = await Swal.fire({
+      title: "Reject Module?",
+      text: "Are you sure you want to reject this module?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, Reject",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
       setLoading(true);
       await adminAxios.post(`reject-module/${selectedData}/`, {
@@ -127,6 +161,20 @@ const AdminCourseOverview = () => {
 
   const toggle_status = async (e, id) => {
     e.preventDefault();
+    
+    const result = await Swal.fire({
+      title: "Change Status?",
+      text: "Are you sure you want to change the status of this module?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Change",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
       setLoading(true);
       await adminAxios.post(`module-status/${id}/`);

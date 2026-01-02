@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 import { adminAxios } from "../../../../axiosConfig";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import { Search } from "lucide-react";
+import Swal from "sweetalert2";
 
 const Category = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -117,6 +118,20 @@ const Category = () => {
 
   const toggle_status = async (e, category_id) => {
     e.preventDefault();
+    
+    const result = await Swal.fire({
+      title: "Change Status?",
+      text: "Are you sure you want to change the status of this category?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Change",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
       setLoading(true);
       const response = await adminAxios.post("category-status/", {

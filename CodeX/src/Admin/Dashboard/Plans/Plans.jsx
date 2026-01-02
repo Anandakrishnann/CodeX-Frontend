@@ -9,6 +9,8 @@ import VerifiedIcon from "@mui/icons-material/Verified";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import { X, DollarSign, FileText, Tag, Calendar } from "lucide-react";
 import Loading from "@/User/Components/Loading/Loading";
+import RestoreFromTrashIcon from "@mui/icons-material/RestoreFromTrash";
+import Tooltip from "@mui/material/Tooltip";
 
 const Plans = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -21,7 +23,6 @@ const Plans = () => {
     description: "",
   });
   const [loading, setLoading] = useState(false);
-
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -79,26 +80,26 @@ const Plans = () => {
   };
 
   useEffect(() => {
-    const fetchPlans = async () => {
-      try {
-        setLoading(true);
-        const response = await adminAxios.get("list-plan/");
-        setPlan(response.data);
-      } catch (e) {
-        toast.error("Error When Fetching Data");
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchPlans();
   }, []);
 
+  const fetchPlans = async () => {
+    try {
+      setLoading(true);
+      const response = await adminAxios.get("list-plan/");
+      setPlan(response.data);
+    } catch (e) {
+      toast.error("Error When Fetching Data");
+    } finally {
+      setLoading(false);
+    }
+  };
   const handleDelete = async (id) => {
     try {
       setLoading(true);
-      await adminAxios.delete(`delete_plan/${id}/`);
+      await adminAxios.post(`delete-plan/${id}/`);
       toast.success("Plan Deleted Successfully");
-      setPlan(plan.filter((item) => item.id !== id));
+      fetchPlans();
     } catch (error) {
       toast.error("Failed to delete plan");
     } finally {
@@ -140,13 +141,25 @@ const Plans = () => {
                     key={index}
                     className="relative bg-white border border-slate-200 shadow-lg rounded-2xl p-6 hover:shadow-xl transition-all duration-300 ease-out flex flex-col justify-between min-h-[380px] group"
                   >
-                    <button
-                      className="absolute top-4 right-4 bg-red-500 text-white font-medium p-2 rounded-lg hover:bg-red-600 transition-all duration-200 shadow-md hover:shadow-lg"
-                      title="Delete Plan"
-                      onClick={() => handleDelete(data.id)}
-                    >
-                      <DeleteForeverIcon />
-                    </button>
+                    {data.is_active ? (
+                      <Tooltip title="Delete" arrow>
+                        <button
+                          className="absolute top-4 right-4 bg-red-500 text-white font-medium p-2 rounded-lg hover:bg-red-600 transition-all duration-200 shadow-md hover:shadow-lg"
+                          onClick={() => handleDelete(data.id)}
+                        >
+                          <DeleteForeverIcon fontSize="small" />
+                        </button>
+                      </Tooltip>
+                    ) : (
+                      <Tooltip title="Restore" arrow>
+                        <button
+                          className="absolute top-4 right-4 bg-green-500 text-white font-medium p-2 rounded-lg hover:bg-green-600 transition-all duration-200 shadow-md hover:shadow-lg"
+                          onClick={() => handleDelete(data.id)}
+                        >
+                          <RestoreFromTrashIcon fontSize="small" />
+                        </button>
+                      </Tooltip>
+                    )}
 
                     <div>
                       <div className="mb-5">
@@ -172,7 +185,7 @@ const Plans = () => {
 
                     <div className="mt-auto pt-4 border-t border-slate-100">
                       <h2 className="text-3xl font-bold text-slate-800">
-                        ₹{data.price}
+                        ${data.price}
                       </h2>
                     </div>
                   </div>
@@ -183,22 +196,20 @@ const Plans = () => {
       )}
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg relative overflow-hidden border border-slate-200">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-black rounded-2xl shadow-2xl w-full max-w-lg relative overflow-hidden border-2 border-black">
             {/* Header */}
-            <div className="bg-slate-50 px-6 py-5 border-b border-slate-200">
+            <div className="bg-black px-6 py-5 border-b-2 border-black">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-sm">
-                    <Tag className="w-5 h-5 text-white" />
+                  <div className="w-10 h-10 rounded-xl bg-green-500 flex items-center justify-center shadow-lg">
+                    <Tag className="w-5 h-5 text-black" />
                   </div>
-                  <h2 className="text-xl font-semibold text-slate-800">
-                    Create Plan
-                  </h2>
+                  <h2 className="text-xl font-bold text-white">Create Plan</h2>
                 </div>
                 <button
                   onClick={() => setIsModalOpen(false)}
-                  className="w-8 h-8 rounded-lg hover:bg-slate-200 flex items-center justify-center transition-all duration-200 text-white hover:text-white"
+                  className="w-8 h-8 rounded-lg hover:bg-white/10 flex items-center justify-center transition-all duration-200 text-white"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -209,14 +220,14 @@ const Plans = () => {
             <div className="px-6 py-5 max-h-[500px] overflow-y-auto">
               {/* Name Field */}
               <div className="mb-5">
-                <label className="flex items-center gap-2 text-sm font-medium text-black mb-2">
-                  <FileText className="w-4 h-4 text-slate-600" />
+                <span className="flex items-center gap-2 text-sm font-semibold text-green-500 mb-2">
+                  <FileText className="w-4 h-4 text-green-500" />
                   Plan Name
-                </label>
+                </span>
                 <input
                   name="name"
                   type="text"
-                  className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all outline-none bg-white hover:border-slate-300 text-slate-800 placeholder-slate-400"
+                  className="w-full px-4 py-3 border-2 border-black rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all outline-none bg-white text-black placeholder-gray-400 font-medium"
                   placeholder="Enter plan name"
                   onChange={handleChange}
                 />
@@ -224,18 +235,18 @@ const Plans = () => {
 
               {/* Plan Category */}
               <div className="mb-5">
-                <label className="flex items-center gap-2 text-sm font-medium text-black mb-3">
-                  <Tag className="w-4 h-4 text-black" />
+                <span className="flex items-center gap-2 text-sm font-semibold text-green-500 mb-3">
+                  <Tag className="w-4 h-4 text-green-500" />
                   Plan Category
-                </label>
+                </span>
                 <div className="grid grid-cols-3 gap-2">
                   {["BASIC", "PRO", "PREMIUM"].map((cat) => (
                     <label
                       key={cat}
-                      className={`relative cursor-pointer rounded-lg p-3 text-center text-sm font-medium transition-all border ${
+                      className={`relative cursor-pointer rounded-xl p-3 text-center text-sm font-bold transition-all border-2 ${
                         formData.plan_category === cat
-                          ? "bg-slate-800 text-black border-slate-800 shadow-md"
-                          : "bg-slate-50 text-black border-slate-200 hover:border-slate-300 hover:bg-slate-100"
+                          ? "bg-green-500 text-black border-green-500 shadow-lg"
+                          : "bg-white text-black border-black hover:border-green-500 hover:bg-green-50"
                       }`}
                     >
                       <input
@@ -254,18 +265,18 @@ const Plans = () => {
 
               {/* Plan Type */}
               <div className="mb-5">
-                <label className="flex items-center gap-2 text-sm font-medium text-slate-700 mb-3">
-                  <Calendar className="w-4 h-4 text-slate-600" />
+                <span className="flex items-center gap-2 text-sm font-semibold text-green-500 mb-3">
+                  <Calendar className="w-4 h-4 text-green-500" />
                   Billing Cycle
-                </label>
+                </span>
                 <div className="grid grid-cols-2 gap-3">
                   {["MONTHLY", "YEARLY"].map((type) => (
                     <label
                       key={type}
-                      className={`relative cursor-pointer rounded-lg p-3 text-center text-sm font-medium transition-all border ${
+                      className={`relative cursor-pointer rounded-xl p-3 text-center text-sm font-bold transition-all border-2 ${
                         formData.plan_type === type
-                          ? "bg-slate-800 text-white border-slate-800 shadow-md"
-                          : "bg-slate-50 text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-100"
+                          ? "bg-green-500 text-black border-green-500 shadow-lg"
+                          : "bg-white text-black border-black hover:border-green-500 hover:bg-green-50"
                       }`}
                     >
                       <input
@@ -284,32 +295,32 @@ const Plans = () => {
 
               {/* Price */}
               <div className="mb-5">
-                <label className="flex items-center gap-2 text-sm font-medium text-slate-700 mb-2">
-                  <DollarSign className="w-4 h-4 text-slate-600" />
+                <span className="flex items-center gap-2 text-sm font-semibold text-green-500 mb-2">
+                  <DollarSign className="w-4 h-4 text-green-500" />
                   Price
-                </label>
+                </span>
                 <div className="relative">
                   <input
                     name="price"
                     type="number"
                     step="0.01"
-                    className="w-full px-4 py-3 pl-10 border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all outline-none bg-white hover:border-slate-300 text-slate-800 placeholder-slate-400"
+                    className="w-full px-4 py-3 pl-10 border-2 border-black rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all outline-none bg-white text-black placeholder-gray-400 font-medium"
                     placeholder="0.00"
                     onChange={handleChange}
                   />
-                  <DollarSign className="w-5 h-5 text-slate-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+                  <DollarSign className="w-5 h-5 text-green-500 absolute left-3 top-1/2 transform -translate-y-1/2" />
                 </div>
               </div>
 
               {/* Description */}
               <div className="mb-6">
-                <label className="flex items-center gap-2 text-sm font-medium text-slate-700 mb-2">
-                  <FileText className="w-4 h-4 text-slate-600" />
+                <span className="flex items-center gap-2 text-sm font-semibold text-green-500 mb-2">
+                  <FileText className="w-4 h-4 text-green-500" />
                   Description
-                </label>
+                </span>
                 <textarea
                   name="description"
-                  className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all outline-none bg-white hover:border-slate-300 resize-none text-slate-800 placeholder-slate-400"
+                  className="w-full px-4 py-3 border-2 border-black rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all outline-none bg-white resize-none text-black placeholder-gray-400 font-medium"
                   rows={3}
                   placeholder="Describe your plan features..."
                   onChange={handleChange}
@@ -318,16 +329,16 @@ const Plans = () => {
             </div>
 
             {/* Footer */}
-            <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex gap-3">
+            <div className="px-6 py-4 bg-black border-t-2 border-black flex gap-3">
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="flex-1 px-4 py-3 text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all font-medium"
+                className="flex-1 px-4 py-3 text-black bg-white border-2 border-white rounded-xl hover:bg-gray-100 transition-all font-bold"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSubmit}
-                className="flex-1 px-4 py-3 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition-all font-medium shadow-md"
+                className="flex-1 px-4 py-3 bg-green-500 text-black rounded-xl hover:bg-green-400 transition-all font-bold shadow-lg"
               >
                 Create Plan
               </button>

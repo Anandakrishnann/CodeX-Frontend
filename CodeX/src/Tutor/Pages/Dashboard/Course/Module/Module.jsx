@@ -11,6 +11,7 @@ import PendingActionsIcon from "@mui/icons-material/PendingActions";
 import { setModuleId } from "../../../../../redux/slices/userSlice";
 import { useNavigate } from "react-router-dom";
 import Loading from "@/User/Components/Loading/Loading";
+import Swal from "sweetalert2";
 
 const Modules = () => {
   const [modules, setModules] = useState([]);
@@ -135,6 +136,20 @@ const Modules = () => {
 
   const toggle_status = async (e, id) => {
     e.preventDefault();
+    
+    const result = await Swal.fire({
+      title: "Change Status?",
+      text: "Are you sure you want to change the status of this module?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Change",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
       setLoading(true);
       await tutorAxios.post(`module-status/${id}/`);

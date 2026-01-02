@@ -20,6 +20,7 @@ import Layout from "../Layout/Layout";
 import { RotateCcw } from "lucide-react";
 import { useSelector } from "react-redux";
 import Loading from "@/User/Components/Loading/Loading";
+import Swal from "sweetalert2";
 
 const TutorView = () => {
   const tutorId = useSelector((state) => state.user.tutorId);
@@ -45,6 +46,19 @@ const TutorView = () => {
   }, [tutorId]);
 
   const acceptApplication = async (id) => {
+    const result = await Swal.fire({
+      title: "Accept Application?",
+      text: "Are you sure you want to accept this tutor application?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#16a34a",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Accept",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
       setLoading(true);
       await adminAxios.patch(`tutor_verification/${id}/`, {
@@ -60,6 +74,19 @@ const TutorView = () => {
   };
 
   const rejectApplication = async (id) => {
+    const result = await Swal.fire({
+      title: "Reject Application?",
+      text: "Are you sure you want to reject this tutor application?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, Reject",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
       setLoading(true);
       await adminAxios.patch(`tutor_verification/${id}/`, {
@@ -80,6 +107,19 @@ const TutorView = () => {
 
   const toggle_status = async (e, tutorId) => {
     e.preventDefault();
+
+    const result = await Swal.fire({
+      title: "Change Status?",
+      text: "Are you sure you want to change the status of this tutor?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Change",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!result.isConfirmed) return;
 
     try {
       setLoading(true);
@@ -300,14 +340,14 @@ const TutorView = () => {
                       {userData.status === "pending" && (
                         <>
                           <button
-                            onClick={() => acceptApplication(userId)}
+                            onClick={() => acceptApplication(userData.id)}
                             className="w-full bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-bold py-3 px-6 rounded-xl flex items-center justify-center gap-2 transition-all duration-300 transform hover:scale-105 shadow-lg"
                           >
                             <DoneOutlineIcon className="w-5 h-5" />
                             Accept Application
                           </button>
                           <button
-                            onClick={() => rejectApplication(userId)}
+                            onClick={() => rejectApplication(userData.id)}
                             className="w-full bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white font-bold py-3 px-6 rounded-xl flex items-center justify-center gap-2 transition-all duration-300 transform hover:scale-105 shadow-lg"
                           >
                             <CloseIcon className="w-5 h-5" />

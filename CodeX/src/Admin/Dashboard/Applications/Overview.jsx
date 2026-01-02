@@ -18,6 +18,7 @@ import { toast } from "react-toastify";
 import Loading from "../../../User/Components/Loading/Loading";
 import Layout from "../Layout/Layout";
 import { useSelector } from "react-redux";
+import Swal from "sweetalert2";
 
 const Overview = () => {
   const id = useSelector((state) => state.user.applicationId);
@@ -65,8 +66,22 @@ const Overview = () => {
       return;
     }
 
+    const result = await Swal.fire({
+      title: "Accept Application?",
+      text: "Are you sure you want to accept this application?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#16a34a", // green
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Accept",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
       setLoading(true);
+
       await adminAxios.post(`/accept-application/${applicationId}/`);
       console.log("Application accepted");
 
@@ -74,8 +89,17 @@ const Overview = () => {
         ...prevData,
         status: "accepted",
       }));
+
       toast.success("Application Accepted");
       fetchUserData();
+
+      Swal.fire({
+        title: "Accepted!",
+        text: "The application has been accepted successfully.",
+        icon: "success",
+        timer: 1500,
+        showConfirmButton: false,
+      });
     } catch (error) {
       toast.error("Something went wrong");
       console.error("Error:", error);
@@ -89,6 +113,19 @@ const Overview = () => {
       toast.error("Please provide a reason for rejection");
       return;
     }
+
+    const result = await Swal.fire({
+      title: "Reject Application?",
+      text: "Are you sure you want to reject this application?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, Reject",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!result.isConfirmed) return;
 
     try {
       setLoading(true);
@@ -106,6 +143,14 @@ const Overview = () => {
       setRejectionReason("");
       fetchReason();
       fetchUserData();
+
+      Swal.fire({
+        title: "Rejected!",
+        text: "The application has been rejected.",
+        icon: "success",
+        timer: 1500,
+        showConfirmButton: false,
+      });
     } catch (error) {
       toast.error("Something went wrong");
       console.error("Error:", error);
@@ -127,7 +172,6 @@ const Overview = () => {
     setRejectionReason("");
   };
 
-  
   const getStatusConfig = (status) => {
     const configs = {
       pending: {
@@ -245,6 +289,7 @@ const Overview = () => {
                             <DoneOutlineIcon className="w-5 h-5" />
                             Accept Application
                           </button>
+
                           <button
                             onClick={handleRejectClick}
                             className="w-full bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white font-bold py-3 px-6 rounded-xl flex items-center justify-center gap-2 transition-all duration-300 transform hover:scale-105 shadow-lg"

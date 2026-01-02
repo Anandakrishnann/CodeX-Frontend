@@ -26,6 +26,7 @@ import PendingActionsIcon from "@mui/icons-material/PendingActions";
 import { useNavigate } from "react-router-dom";
 import { setCourseId } from "../../../../../redux/slices/userSlice";
 import Loading from "@/User/Components/Loading/Loading";
+import Swal from "sweetalert2";
 
 const Course = () => {
   const [courses, setCourses] = useState([]);
@@ -370,6 +371,20 @@ const Course = () => {
 
   const toggle_status = async (e, course_id) => {
     e.preventDefault();
+    
+    const result = await Swal.fire({
+      title: "Change Status?",
+      text: "Are you sure you want to change the status of this course?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Change",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
       await tutorAxios.post(`course-status/${course_id}/`);
       toast.success("Status Changed Successfully");

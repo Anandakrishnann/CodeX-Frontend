@@ -19,6 +19,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setPayoutRequestId } from "@/redux/slices/userSlice";
 import Loading from "@/User/Components/Loading/Loading";
+import Swal from "sweetalert2";
 
 const PayoutRequests = () => {
   const [payoutRequests, setPayoutRequests] = useState([]);
@@ -89,6 +90,19 @@ const PayoutRequests = () => {
   };
 
   const handleApprove = async (requestId) => {
+    const result = await Swal.fire({
+      title: "Approve Payout?",
+      text: "Are you sure you want to approve this payout request?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#16a34a",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Approve",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
       setLoading(true);
       await adminAxios.post(`approve-payout-request/${requestId}/`, {
@@ -105,6 +119,19 @@ const PayoutRequests = () => {
   };
 
   const handleReject = async (requestId) => {
+    const result = await Swal.fire({
+      title: "Reject Payout?",
+      text: "Are you sure you want to reject this payout request?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, Reject",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
       setLoading(true);
       await adminAxios.post(`reject-payout-request/${requestId}/`, {

@@ -11,6 +11,7 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import { useNavigate } from "react-router-dom";
 import { setLessonId } from "../../../../redux/slices/userSlice";
 import Loading from "@/User/Components/Loading/Loading";
+import Swal from "sweetalert2";
 
 const AdminLessons = () => {
   const [lessons, setLessons] = useState([]);
@@ -62,6 +63,20 @@ const AdminLessons = () => {
 
   const toggle_status = async (e, lessonId) => {
     e.preventDefault();
+    
+    const result = await Swal.fire({
+      title: "Change Status?",
+      text: "Are you sure you want to change the status of this lesson?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Change",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
       setLoading(true);
       await adminAxios.post(`lesson-status/${lessonId}/`);
@@ -77,6 +92,20 @@ const AdminLessons = () => {
 
   const handleAccept = async (e, lessonId) => {
     e.preventDefault();
+    
+    const result = await Swal.fire({
+      title: "Accept Lesson?",
+      text: "Are you sure you want to accept this lesson?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#16a34a",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Accept",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
       setLoading(true);
       await adminAxios.post(`accept-lesson/${lessonId}/`);
@@ -96,6 +125,25 @@ const AdminLessons = () => {
 
   const handleReject = async (e) => {
     e.preventDefault();
+    
+    if (!rejectionReason.trim()) {
+      toast.error("Please provide a reason for rejection");
+      return;
+    }
+
+    const result = await Swal.fire({
+      title: "Reject Lesson?",
+      text: "Are you sure you want to reject this lesson?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, Reject",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
       setLoading(true);
       await adminAxios.post(`reject-lesson/${selectedData}/`, {

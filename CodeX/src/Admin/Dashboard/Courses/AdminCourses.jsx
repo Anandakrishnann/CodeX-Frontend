@@ -24,6 +24,7 @@ import { setCourseId } from "../../../redux/slices/userSlice";
 import { useNavigate } from "react-router-dom";
 import Tooltip from "@mui/material/Tooltip";
 import Loading from "@/User/Components/Loading/Loading";
+import Swal from "sweetalert2";
 
 const Courses = () => {
   const [Courses, setCourses] = useState([]);
@@ -39,7 +40,7 @@ const Courses = () => {
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
-  const ITEMS_PER_PAGE = 6;
+  const ITEMS_PER_PAGE = 3;
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -63,6 +64,19 @@ const Courses = () => {
 
   const toggle_status = async (e, course_id) => {
     e.preventDefault();
+
+    const result = await Swal.fire({
+      title: "Change Status?",
+      text: "Are you sure you want to change the status of this course?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Change",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!result.isConfirmed) return;
 
     try {
       setLoading(true);
