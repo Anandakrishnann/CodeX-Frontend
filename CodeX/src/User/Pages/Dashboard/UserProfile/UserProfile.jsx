@@ -5,7 +5,7 @@ import EditNoteIcon from "@mui/icons-material/EditNote";
 import EmailIcon from "@mui/icons-material/Email";
 import PhoneIcon from "@mui/icons-material/Phone";
 import PersonIcon from "@mui/icons-material/Person";
-import { KeyRound } from "lucide-react";  
+import { KeyRound } from "lucide-react";
 // import { toast } from "sonner";
 import { toast } from "react-toastify";
 import Layout from "../Layout/Layout";
@@ -75,7 +75,7 @@ const UserProfile = () => {
         const formData = new FormData();
         formData.append("profilePicture", selectedFile);
 
-        const response = await userAxios.post("profile_picture/", formData, {
+        const response = await userAxios.post("profile-picture/", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
@@ -193,7 +193,6 @@ const UserProfile = () => {
       const newPassword = passwordData.newPassword.trim();
       const confirmPassword = passwordData.confirmPassword.trim();
 
-
       if (!oldPassword || !newPassword || !confirmPassword) {
         toast.error("All fields are required");
         return;
@@ -265,17 +264,21 @@ const UserProfile = () => {
                 <EditNoteIcon />
                 Edit Profile
               </button>
-              <button
-                onClick={() => setIsPasswordModalOpen(true)}
-                className="bg-gradient-to-r from-green-600 to-emerald-600 
+              {userData.google_verified ? (
+                <span></span>
+              ) : (
+                <button
+                  onClick={() => setIsPasswordModalOpen(true)}
+                  className="bg-gradient-to-r from-green-600 to-emerald-600 
              hover:from-green-700 hover:to-emerald-700 
              text-white font-bold px-6 py-3 rounded-2xl 
              shadow-2xl flex items-center gap-2 
              transform hover:scale-105 transition-all duration-300"
-              >
-                <KeyRound size={20} />
-                Change Password
-              </button>
+                >
+                  <KeyRound size={20} />
+                  Change Password
+                </button>
+              )}
             </div>
           </div>
 
@@ -290,7 +293,7 @@ const UserProfile = () => {
                     <div className="relative">
                       <img
                         src={
-                          userData.profile-picture ||
+                          userData.profile_picture ||
                           "https://i.pinimg.com/736x/de/0a/47/de0a470a4617bb6272ad32dea7c497ce.jpg"
                         }
                         alt={userData.first_name}

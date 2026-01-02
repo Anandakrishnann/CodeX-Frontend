@@ -393,7 +393,10 @@ const TutorProfile = () => {
                   <EditNoteIcon />
                   Edit Profile
                 </button>
-                <button
+                {userData.google_verified ? (
+                  <span></span>
+                ):(
+                  <button
                   onClick={() => setIsPasswordModalOpen(true)}
                   className="bg-gradient-to-r from-green-600 to-emerald-600 
              hover:from-green-700 hover:to-emerald-700 
@@ -404,6 +407,7 @@ const TutorProfile = () => {
                   <KeyRound size={20} />
                   Change Password
                 </button>
+                )}
               </div>
             </div>
 
@@ -498,7 +502,7 @@ const TutorProfile = () => {
                         <div className="flex justify-between text-sm">
                           <span className="text-gray-400">Price:</span>
                           <span className="text-emerald-400 font-bold">
-                            ₹{user.plan_details.price}
+                            ${user.plan_details.price}
                           </span>
                         </div>
                         <div className="flex justify-between text-sm">
@@ -598,7 +602,7 @@ const TutorProfile = () => {
                                               Price:
                                             </span>
                                             <span className="text-emerald-400 font-bold">
-                                              ₹{sub.plan.price}
+                                              ${sub.plan.price}
                                             </span>
                                           </div>
 

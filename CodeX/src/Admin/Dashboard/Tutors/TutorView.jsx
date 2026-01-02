@@ -300,7 +300,7 @@ const TutorView = () => {
                           <div className="flex justify-between text-sm">
                             <span className="text-gray-400">Price:</span>
                             <span className="text-emerald-400 font-bold">
-                              ₹{userData.plan_price}
+                              ${userData.plan_price}
                             </span>
                           </div>
                           <div className="flex justify-between text-sm">
