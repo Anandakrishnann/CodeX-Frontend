@@ -227,144 +227,135 @@ const PlatformWallet = () => {
 
             {/* Transactions Grid */}
             <div>
-              <h2 className="text-3xl font-extrabold text-white mb-6">
-                Recent Transactions
-              </h2>
-              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                {paginatedApps && paginatedApps.length > 0 ? (
-                  paginatedApps.map((transaction) => (
-                    <div
-                      key={transaction.id}
-                      className="group bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 border border-gray-200/50 transform hover:-translate-y-1 hover:scale-[1.02]"
-                    >
-                      <div className="h-2 w-full bg-gradient-to-r from-green-500 to-emerald-600 transition-all duration-300 group-hover:h-3"></div>
+  <h2 className="text-3xl font-extrabold text-white mb-6">
+    Recent Transactions
+  </h2>
 
-                      <div className="p-6">
-                        <div className="flex justify-between items-start mb-4">
-                          <div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-1">
-                              {transaction.user.name}
-                            </h3>
-                            <p className="text-gray-600 text-sm">
-                              {transaction.user.email}
-                            </p>
-                          </div>
-                          <span
-                            className={`text-xs font-semibold px-3 py-1 rounded-full ${
-                              transaction.transaction_type === "COURSE_PURCHASE"
-                                ? "bg-green-100 text-green-800"
-                                : "bg-blue-100 text-blue-800"
-                            }`}
-                          >
-                            {getTransactionLabel(transaction.transaction_type)}
-                          </span>
-                        </div>
+  <div className="overflow-x-auto bg-white rounded-2xl shadow-xl border border-gray-200">
+    <table className="min-w-full divide-y divide-gray-200">
+      <thead className="bg-gray-100">
+        <tr>
+          <th className="px-6 py-4 text-left text-sm font-bold text-gray-700">
+            Type
+          </th>
+          <th className="px-6 py-4 text-left text-sm font-bold text-gray-700">
+            Amount
+          </th>
+          <th className="px-6 py-4 text-left text-sm font-bold text-gray-700">
+            Tutor
+          </th>
+          <th className="px-6 py-4 text-left text-sm font-bold text-gray-700">
+            Date
+          </th>
+          <th className="px-6 py-4 text-left text-sm font-bold text-gray-700">
+            Action
+          </th>
+        </tr>
+      </thead>
 
-                        <div className="space-y-3 mb-4">
-                          <div className="flex items-center text-gray-700">
-                            <DollarSign
-                              size={18}
-                              className="mr-2 text-green-500"
-                            />
-                            <span className="font-medium text-gray-900">
-                              Amount:
-                            </span>
-                            <span className="ml-2 text-2xl font-bold text-green-600">
-                              ${transaction.amount}
-                            </span>
-                          </div>
+      <tbody className="divide-y divide-gray-200">
+        {paginatedApps && paginatedApps.length > 0 ? (
+          paginatedApps.map((transaction) => (
+            <tr
+              key={transaction.id}
+              className="hover:bg-gray-50 transition"
+            >
 
-                          {transaction.tutor && (
-                            <div className="flex items-center text-gray-700">
-                              <User size={18} className="mr-2 text-green-500" />
-                              <span className="font-medium text-gray-900">
-                                Tutor:
-                              </span>
-                              <span className="ml-2 text-gray-900">
-                                {transaction.tutor_name}
-                              </span>
-                            </div>
-                          )}
 
-                          <div className="flex items-center text-gray-600">
-                            <Calendar
-                              size={18}
-                              className="mr-2 text-green-500"
-                            />
-                            <span className="text-sm font-medium">
-                              {new Date(
-                                transaction.created_at
-                              ).toLocaleDateString("en-US", {
-                                day: "2-digit",
-                                month: "long",
-                                year: "numeric",
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              })}
-                            </span>
-                          </div>
-                        </div>
+              <td className="px-6 py-4">
+                <span
+                  className={`text-xs font-semibold px-3 py-1 rounded-full ${
+                    transaction.transaction_type === "COURSE_PURCHASE"
+                      ? "bg-green-100 text-green-800"
+                      : "bg-blue-100 text-blue-800"
+                  }`}
+                >
+                  {getTransactionLabel(transaction.transaction_type)}
+                </span>
+              </td>
 
-                        <div className="pt-4 border-t border-gray-200">
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs text-gray-500">
-                              Transaction ID: #{transaction.id}
-                            </span>
-                            {getTransactionIcon(transaction.transaction_type)}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="col-span-full text-center py-20">
-                    <DollarSign
-                      className="mx-auto mb-4 text-gray-600"
-                      size={80}
-                    />
-                    <p className="text-gray-400 text-2xl font-medium">
-                      No transactions found
-                    </p>
-                  </div>
+              <td className="px-6 py-4 font-bold text-green-600">
+                ${transaction.amount}
+              </td>
+
+              <td className="px-6 py-4 text-gray-800">
+                {transaction.tutor_name || "—"}
+              </td>
+
+              <td className="px-6 py-4 text-gray-600 text-sm">
+                {new Date(transaction.created_at).toLocaleDateString(
+                  "en-US",
+                  {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  }
                 )}
-              </div>
-              {totalPages > 1 && (
-            <div className="flex justify-center items-center gap-2 mt-10">
-              <button
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage((p) => p - 1)}
-                className="px-4 py-2 rounded-lg bg-white text-black disabled:opacity-40"
-              >
-                Prev
-              </button>
+              </td>
 
-              {[...Array(totalPages)].map((_, i) => {
-                const page = i + 1;
-                return (
-                  <button
-                    key={page}
-                    onClick={() => setCurrentPage(page)}
-                    className={`px-4 py-2 rounded-lg font-bold ${
-                      currentPage === page
-                        ? "bg-blue-600 text-white"
-                        : "bg-white text-black"
-                    }`}
-                  >
-                    {page}
-                  </button>
-                );
-              })}
+              <td className="px-6 py-4">
+                {getTransactionIcon(transaction.transaction_type)}
+              </td>
+            </tr>
+          ))
+        ) : (
+          <tr>
+            <td colSpan="7" className="text-center py-16">
+              <DollarSign
+                className="mx-auto mb-4 text-gray-400"
+                size={64}
+              />
+              <p className="text-gray-400 text-xl font-medium">
+                No transactions found
+              </p>
+            </td>
+          </tr>
+        )}
+      </tbody>
+    </table>
+  </div>
 
-              <button
-                disabled={currentPage === totalPages}
-                onClick={() => setCurrentPage((p) => p + 1)}
-                className="px-4 py-2 rounded-lg bg-white text-black disabled:opacity-40"
-              >
-                Next
-              </button>
-            </div>
-          )}
-            </div>
+  {/* Pagination */}
+  {totalPages > 1 && (
+    <div className="flex justify-center items-center gap-2 mt-10">
+      <button
+        disabled={currentPage === 1}
+        onClick={() => setCurrentPage((p) => p - 1)}
+        className="px-4 py-2 rounded-lg bg-white text-black disabled:opacity-40"
+      >
+        Prev
+      </button>
+
+      {[...Array(totalPages)].map((_, i) => {
+        const page = i + 1;
+        return (
+          <button
+            key={page}
+            onClick={() => setCurrentPage(page)}
+            className={`px-4 py-2 rounded-lg font-bold ${
+              currentPage === page
+                ? "bg-blue-600 text-white"
+                : "bg-white text-black"
+            }`}
+          >
+            {page}
+          </button>
+        );
+      })}
+
+      <button
+        disabled={currentPage === totalPages}
+        onClick={() => setCurrentPage((p) => p + 1)}
+        className="px-4 py-2 rounded-lg bg-white text-black disabled:opacity-40"
+      >
+        Next
+      </button>
+    </div>
+  )}
+</div>
+
           </div>
         </div>
       )}
