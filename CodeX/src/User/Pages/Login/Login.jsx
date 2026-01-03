@@ -36,7 +36,7 @@ const Login = () => {
 
   const fetchCourses = async () => {
     try {
-      const response = await userAxios.get("enrolled_courses/");
+      const response = await userAxios.get("enrolled-courses/");
       dispatch(setPurchasedCourses(response.data));
     } catch (error) {
       console.log(error || "Error While Loading Courses");
