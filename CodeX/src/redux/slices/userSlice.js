@@ -38,7 +38,7 @@ const userSlice = createSlice({
       state.categories = null;
     },
 
-    setPurchasedCourses: (state) => {
+    setPurchasedCourses: (state, action) => {
       state.purchasedCourses = action.payload;
     },
 

@@ -180,7 +180,6 @@ const Table = ({ datas, fucntions, columns, name }) => {
             </tbody>
           </table>
         </div>
-        {totalPages > 1 && (
             <div className="flex justify-center items-center gap-2 mt-10">
               <button
                 disabled={currentPage === 1}
@@ -215,7 +214,6 @@ const Table = ({ datas, fucntions, columns, name }) => {
                 Next
               </button>
             </div>
-          )}
       </div>
       {isModalOpen && selectedUser && (
         <EditUserModal

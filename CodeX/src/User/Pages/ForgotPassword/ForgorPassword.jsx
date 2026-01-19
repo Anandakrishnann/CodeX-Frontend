@@ -17,16 +17,21 @@ const ForgotPassword = () => {
         toast.error("Please Enter Valid Email");
         return;
       }
+
       setLoading(true);
       await userAxios.post(`forgot-password/${email}/`);
       toast.success("📧 Password reset email sent successfully!");
       setIsModalOpen(true);
     } catch (error) {
-      toast.error("❌ Failed to send password reset email. Please try again.");
+      const errorMessage =
+        error?.response?.data?.error ||
+        error?.response?.data?.message ||
+        "❌ Failed to send password reset email. Please try again.";
+
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
-    setIsModalOpen(true);
   };
 
   return (
@@ -35,39 +40,39 @@ const ForgotPassword = () => {
         <Loading />
       ) : (
         <>
-        <BackgroundAnimation/>
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="border border-green-500 p-8 rounded-lg w-full max-w-md shadow-lg font-serif">
-            <h2 className="text-2xl font-bold text-white text-center mb-6">
-              Forgot Password
-            </h2>
+          <BackgroundAnimation />
+          <div className="min-h-screen flex items-center justify-center">
+            <div className="border border-green-500 p-8 rounded-lg w-full max-w-md shadow-lg font-serif">
+              <h2 className="text-2xl font-bold text-white text-center mb-6">
+                Forgot Password
+              </h2>
 
-            <div className="space-y-4">
-              <div>
-                <h3 htmlFor="email" className="block text-white mb-1">
-                  Email
-                </h3>
-                <input
-                  type="email"
-                  id="email"
-                  placeholder="Enter your email" 
-                  className="w-full px-4 py-2 rounded-md bg-[#000000] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 border border-green-500"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
+              <div className="space-y-4">
+                <div>
+                  <h3 htmlFor="email" className="block text-white mb-1">
+                    Email
+                  </h3>
+                  <input
+                    type="email"
+                    id="email"
+                    placeholder="Enter your email"
+                    className="w-full px-4 py-2 rounded-md bg-[#000000] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 border border-green-500"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full py-3 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors duration-200 font-medium text-base disabled:bg-zinc-800 disabled:text-zinc-500 cursor-pointer"
+                  onClick={handleSubmit}
+                >
+                  Send Mail
+                </button>
               </div>
-
-              <button
-                type="submit"
-                className="w-full py-3 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors duration-200 font-medium text-base disabled:bg-zinc-800 disabled:text-zinc-500 cursor-pointer"
-                onClick={handleSubmit}
-              >
-                Send Mail
-              </button>
             </div>
           </div>
-        </div>
         </>
       )}
       {isModalOpen === true ? (

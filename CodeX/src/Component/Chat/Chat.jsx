@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { chatAxios } from "../../../axiosConfig";
+import { chatAxios, tutorAxios, userAxios } from "../../../axiosConfig";
 import {
   FaSearch,
   FaVideo,
@@ -22,6 +22,9 @@ const Chat = ({ currentUserId, tutorId }) => {
   const [selectedRoomId, setSelectedRoomId] = useState(null);
   const [showSidebar, setShowSidebar] = useState(true);
   const [currentUserName, setCurrentUserName] = useState("");
+  const [currentTutor, setCurrentTutor] = useState(null);
+
+  const wsBaseUrl = import.meta.env.VITE_API_WEBSOCKET_URL;
 
   const socketRef = useRef(null);
   const bottomRef = useRef(null);
@@ -43,11 +46,33 @@ const Chat = ({ currentUserId, tutorId }) => {
     setSelectedRoomId(room.id);
     setReceiverName(room.receiver_name);
     setShowSidebar(false);
+    // Clear currentTutor when selecting existing room - we'll use receiverName from room
+    setCurrentTutor(null);
   };
 
   const handleBackToSidebar = () => {
     setShowSidebar(true);
   };
+
+  const fetchInitialTutor = async () => {
+    try {
+      const response = await tutorAxios.get(`fetch-tutor/${tutorId}`);
+      setCurrentTutor(response.data);
+      const tutorName = response.data.first_name && response.data.last_name 
+        ? `${response.data.first_name} ${response.data.last_name}`
+        : response.data.first_name || response.data.username || "Tutor";
+      setReceiverName(tutorName);
+    } catch (error) {
+      toast.error("Error while fetching tutor");
+    }
+  };
+
+  // Fetch tutor only when tutorId is provided (new conversation)
+  useEffect(() => {
+    if (tutorId) {
+      fetchInitialTutor();
+    }
+  }, [tutorId]);
 
   /* -------------------- AUTO SCROLL -------------------- */
   useEffect(() => {
@@ -71,7 +96,7 @@ const Chat = ({ currentUserId, tutorId }) => {
     if (!roomId || socketRef.current) return;
 
     socketRef.current = new WebSocket(
-      `wss://api.codexlearning.online/ws/chatroom/${roomId}/`
+      `${import.meta.env.VITE_API_WEBSOCKET_URL}/ws/chatroom/${roomId}/`
     );
 
     socketRef.current.onmessage = () => {
@@ -124,6 +149,12 @@ const Chat = ({ currentUserId, tutorId }) => {
 
     try {
       if (!selectedRoomId) {
+        // First message - creating new room with tutorId
+        if (!tutorId) {
+          toast.error("No tutor selected");
+          return;
+        }
+
         const res = await chatAxios.post("send-first-message/", {
           tutor_id: tutorId,
           content: message,
@@ -131,6 +162,9 @@ const Chat = ({ currentUserId, tutorId }) => {
 
         setSelectedRoomId(res.data.room_id);
         setMessage("");
+        
+        // Refresh rooms after creating new room
+        await fetchRooms();
         return;
       }
 
@@ -169,6 +203,19 @@ const Chat = ({ currentUserId, tutorId }) => {
       socketRef.current = null;
     };
   }, [selectedRoomId]);
+
+  // Get display name for header
+  const getDisplayName = () => {
+    // If tutorId exists (new conversation), show fetched tutor name
+    if (tutorId && currentTutor) {
+      if (currentTutor.first_name && currentTutor.last_name) {
+        return `${currentTutor.first_name} ${currentTutor.last_name}`;
+      }
+      return currentTutor.first_name || currentTutor.username || "Tutor";
+    }
+    // Otherwise show receiver name from selected room
+    return receiverName;
+  };
 
   /* -------------------- RENDER -------------------- */
   return (
@@ -302,13 +349,13 @@ const Chat = ({ currentUserId, tutorId }) => {
               </button>
               <div className="relative">
                 <div className="w-10 h-10 md:w-14 md:h-14 bg-black text-white rounded-full flex items-center justify-center font-bold text-sm md:text-lg">
-                  {getInitials(receiverName)}
+                  {getInitials(getDisplayName())}
                 </div>
                 <div className="absolute -bottom-1 -right-1 w-3 h-3 md:w-5 md:h-5 bg-green-500 border-2 md:border-3 border-black rounded-full"></div>
               </div>
               <div>
                 <h3 className="text-lg md:text-2xl font-bold text-black">
-                  {receiverName}
+                  {getDisplayName()}
                 </h3>
                 <p className="text-xs md:text-sm text-green-500 flex items-center">
                   <span className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>

@@ -199,7 +199,7 @@ const Applications = () => {
               )}
             </div>
 
-            {totalPages > 1 && (
+
               <div className="flex justify-center gap-2 mt-10">
                 <button
                   disabled={currentPage === 1}
@@ -229,7 +229,6 @@ const Applications = () => {
                   Next
                 </button>
               </div>
-            )}
           </div>
         </div>
       )}
