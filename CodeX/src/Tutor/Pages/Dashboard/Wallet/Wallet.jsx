@@ -37,7 +37,11 @@ const TutorWallet = () => {
     amount: "",
   });
   const [loading, setLoading] = useState(false);
+  const [currentTransactionPage, setCurrentTransactionPage] = useState(1);
+  const [currentPayoutPage, setCurrentPayoutPage] = useState(1);
   const tutor = useSelector((state) => state.user.user);
+
+  const itemsPerPage = 6;
 
   console.log("payouts", payoutRequests);
 
@@ -45,6 +49,14 @@ const TutorWallet = () => {
     fetchWalletDashboard();
     fetchPayoutRequests();
   }, []);
+
+  useEffect(() => {
+    setCurrentTransactionPage(1);
+  }, [viewMode]);
+
+  useEffect(() => {
+    setCurrentPayoutPage(1);
+  }, [filter]);
 
   const fetchWalletDashboard = async () => {
     try {
@@ -212,6 +224,100 @@ const TutorWallet = () => {
     setIsRejected(rejected);
   }, [payoutRequests, filter]);
 
+  // Pagination calculations for transactions
+  const totalTransactionPages = Math.ceil(transactions.length / itemsPerPage);
+  const indexOfLastTransaction = currentTransactionPage * itemsPerPage;
+  const indexOfFirstTransaction = indexOfLastTransaction - itemsPerPage;
+  const currentTransactions = transactions.slice(indexOfFirstTransaction, indexOfLastTransaction);
+
+  // Pagination calculations for payouts
+  const totalPayoutPages = Math.ceil(filteredPayoutRequests.length / itemsPerPage);
+  const indexOfLastPayout = currentPayoutPage * itemsPerPage;
+  const indexOfFirstPayout = indexOfLastPayout - itemsPerPage;
+  const currentPayouts = filteredPayoutRequests.slice(indexOfFirstPayout, indexOfLastPayout);
+
+  const handleTransactionPageChange = (pageNumber) => {
+    setCurrentTransactionPage(pageNumber);
+    window.scrollTo({ top: 400, behavior: 'smooth' });
+  };
+
+  const handlePayoutPageChange = (pageNumber) => {
+    setCurrentPayoutPage(pageNumber);
+    window.scrollTo({ top: 400, behavior: 'smooth' });
+  };
+
+  const renderPagination = (currentPage, totalPages, onPageChange) => {
+    ;
+
+    return (
+      <div className="flex justify-center items-center gap-2 mt-8">
+        {/* Previous Button */}
+        <button
+          onClick={() => onPageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className={`px-4 py-2 rounded-lg font-semibold transition-all duration-300 ${
+            currentPage === 1
+              ? "bg-gray-700 text-gray-500 cursor-not-allowed"
+              : "bg-gray-800 text-white hover:bg-green-500 hover:text-white border-2 border-white"
+          }`}
+        >
+          Previous
+        </button>
+
+        {/* Page Numbers */}
+        {[...Array(totalPages)].map((_, index) => {
+          const pageNumber = index + 1;
+          
+          if (
+            pageNumber === 1 ||
+            pageNumber === totalPages ||
+            (pageNumber >= currentPage - 1 && pageNumber <= currentPage + 1)
+          ) {
+            return (
+              <button
+                key={pageNumber}
+                onClick={() => onPageChange(pageNumber)}
+                className={`px-4 py-2 rounded-lg font-semibold transition-all duration-300 ${
+                  currentPage === pageNumber
+                    ? "bg-white text-black shadow-lg scale-110"
+                    : "bg-gray-800 text-white hover:bg-green-500/50 border-2 border-white"
+                }`}
+              >
+                {pageNumber}
+              </button>
+            );
+          }
+          
+          if (
+            pageNumber === currentPage - 2 ||
+            pageNumber === currentPage + 2
+          ) {
+            return (
+              <span key={pageNumber} className="px-2 text-gray-500">
+                ...
+              </span>
+            );
+          }
+          
+          return null;
+        })}
+
+        {/* Next Button */}
+        <button
+          onClick={() => onPageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className={`px-4 py-2 rounded-lg font-semibold transition-all duration-300 ${
+            currentPage === totalPages
+              ? "bg-gray-700 text-gray-500 cursor-not-allowed"
+              : "bg-gray-800 text-white hover:bg-green-500 hover:text-white border-2 border-white"
+          }`}
+        >
+          Next
+        </button>
+      </div>
+    );
+  };
+
   return (
     <Layout page="Wallet">
       {loading ? (
@@ -362,9 +468,9 @@ const TutorWallet = () => {
             {/* Transactions/Payouts Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {viewMode === "transactions" ? (
-                // Display all transactions without filtering
-                transactions && transactions.length > 0 ? (
-                  transactions.map((transaction, index) => (
+                // Display paginated transactions
+                currentTransactions && currentTransactions.length > 0 ? (
+                  currentTransactions.map((transaction, index) => (
                     <div
                       key={index}
                       className="group bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 border border-gray-200/50 flex flex-col h-full transform hover:-translate-y-1 hover:scale-[1.02]"
@@ -435,9 +541,9 @@ const TutorWallet = () => {
                     </p>
                   </div>
                 )
-              ) : // Display filtered payout requests
-              filteredPayoutRequests && filteredPayoutRequests.length > 0 ? (
-                filteredPayoutRequests.map((payout, index) => (
+              ) : // Display paginated payout requests
+              currentPayouts && currentPayouts.length > 0 ? (
+                currentPayouts.map((payout, index) => (
                   <div
                     key={index}
                     className="group bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 border border-gray-200/50 flex flex-col h-full transform hover:-translate-y-1 hover:scale-[1.02]"
@@ -551,6 +657,12 @@ const TutorWallet = () => {
                 </div>
               )}
             </div>
+
+            {/* Pagination Controls */}
+            {viewMode === "transactions" 
+              ? renderPagination(currentTransactionPage, totalTransactionPages, handleTransactionPageChange)
+              : renderPagination(currentPayoutPage, totalPayoutPages, handlePayoutPageChange)
+            }
           </div>
 
           {/* Payout Modal */}
