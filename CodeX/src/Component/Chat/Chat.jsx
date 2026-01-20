@@ -63,7 +63,6 @@ const Chat = ({ currentUserId, tutorId }) => {
         : response.data.first_name || response.data.username || "Tutor";
       setReceiverName(tutorName);
     } catch (error) {
-      toast.error("Error while fetching tutor");
     }
   };
 
