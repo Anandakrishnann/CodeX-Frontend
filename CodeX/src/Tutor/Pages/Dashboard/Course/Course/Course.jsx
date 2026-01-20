@@ -105,7 +105,7 @@ const Course = () => {
       }
     };
     loadData();
-  }, [editFormData]);
+  }, [ editFormData]);
 
   const fetchCourses = async () => {
     try {
