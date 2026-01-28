@@ -297,8 +297,6 @@ const Course = () => {
 
           const response = await tutorAxios.post("create-course/", data);
 
-          toast.success("Course Added Successfully");
-          toast.success("Wait for the Admin Approval");
           setCourses((prevCourses) => [...prevCourses, response.data]);
           setFormData({});
           setSelectedCategory(null);
@@ -353,6 +351,37 @@ const Course = () => {
     dispatch(setCourseId(id));
     navigate("/tutor/course/modules");
   };
+
+  const courseCompleteClick = async (e, course_id) => {
+    e.preventDefault();
+    
+    const result = await Swal.fire({
+      title: "Complete Course?",
+      text: "Are you sure you want to complete this course?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Change",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      await tutorAxios.post(`complete-course/${course_id}/`);
+      toast.success("Course Completed Successfully");
+      toast.success("Wait for the admin to approve");
+      fetchCourses();
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error(
+        error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Course not Found"
+      );
+    }
+  }
 
   const handleCourseAnalytics = (id) => {
     dispatch(setCourseId(id));
@@ -438,21 +467,21 @@ const Course = () => {
             </div>
           </div>
           {/* Filter Buttons */}
-          <div className="mb-10">
+          <div className="mb-10 flex flex-wrap items-center gap-3">
             <button
-              className="text-2xl ml-6 mr-24 text-black bg-white p-1 rounded-md font-extrabold m-3 border border-white hover:text-white hover:bg-black hover:border-white hover:border-2"
-              style={{ width: "180px" }}
+              className="text-2xl text-black bg-white p-1 rounded-md font-extrabold border border-white hover:text-white hover:bg-black hover:border-white hover:border-2 w-full sm:w-auto sm:ml-6 sm:mr-16"
+              style={{ maxWidth: "200px" }}
               onClick={handleModal}
             >
               Create Course
             </button>
 
             <button
-              className={`text-xl font-bold px-5 py-2 ml-20 mt-2 ${
+              className={`text-xl font-bold px-5 py-2 ${
                 filter === "pending"
                   ? "bg-white text-black"
                   : "bg-black text-white"
-              } rounded-lg border-2 border-white hover:bg-black hover:text-white transition-all duration-300`}
+              } rounded-lg border-2 border-white hover:bg-black hover:text-white transition-all duration-300 w-full sm:w-auto`}
               onClick={() => setFilter("pending")}
             >
               Pending{" "}
@@ -461,11 +490,11 @@ const Course = () => {
                 </span>
             </button>
             <button
-              className={`text-xl font-bold px-5 py-2 ml-2 mt-2 ${
+              className={`text-xl font-bold px-5 py-2 ${
                 filter === "accepted"
                   ? "bg-white text-black"
                   : "bg-black text-white"
-              } rounded-lg border-2 border-white hover:bg-black hover:text-white transition-all duration-300`}
+              } rounded-lg border-2 border-white hover:bg-black hover:text-white transition-all duration-300 w-full sm:w-auto`}
               onClick={() => setFilter("accepted")}
             >
               Accepted{" "}
@@ -474,11 +503,11 @@ const Course = () => {
                 </span>
             </button>
             <button
-              className={`text-xl font-bold px-5 py-2 ml-2 mt-2 ${
+              className={`text-xl font-bold px-5 py-2 ${
                 filter === "rejected"
                   ? "bg-white text-black"
                   : "bg-black text-white"
-              } rounded-lg border-2 border-white hover:bg-black hover:text-white transition-all duration-300`}
+              } rounded-lg border-2 border-white hover:bg-black hover:text-white transition-all duration-300 w-full sm:w-auto`}
               onClick={() => setFilter("rejected")}
             >
               Rejected{" "}
@@ -555,12 +584,32 @@ const Course = () => {
 
                       <div className="flex items-center space-x-2">
                         {course.status === "pending" ? (
+                          <>
                           <button
                             className="p-2 text-white bg-blue-500 rounded-lg hover:bg-white hover:text-blue-500 hover:border hover:border-blue-500 transition"
                             onClick={() => handleEditModal(course.id)}
                           >
-                            Pending <PendingActionsIcon fontSize="small" />
+                           <PendingActionsIcon fontSize="small" />
                           </button>
+                          <Tooltip title="Details" arrow>
+                              <button
+                                className="p-2 text-white bg-blue-500 rounded-lg hover:bg-white hover:text-blue-500 hover:border hover:border-blue-500 transition"
+                                onClick={() => handleCourseClick(course.id)}
+                              >
+                                <VisibilityIcon fontSize="small" />
+                              </button>
+                            </Tooltip>
+                              {course.is_complete === true ? (
+                                <span></span>
+                              ):(
+                                <button
+                                className="p-2 text-white bg-green-500 rounded-lg hover:bg-white hover:text-green-500 hover:border hover:border-green-500 transition"
+                                onClick={(e) => courseCompleteClick(e, course.id)}
+                              >
+                               Complete Course
+                              </button>
+                              )}
+                          </>
                         ) : course.status === "rejected" ? (
                           <button
                             className="p-2 text-white bg-red-500 rounded-lg hover:bg-white hover:text-blue-500 hover:border hover:border-blue-500 transition"

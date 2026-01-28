@@ -14,8 +14,11 @@ import { userAxios } from "../../../../../axiosConfig";
 import { toast } from "react-toastify";
 import { logoutUser } from "@/redux/slices/userSlice";
 
-const Sidebar = ({ activeItem, setActiveItem }) => {
-  const [open, setOpen] = useState(false);
+const Sidebar = ({ activeItem, setActiveItem, sidebarOpen, setSidebarOpen }) => {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = typeof setSidebarOpen === "function";
+  const open = isControlled ? !!sidebarOpen : internalOpen;
+  const setOpen = isControlled ? setSidebarOpen : setInternalOpen;
   const navigate = useNavigate();
   const dispatch = useDispatch();
 

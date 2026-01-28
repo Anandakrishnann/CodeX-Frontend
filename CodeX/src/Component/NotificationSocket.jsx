@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
 
 function buildWebSocketUrl() {
   const VITE_API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
@@ -20,10 +21,17 @@ const NotificationSocket = ({ onMessage }) => {
   const reconnectDelay = 3000;
   const onMessageRef = useRef(onMessage);
   const processedIdsRef = useRef(new Set());
+  const role = useSelector((state) => state.user.role);
+  const roleRef = useRef(role);
+  const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
 
   useEffect(() => {
     onMessageRef.current = onMessage;
   }, [onMessage]);
+
+  useEffect(() => {
+    roleRef.current = role;
+  }, [role]);
 
   const connect = (url) => {
     if (socketRef.current) {
@@ -53,7 +61,29 @@ const NotificationSocket = ({ onMessage }) => {
           }
           
           onMessageRef.current?.(data);
-          toast.info("New notification");
+          
+          // Show toast only for user and tutor, not admin
+          const currentRole = roleRef.current;
+          if (currentRole === "user" || currentRole === "tutor") {
+            const notificationMessage =
+              data?.message ||
+              data?.title ||
+              data?.notification?.message ||
+              data?.notification?.title ||
+              data?.data?.message ||
+              data?.data?.title ||
+              "New notification";
+
+            toast.info(String(notificationMessage), {
+              position: "top-right",
+              autoClose: 3000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              style: { zIndex: 99999 },
+            });
+          }
         } catch (err) {
         }
       };
@@ -74,7 +104,7 @@ const NotificationSocket = ({ onMessage }) => {
 
       socketRef.current = socket;
     } catch (err) {
-      // Error creating WebSocket
+      // Error creating WebSocket 
     }
   };
 

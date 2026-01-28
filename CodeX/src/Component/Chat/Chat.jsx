@@ -113,10 +113,7 @@ const Chat = ({ currentUserId, tutorId }) => {
     if (messages.length > previousMessagesCount.current && previousMessagesCount.current > 0) {
       const latestMessage = messages[messages.length - 1];
       if (latestMessage.sender_id !== currentUserId) {
-        toast.info(`New message from ${receiverName}`, {
-          position: "top-right",
-          autoClose: 3000,
-        });
+       
       }
     }
     previousMessagesCount.current = messages.length;

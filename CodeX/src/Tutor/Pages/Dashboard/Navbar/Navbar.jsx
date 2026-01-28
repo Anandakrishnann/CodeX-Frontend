@@ -62,7 +62,7 @@ const Navbar = ({ setSidebarOpen }) => {
     >
       <div className="flex items-center">
         <button className="lg:hidden mr-4" onClick={() => setSidebarOpen(true)}>
-          <Menu className="h-6 w-6" />
+          <Menu className="h-6 w-6 text-white" />
         </button>
         <h1 className="text-xl font-semibold"></h1>
       </div>

@@ -234,19 +234,19 @@ const AdminCourseOverview = () => {
                       </div>
                     </div>
                   </div>
-                  <div>
+                  <div className="mt-4 flex flex-wrap items-center gap-3">
                     <button
-                      className="text-xl font-bold px-5 py-2 ml-2 mt-2 mr-40 bg-white text-black rounded-lg border-2 border-white hover:bg-black hover:text-white transition-all duration-300"
+                      className="text-xl font-bold px-5 py-2 bg-white text-black rounded-lg border-2 border-white hover:bg-black hover:text-white transition-all duration-300 w-full sm:w-auto sm:ml-2 sm:mr-10 lg:mr-40"
                       onClick={() => navigate(-1)}
                     >
                       Back
                     </button>
                     <button
-                      className={`text-xl font-bold px-5 py-2 ml-20 mt-2 ${
+                      className={`text-xl font-bold px-5 py-2 ${
                         filter === "pending"
                           ? "bg-white text-black"
                           : "bg-black text-white"
-                      } rounded-lg border-2 border-white hover:bg-black hover:text-white transition-all duration-300`}
+                      } rounded-lg border-2 border-white hover:bg-black hover:text-white transition-all duration-300 w-full sm:w-auto`}
                       onClick={() => setFilter("pending")}
                     >
                       Pending{" "}
@@ -255,11 +255,11 @@ const AdminCourseOverview = () => {
                       </span>
                     </button>
                     <button
-                      className={`text-xl font-bold px-5 py-2 ml-2 mt-2 ${
+                      className={`text-xl font-bold px-5 py-2 ${
                         filter === "accepted"
                           ? "bg-white text-black"
                           : "bg-black text-white"
-                      } rounded-lg border-2 border-white hover:bg-black hover:text-white transition-all duration-300`}
+                      } rounded-lg border-2 border-white hover:bg-black hover:text-white transition-all duration-300 w-full sm:w-auto`}
                       onClick={() => setFilter("accepted")}
                     >
                       Accepted{" "}
@@ -268,11 +268,11 @@ const AdminCourseOverview = () => {
                       </span>
                     </button>
                     <button
-                      className={`text-xl font-bold px-5 py-2 ml-2 mt-2 ${
+                      className={`text-xl font-bold px-5 py-2 ${
                         filter === "rejected"
                           ? "bg-white text-black"
                           : "bg-black text-white"
-                      } rounded-lg border-2 border-white hover:bg-black hover:text-white transition-all duration-300`}
+                      } rounded-lg border-2 border-white hover:bg-black hover:text-white transition-all duration-300 w-full sm:w-auto`}
                       onClick={() => setFilter("rejected")}
                     >
                       Rejected{" "}

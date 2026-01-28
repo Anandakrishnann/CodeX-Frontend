@@ -359,9 +359,18 @@ const Modules = () => {
                               Rejected <DeleteForeverIcon fontSize="small" />
                             </button>
                           ) : module.status === "pending" ? (
+                            
+                            <>
                             <button className="p-2 text-white bg-blue-500 rounded-lg hover:bg-white hover:text-blue-500 hover:border hover:border-blue-500 transition flex items-center gap-1">
                               Pending <PendingActionsIcon fontSize="small" />
                             </button>
+                            <button
+                                className="p-2 text-white bg-blue-500 rounded-lg hover:bg-white hover:text-blue-500 hover:border hover:border-blue-500 transition"
+                                onClick={() => handleCourseClick(module.id)}
+                              >
+                                <VisibilityIcon fontSize="small" />
+                              </button>
+                            </>
                           ) : (
                             <>
                               <button
