@@ -296,6 +296,7 @@ const Course = () => {
           console.log("data  ", data);
 
           const response = await tutorAxios.post("create-course/", data);
+          toast.info("Add Modules for the course")
 
           setCourses((prevCourses) => [...prevCourses, response.data]);
           setFormData({});

@@ -114,7 +114,6 @@ const Modules = () => {
 
         const response = await tutorAxios.post("create-module/", data);
         toast.success("Module Added Successfully Create Lessons");
-        toast.success("Wait for the Admin Approval");
         setModules((prevModules) => [...prevModules, response.data]);
         setFormData([{}]);
         setIsModalOpen(false);

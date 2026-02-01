@@ -188,7 +188,6 @@ const Lessons = () => {
       });
 
       toast.success("Lesson Added Successfully");
-      toast.success("Wait for Admin Approval");
       fetchLessons();
 
       // Reset form state
