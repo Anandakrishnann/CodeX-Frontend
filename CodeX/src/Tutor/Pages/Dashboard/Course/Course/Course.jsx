@@ -518,9 +518,16 @@ const Course = () => {
           </div>
 
           {/* Course Cards Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredLessons &&
-              filteredLessons.map((course, index) => (
+          {filteredLessons && filteredLessons.length === 0 ? (
+            <div className="flex items-center justify-center py-16">
+              <p className="text-xl font-semibold text-gray-200 text-center">
+                No courses created or active yet.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filteredLessons &&
+                filteredLessons.map((course, index) => (
                 <div
                   key={index}
                   className="group bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 border border-gray-200/50 flex flex-col h-full transform hover:-translate-y-1 hover:scale-[1.02]"
@@ -689,7 +696,8 @@ const Course = () => {
                   </div>
                 </div>
               ))}
-          </div>
+            </div>
+          )}
         </div>
 
         {isModalOpen && (

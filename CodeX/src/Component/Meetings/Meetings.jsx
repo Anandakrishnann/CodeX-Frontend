@@ -147,7 +147,7 @@ export default function TutorMeeting() {
     const diffInMinutes = (selectedDateTime - currentTime) / (1000 * 60);
 
     if (diffInMinutes < 15) {
-      toast.error("Meeting time must be at least 30 minutes from now");
+      toast.error("Meeting time must be at least 15 minutes from now");
       return;
     }
 

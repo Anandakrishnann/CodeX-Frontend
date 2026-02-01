@@ -171,29 +171,8 @@ const Overview = () => {
     setShowRejectModal(false);
     setRejectionReason("");
   };
+  
 
-  const getStatusConfig = (status) => {
-    const configs = {
-      pending: {
-        gradient: "from-amber-400 to-orange-500",
-        icon: <AccessTimeIcon className="w-5 h-5" />,
-        text: "Pending Review",
-      },
-      verified: {
-        gradient: "from-emerald-400 to-green-600",
-        icon: <TaskAltIcon className="w-5 h-5" />,
-        text: "Verified",
-      },
-      rejected: {
-        gradient: "from-red-400 to-rose-600",
-        icon: <CancelIcon className="w-5 h-5" />,
-        text: "Rejected",
-      },
-    };
-    return configs[status] || configs.pending;
-  };
-
-  const statusConfig = getStatusConfig(userData.status);
 
   return (
     <Layout>
@@ -212,14 +191,34 @@ const Overview = () => {
                   Review and manage tutor application
                 </p>
               </div>
-              <div
-                className={`bg-gradient-to-r ${statusConfig.gradient} px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-3 transform hover:scale-105 transition-all duration-300`}
+              {userData.status === "pending" ? (
+                <div
+                className={`bg-gradient-to-r from-amber-400 to-orange-500 px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-3 transform hover:scale-105 transition-all duration-300`}
               >
-                {statusConfig.icon}
+                <AccessTimeIcon className="w-5 h-5" />,
                 <span className="text-white font-bold text-lg">
-                  {statusConfig.text}
+                  {userData.status}
                 </span>
               </div>
+              ): userData.status === "rejected" ? (
+                <div
+                className={`bg-gradient-to-r from-red-400 to-rose-600 px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-3 transform hover:scale-105 transition-all duration-300`}
+              >
+                <CancelIcon className="w-5 h-5" />
+                <span className="text-white font-bold text-lg">
+                  {userData.status}
+                </span>
+              </div>
+              ):(
+                <div
+                className={`bg-gradient-to-r from-emerald-400 to-green-600 px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-3 transform hover:scale-105 transition-all duration-300`}
+              >
+                <TaskAltIcon className="w-5 h-5" />
+                <span className="text-white font-bold text-lg">
+                  {userData.status}
+                </span>
+              </div>
+              )}
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
